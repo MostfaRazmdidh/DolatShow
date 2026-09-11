@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.nosuchstudio.rtltmpro": {
+      "version": "file:I:/Mostfa/avestatech/une/Assate/RTLTMPro-master/UPMPackage",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "com.unity.2d.animation": {
       "version": "15.1.0",
       "depth": 0,
