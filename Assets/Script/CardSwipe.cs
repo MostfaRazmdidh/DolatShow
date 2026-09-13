@@ -32,6 +32,13 @@ public class CardSwipe : MonoBehaviour
     // کارت بعدی رو از دیتابیس می‌گیره و متنش رو نمایش می‌ده
     void LoadNextCard()
     {
+        if (GameStats.Instance.IsGameOver)
+        {
+            Debug.Log("بازی تموم شد — کارت جدیدی نمایش داده نمی‌شه.");
+            gameObject.SetActive(false);
+            return;
+        }
+
         currentCard = CardDatabase.Instance.GetNextCard();
 
         if (currentCard == null)
@@ -97,6 +104,8 @@ public class CardSwipe : MonoBehaviour
 
         string flag = approved ? currentCard.setFlagOnApprove : currentCard.setFlagOnReject;
         CardDatabase.Instance.SetFlag(flag);
+
+        GameStats.Instance.AdvanceMonth();
     }
 
     Vector3 GetMouseWorldPosition()
