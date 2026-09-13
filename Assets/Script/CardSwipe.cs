@@ -15,6 +15,10 @@ public class CardSwipe : MonoBehaviour
     [SerializeField] private float returnSpeed = 10f;
     [SerializeField] private float flyOffDistance = 15f;
 
+    [Header("پیش‌نمایش اثر تصمیم (اختیاری)")]
+    [SerializeField] private StatBarUI[] statBars; // هر ۴ نوار وضعیت رو اینجا بریز
+    [SerializeField] private float hintThreshold = 0.3f; // از این فاصله به بعد پیش‌نمایش ظاهر می‌شه
+
     private Vector3 startPosition;
     private Vector3 dragOffset;
     private bool isDragging = false;
@@ -71,12 +75,44 @@ public class CardSwipe : MonoBehaviour
 
         float xOffset = transform.position.x - startPosition.x;
         transform.rotation = Quaternion.Euler(0, 0, -xOffset * rotationFactor);
+
+        UpdateHints(xOffset);
+    }
+
+    // بر اساس جهت و فاصله‌ی کشیدن، نشون می‌ده اگه همین الان رها کنی چه اثری رخ می‌ده
+    void UpdateHints(float xOffset)
+    {
+        if (statBars == null || currentCard == null) return;
+
+        if (Mathf.Abs(xOffset) < hintThreshold)
+        {
+            HideAllHints();
+            return;
+        }
+
+        var effects = xOffset > 0 ? currentCard.approveEffects : currentCard.rejectEffects;
+
+        foreach (var bar in statBars)
+        {
+            var effect = effects.Find(e => e.type == bar.StatType);
+            if (effect != null)
+                bar.ShowHint(effect.amount);
+            else
+                bar.HideHint();
+        }
+    }
+
+    void HideAllHints()
+    {
+        if (statBars == null) return;
+        foreach (var bar in statBars) bar.HideHint();
     }
 
     void OnMouseUp()
     {
         if (!isDragging) return;
         isDragging = false;
+        HideAllHints();
 
         float xOffset = transform.position.x - startPosition.x;
 
