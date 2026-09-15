@@ -14,10 +14,15 @@ public class StatBarUI : MonoBehaviour
 
     public GameStats.StatType StatType => statType;
 
+    private TMP_Text valueText; // عدد فعلی شاخص، روی خودِ اسلایدر — با کد ساخته می‌شه، نیازی به وایرینگ دستی نداره
+
     void Start()
     {
+        CreateValueText();
+
         // مقدار اولیه رو بگیر و نمایش بده
         slider.value = GameStats.Instance.GetStat(statType);
+        UpdateValueText(slider.value);
 
         // از این به بعد هر تغییری رخ بده خودکار آپدیت می‌شه
         GameStats.Instance.OnStatChanged += HandleStatChanged;
@@ -34,6 +39,30 @@ public class StatBarUI : MonoBehaviour
     {
         if (changedType != statType) return; // این نوار فقط به شاخص خودش واکنش نشون می‌ده
         slider.value = newValue;
+        UpdateValueText(newValue);
+    }
+
+    // عدد شاخص رو روی خودِ نوار (روی اسلایدر) نشون می‌ده — فقط عدده، نیازی به RTL نداره
+    void CreateValueText()
+    {
+        GameObject textGO = new GameObject("ValueText", typeof(RectTransform));
+        textGO.transform.SetParent(slider.transform, false);
+        RectTransform rect = textGO.GetComponent<RectTransform>();
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+
+        valueText = textGO.AddComponent<TextMeshProUGUI>();
+        valueText.alignment = TextAlignmentOptions.Center;
+        valueText.fontSize = 22;
+        valueText.color = Color.black;
+        valueText.raycastTarget = false;
+    }
+
+    void UpdateValueText(float value)
+    {
+        if (valueText != null) valueText.text = ((int)value).ToString();
     }
 
     // موقع کشیدن کارت صدا زده می‌شه تا نشون بده اگه همین الان رها کنی، این شاخص چقدر تغییر می‌کنه

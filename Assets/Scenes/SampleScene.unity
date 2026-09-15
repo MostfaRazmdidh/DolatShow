@@ -2727,6 +2727,8 @@ GameObject:
   - component: {fileID: 2076496393}
   - component: {fileID: 2076496395}
   - component: {fileID: 289047299}
+  - component: {fileID: 332788337}
+  - component: {fileID: 977779186}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -3341,6 +3343,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3741499eb9048cea7fb05589a7f9425, type: 3}
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::GameOverUI
+  persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
+  targetCanvas: {fileID: 1964030836}
+  cardSwipe: {fileID: 718640286}
+--- !u!114 &332788337
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076496392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fd3a7c59a87457bb174a6354d9d9b9b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuUI
+  persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
+  targetCanvas: {fileID: 1964030836}
+  cardSwipe: {fileID: 718640286}
+--- !u!114 &977779186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076496392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12f9c137d1e943389adef1b24f15462b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::YearDisplayUI
   persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
   targetCanvas: {fileID: 1964030836}
 --- !u!1660057539 &9223372036854775807

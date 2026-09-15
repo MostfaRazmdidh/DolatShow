@@ -30,6 +30,11 @@ public class CardSwipe : MonoBehaviour
     {
         startPosition = transform.position;
         mainCamera = Camera.main;
+    }
+
+    // با «بازی جدید» یا «ادامه‌ی بازی» از منوی اصلی صدا زده می‌شه
+    public void BeginGame()
+    {
         LoadNextCard();
     }
 
@@ -142,6 +147,12 @@ public class CardSwipe : MonoBehaviour
         CardDatabase.Instance.SetFlag(flag);
 
         GameStats.Instance.AdvanceMonth();
+
+        // بعد از هر تصمیم، وضعیت رو خودکار ذخیره می‌کنیم تا «ادامه‌ی بازی» درست کار کنه
+        if (GameStats.Instance.IsGameOver)
+            SaveSystem.DeleteSave();
+        else
+            SaveSystem.Save(GameStats.Instance.CreateSaveData());
     }
 
     Vector3 GetMouseWorldPosition()
