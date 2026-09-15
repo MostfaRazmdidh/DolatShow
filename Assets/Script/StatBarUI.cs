@@ -15,12 +15,17 @@ public class StatBarUI : MonoBehaviour
     [Header("آیکون شاخص (اختیاری)")]
     [SerializeField] private Sprite icon;
 
+    [Header("ظاهر نوار (تم چرمی/طلایی)")]
+    [SerializeField] private Color trackColor = new Color(0.18f, 0.12f, 0.07f, 0.95f); // چرم تیره
+    [SerializeField] private Color fillColor = new Color(0.79f, 0.62f, 0.24f, 1f);      // طلایی
+
     public GameStats.StatType StatType => statType;
 
     private TMP_Text valueText; // عدد فعلی شاخص، روی خودِ اسلایدر — با کد ساخته می‌شه، نیازی به وایرینگ دستی نداره
 
     void Start()
     {
+        StyleSlider();
         CreateValueText();
         CreateIcon();
 
@@ -30,6 +35,30 @@ public class StatBarUI : MonoBehaviour
 
         // از این به بعد هر تغییری رخ بده خودکار آپدیت می‌شه
         GameStats.Instance.OnStatChanged += HandleStatChanged;
+    }
+
+    // اسلایدر پیش‌فرض یونیتی سفید و زشته؛ اینجا با کد رنگ چرمی/طلایی بهش می‌دیم و دستگیره‌ی
+    // اضافی رو مخفی می‌کنیم (چون این اسلایدر فقط نمایشیه و تعاملی نیست)
+    void StyleSlider()
+    {
+        // track (پس‌زمینه‌ی خالی نوار)
+        Transform bg = slider.transform.Find("Background");
+        if (bg != null)
+        {
+            Image bgImg = bg.GetComponent<Image>();
+            if (bgImg != null) bgImg.color = trackColor;
+        }
+
+        // fill (بخش پر شده)
+        if (slider.fillRect != null)
+        {
+            Image fillImg = slider.fillRect.GetComponent<Image>();
+            if (fillImg != null) fillImg.color = fillColor;
+        }
+
+        // دستگیره‌ی اسلایدر رو مخفی کن — این نوار فقط نمایشیه
+        if (slider.handleRect != null)
+            slider.handleRect.gameObject.SetActive(false);
     }
 
     void OnDestroy()
@@ -60,7 +89,10 @@ public class StatBarUI : MonoBehaviour
         valueText = textGO.AddComponent<TextMeshProUGUI>();
         valueText.alignment = TextAlignmentOptions.Center;
         valueText.fontSize = 22;
-        valueText.color = Color.black;
+        valueText.color = Color.white;
+        valueText.fontStyle = FontStyles.Bold;
+        valueText.outlineWidth = 0.2f;
+        valueText.outlineColor = Color.black;
         valueText.raycastTarget = false;
     }
 
