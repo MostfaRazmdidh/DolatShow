@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.nosuchstudio.rtltmpro": {
-      "version": "file:C:/Users/AvectaTehe/Documents/Project/Assat/RTLTMPro-master/UPMPackage",
+      "version": "file:C:/Users/linuxcomputer/Documents/Project/RTLTMPro-master/UPMPackage",
       "depth": 0,
       "source": "local",
       "dependencies": {}

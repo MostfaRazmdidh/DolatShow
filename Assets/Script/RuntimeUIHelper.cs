@@ -55,4 +55,30 @@ public static class RuntimeUIHelper
 
         return buttonGO;
     }
+
+    // یه Image ساده (بدون دکمه) — برای پس‌زمینه، لوگو، آیکون شاخص‌ها و... که خودشون متن/برچسب دارن
+    // stretch=true یعنی دقیقاً پر کن (برای پس‌زمینه‌ها)، false یعنی نسبت تصویر رو حفظ کن (برای لوگو/آیکون)
+    public static GameObject CreateImage(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Sprite sprite, bool stretch = false)
+    {
+        GameObject imageGO = new GameObject(name, typeof(RectTransform));
+        imageGO.transform.SetParent(parent, false);
+        RectTransform rect = imageGO.GetComponent<RectTransform>();
+        rect.anchorMin = anchorMin;
+        rect.anchorMax = anchorMax;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+
+        Image img = imageGO.AddComponent<Image>();
+        img.sprite = sprite;
+        img.preserveAspect = !stretch;
+        return imageGO;
+    }
+
+    // دکمه‌ای که خودِ عکسش برچسب/متن رو داره (مثل «شروع بازی» یا «بازگشت» که از قبل رو تصویر نوشته شده)
+    public static GameObject CreateImageButton(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Sprite sprite, UnityEngine.Events.UnityAction onClick)
+    {
+        GameObject buttonGO = CreateImage(parent, name, anchorMin, anchorMax, sprite);
+        buttonGO.AddComponent<Button>().onClick.AddListener(onClick);
+        return buttonGO;
+    }
 }
