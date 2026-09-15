@@ -104,4 +104,54 @@ public class GameStats : MonoBehaviour
             OnGameWon?.Invoke();
         }
     }
+
+    // برای «بازی جدید» — همه‌چیز رو به مقدار اولیه برمی‌گردونه
+    public void ResetState()
+    {
+        Budget = startValue;
+        Popularity = startValue;
+        Security = startValue;
+        Diplomacy = startValue;
+        CurrentMonth = 1;
+        IsGameOver = false;
+
+        NotifyAllStatsChanged();
+        OnMonthChanged?.Invoke(CurrentMonth);
+    }
+
+    // برای دکمه‌ی «ادامه‌ی بازی» — وضعیت ذخیره‌شده رو برمی‌گردونه
+    public void LoadFromSaveData(SaveData data)
+    {
+        Budget = data.budget;
+        Popularity = data.popularity;
+        Security = data.security;
+        Diplomacy = data.diplomacy;
+        CurrentMonth = data.currentMonth;
+        IsGameOver = false;
+
+        NotifyAllStatsChanged();
+        OnMonthChanged?.Invoke(CurrentMonth);
+    }
+
+    // یه عکس‌لحظه‌ای از وضعیت فعلی برای ذخیره‌سازی می‌سازه
+    public SaveData CreateSaveData()
+    {
+        return new SaveData
+        {
+            budget = Budget,
+            popularity = Popularity,
+            security = Security,
+            diplomacy = Diplomacy,
+            currentMonth = CurrentMonth,
+            activeFlags = CardDatabase.Instance.GetActiveFlags()
+        };
+    }
+
+    void NotifyAllStatsChanged()
+    {
+        OnStatChanged?.Invoke(StatType.Budget, Budget);
+        OnStatChanged?.Invoke(StatType.Popularity, Popularity);
+        OnStatChanged?.Invoke(StatType.Security, Security);
+        OnStatChanged?.Invoke(StatType.Diplomacy, Diplomacy);
+    }
 }

@@ -32,6 +32,22 @@ public class CardDatabase : MonoBehaviour
         if (!string.IsNullOrEmpty(flag)) activeFlags.Add(flag);
     }
 
+    // برای ذخیره‌سازی — لیستی از پرچم‌های فعال فعلی
+    public List<string> GetActiveFlags() => activeFlags.ToList();
+
+    // برای «ادامه‌ی بازی» — پرچم‌های ذخیره‌شده رو برمی‌گردونه
+    public void SetActiveFlags(List<string> flags)
+    {
+        activeFlags = new HashSet<string>(flags);
+    }
+
+    // برای «بازی جدید» — همه‌چیز رو پاک می‌کنه
+    public void ClearFlags()
+    {
+        activeFlags.Clear();
+        recentCardIds.Clear();
+    }
+
     // متد اصلی — یه کارت مناسب برای نمایش بعدی برمی‌گردونه، یا null اگه چیزی نمونده
     public CardData GetNextCard()
     {
