@@ -21,6 +21,7 @@ public class GameStats : MonoBehaviour
     public int CurrentMonth { get; private set; } = 1;
     public int TotalMonths => totalMonths;
     public bool IsGameOver { get; private set; } = false;
+    public bool AdUsedThisRun { get; private set; } = false; // فعلاً فقط تو حافظه‌ست، تو سیو ذخیره نمی‌شه
 
     // هر بار شاخصی تغییر کنه صدا زده می‌شه — UI بهش گوش می‌ده تا خودکار آپدیت بشه
     public event Action<StatType, int> OnStatChanged;
@@ -114,9 +115,30 @@ public class GameStats : MonoBehaviour
         Diplomacy = startValue;
         CurrentMonth = 1;
         IsGameOver = false;
+        AdUsedThisRun = false;
 
         NotifyAllStatsChanged();
         OnMonthChanged?.Invoke(CurrentMonth);
+    }
+
+    // شبیه‌سازی اثر تبلیغ جایزه‌دار (فعلاً بدون SDK واقعی) — طبق سند طراحی،
+    // شاخص بحرانی رو به ۳۰ برمی‌گردونه و بازی رو ادامه می‌ده. حداکثر ۱ بار در هر بازی.
+    public void RecoverStatViaAd(StatType type, bool hitMax)
+    {
+        if (AdUsedThisRun) return;
+
+        const int recoveredValue = 30;
+        switch (type)
+        {
+            case StatType.Budget: Budget = recoveredValue; break;
+            case StatType.Popularity: Popularity = recoveredValue; break;
+            case StatType.Security: Security = recoveredValue; break;
+            case StatType.Diplomacy: Diplomacy = recoveredValue; break;
+        }
+
+        IsGameOver = false;
+        AdUsedThisRun = true;
+        OnStatChanged?.Invoke(type, recoveredValue);
     }
 
     // برای دکمه‌ی «ادامه‌ی بازی» — وضعیت ذخیره‌شده رو برمی‌گردونه
