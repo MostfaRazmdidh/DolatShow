@@ -436,6 +436,7 @@ MonoBehaviour:
   statType: 0
   slider: {fileID: 163289116}
   hintText: {fileID: 814085525}
+  icon: {fileID: -3122057824612373263, guid: d844e6d476c1c7b4691773e03eb1bdea, type: 3}
 --- !u!114 &163289116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1674,6 +1675,7 @@ MonoBehaviour:
   statType: 3
   slider: {fileID: 1077233622}
   hintText: {fileID: 906075495}
+  icon: {fileID: 7865482556308654359, guid: 49cff2bc9fbe2484ebd77b263b96858a, type: 3}
 --- !u!114 &1077233622
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1781,6 +1783,7 @@ MonoBehaviour:
   statType: 2
   slider: {fileID: 1095585443}
   hintText: {fileID: 329463124}
+  icon: {fileID: 5982966662427526503, guid: af86a573e0791e24ea59fa2b5092c333, type: 3}
 --- !u!114 &1095585443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2225,6 +2228,7 @@ MonoBehaviour:
   statType: 1
   slider: {fileID: 1732478015}
   hintText: {fileID: 352642747}
+  icon: {fileID: 6027132739694103897, guid: 3aad64315c7ba244cb154987ea116e90, type: 3}
 --- !u!114 &1732478015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2729,6 +2733,7 @@ GameObject:
   - component: {fileID: 289047299}
   - component: {fileID: 332788337}
   - component: {fileID: 977779186}
+  - component: {fileID: 227793616}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -3346,6 +3351,7 @@ MonoBehaviour:
   persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
   targetCanvas: {fileID: 1964030836}
   cardSwipe: {fileID: 718640286}
+  backButtonSprite: {fileID: -1121216386, guid: 3827320648d98d8419f39c6e8cd0eb48, type: 3}
 --- !u!114 &332788337
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3361,6 +3367,9 @@ MonoBehaviour:
   persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
   targetCanvas: {fileID: 1964030836}
   cardSwipe: {fileID: 718640286}
+  backgroundSprite: {fileID: -6695950386315148514, guid: 39e9389fb69f7d0449b905440f103462, type: 3}
+  logoSprite: {fileID: 5799068408523222823, guid: 9a4c833302fbf0b40b8c7b97c8b80e85, type: 3}
+  newGameButtonSprite: {fileID: 2596368825315108945, guid: 3827320648d98d8419f39c6e8cd0eb48, type: 3}
 --- !u!114 &977779186
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3375,6 +3384,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::YearDisplayUI
   persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
   targetCanvas: {fileID: 1964030836}
+--- !u!114 &227793616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2076496392}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9982082cb827429d80e5a6f63cea9d52, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::BackgroundUI
+  targetCanvas: {fileID: 1964030836}
+  backgroundSprite: {fileID: -609270806610097142, guid: 75f0e0a67402e1e44becd71109a710c3, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

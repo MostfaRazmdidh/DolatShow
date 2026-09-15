@@ -12,6 +12,9 @@ public class StatBarUI : MonoBehaviour
     [Header("پیش‌نمایش اثر تصمیم (اختیاری — موقع کشیدن کارت نشون داده می‌شه)")]
     [SerializeField] private TMP_Text hintText; // یه متن کوچیک کنار نوار، مثلاً +۱۵ یا -۲۰ (نیازی به RTL نداره چون فقط عدد و علامته)
 
+    [Header("آیکون شاخص (اختیاری)")]
+    [SerializeField] private Sprite icon;
+
     public GameStats.StatType StatType => statType;
 
     private TMP_Text valueText; // عدد فعلی شاخص، روی خودِ اسلایدر — با کد ساخته می‌شه، نیازی به وایرینگ دستی نداره
@@ -19,6 +22,7 @@ public class StatBarUI : MonoBehaviour
     void Start()
     {
         CreateValueText();
+        CreateIcon();
 
         // مقدار اولیه رو بگیر و نمایش بده
         slider.value = GameStats.Instance.GetStat(statType);
@@ -63,6 +67,25 @@ public class StatBarUI : MonoBehaviour
     void UpdateValueText(float value)
     {
         if (valueText != null) valueText.text = ((int)value).ToString();
+    }
+
+    // آیکون شاخص رو کنار (سمت چپ) خودِ نوار می‌ذاره — اگه آیکونی وصل نشده باشه کاری نمی‌کنه
+    void CreateIcon()
+    {
+        if (icon == null) return;
+
+        GameObject iconGO = new GameObject("Icon", typeof(RectTransform));
+        iconGO.transform.SetParent(transform, false);
+        RectTransform rect = iconGO.GetComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0, 0.5f);
+        rect.anchorMax = new Vector2(0, 0.5f);
+        rect.pivot = new Vector2(1, 0.5f);
+        rect.anchoredPosition = new Vector2(-8, 0);
+        rect.sizeDelta = new Vector2(48, 48);
+
+        Image img = iconGO.AddComponent<Image>();
+        img.sprite = icon;
+        img.preserveAspect = true;
     }
 
     // موقع کشیدن کارت صدا زده می‌شه تا نشون بده اگه همین الان رها کنی، این شاخص چقدر تغییر می‌کنه

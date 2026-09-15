@@ -1,5 +1,4 @@
 using UnityEngine;
-using RTLTMPro;
 using TMPro;
 using System.Collections.Generic;
 
@@ -15,6 +14,11 @@ public class MainMenuUI : MonoBehaviour
 
     [Header("آبجکت کارت (برای شروع بازی بعد از بستن منو)")]
     [SerializeField] private CardSwipe cardSwipe;
+
+    [Header("تصاویر (اختیاری — اگه خالی بمونن از رنگ ساده استفاده می‌شه)")]
+    [SerializeField] private Sprite backgroundSprite;
+    [SerializeField] private Sprite logoSprite;
+    [SerializeField] private Sprite newGameButtonSprite;
 
     private GameObject panel;
 
@@ -45,12 +49,19 @@ public class MainMenuUI : MonoBehaviour
 
     void BuildUI()
     {
-        panel = RuntimeUIHelper.CreateFullScreenPanel(targetCanvas.transform, "MainMenuPanel", new Color(0.05f, 0.05f, 0.08f, 1f));
+        panel = backgroundSprite != null
+            ? RuntimeUIHelper.CreateImage(targetCanvas.transform, "MainMenuPanel", Vector2.zero, Vector2.one, backgroundSprite, stretch: true)
+            : RuntimeUIHelper.CreateFullScreenPanel(targetCanvas.transform, "MainMenuPanel", new Color(0.05f, 0.05f, 0.08f, 1f));
 
-        RTLTextMeshPro title = RuntimeUIHelper.CreateRTLText(panel.transform, "Title", new Vector2(0.1f, 0.65f), new Vector2(0.9f, 0.85f), 48, persianFont);
-        title.text = "دولت شو";
+        if (logoSprite != null)
+            RuntimeUIHelper.CreateImage(panel.transform, "Logo", new Vector2(0.15f, 0.68f), new Vector2(0.85f, 0.9f), logoSprite);
+        else
+            RuntimeUIHelper.CreateRTLText(panel.transform, "Title", new Vector2(0.1f, 0.65f), new Vector2(0.9f, 0.85f), 48, persianFont).text = "دولت شو";
 
-        RuntimeUIHelper.CreateButton(panel.transform, "NewGameButton", new Vector2(0.25f, 0.42f), new Vector2(0.75f, 0.52f), "بازی جدید", persianFont, new Color(0.2f, 0.45f, 0.6f, 1f), StartNewGame);
+        if (newGameButtonSprite != null)
+            RuntimeUIHelper.CreateImageButton(panel.transform, "NewGameButton", new Vector2(0.25f, 0.42f), new Vector2(0.75f, 0.54f), newGameButtonSprite, StartNewGame);
+        else
+            RuntimeUIHelper.CreateButton(panel.transform, "NewGameButton", new Vector2(0.25f, 0.42f), new Vector2(0.75f, 0.52f), "بازی جدید", persianFont, new Color(0.2f, 0.45f, 0.6f, 1f), StartNewGame);
 
         GameObject continueButton = RuntimeUIHelper.CreateButton(panel.transform, "ContinueButton", new Vector2(0.25f, 0.28f), new Vector2(0.75f, 0.38f), "ادامه‌ی بازی", persianFont, new Color(0.2f, 0.45f, 0.6f, 1f), ContinueGame);
         continueButton.SetActive(SaveSystem.HasSave());

@@ -18,6 +18,9 @@ public class GameOverUI : MonoBehaviour
     [Header("آبجکت کارت (برای ادامه‌ی بازی بعد از دیدن تبلیغ)")]
     [SerializeField] private CardSwipe cardSwipe;
 
+    [Header("تصویر دکمه‌ی بازگشت (اختیاری — اگه خالی بمونه از رنگ ساده استفاده می‌شه)")]
+    [SerializeField] private Sprite backButtonSprite;
+
     private GameObject panel;
     private GameObject adButton;
     private RTLTextMeshPro messageText;
@@ -112,7 +115,10 @@ public class GameOverUI : MonoBehaviour
 
         adButton = RuntimeUIHelper.CreateButton(panel.transform, "WatchAdButton", new Vector2(0.3f, 0.3f), new Vector2(0.7f, 0.4f), "دیدن تبلیغ و ادامه", persianFont, new Color(0.6f, 0.5f, 0.15f, 1f), WatchAdAndContinue);
 
-        RuntimeUIHelper.CreateButton(panel.transform, "BackToMenuButton", new Vector2(0.3f, 0.15f), new Vector2(0.7f, 0.25f), "بازگشت به منو", persianFont, new Color(0.2f, 0.55f, 0.25f, 1f), BackToMenu);
+        if (backButtonSprite != null)
+            RuntimeUIHelper.CreateImageButton(panel.transform, "BackToMenuButton", new Vector2(0.3f, 0.15f), new Vector2(0.7f, 0.25f), backButtonSprite, BackToMenu);
+        else
+            RuntimeUIHelper.CreateButton(panel.transform, "BackToMenuButton", new Vector2(0.3f, 0.15f), new Vector2(0.7f, 0.25f), "بازگشت به منو", persianFont, new Color(0.2f, 0.55f, 0.25f, 1f), BackToMenu);
 
         panel.SetActive(false);
     }
