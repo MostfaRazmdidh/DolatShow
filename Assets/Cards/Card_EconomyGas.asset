@@ -23,7 +23,7 @@ MonoBehaviour:
   - type: 1
     amount: 10
   - type: 0
-    amount: -100
+    amount: -15
   rejectEffects:
   - type: 1
     amount: -15
