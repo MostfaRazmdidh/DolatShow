@@ -545,6 +545,28 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: ButtonAssets_6
+      rect:
+        serializedVersion: 2
+        x: 366
+        y: 578
+        width: 293
+        height: 169
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5960359c51214eb4c97664e18cfc0d14
+      internalID: 601128256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -573,6 +595,7 @@ TextureImporter:
       ButtonAssets_3: 8282628853041003050
       ButtonAssets_4: -2683235536969594576
       ButtonAssets_5: 5373632614395416914
+      ButtonAssets_6: 601128256
       ButtonAssets_7: 191512579
       ButtonAssets_8: 1542210183
       ButtonAssets_9: 2059946146
