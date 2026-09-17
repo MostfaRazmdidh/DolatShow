@@ -92,6 +92,7 @@
 - `advisorText` و `bodyText` (نوع RTLTextMeshPro) باید تو Inspector به دو تا متن زیر Canvas داخل کارت وصل بشن
 - `statBars` (آرایه‌ی ۴ تایی از StatBarUI) — موقع کشیدن کارت (`OnMouseDrag`)، بر اساس جهت کشیدن (راست=approveEffects، چپ=rejectEffects) به هر نوار می‌گه چه اثری روش میاد؛ اگه فاصله‌ی کشیدن کمتر از `hintThreshold` باشه یا رها بشه، پیش‌نمایش‌ها مخفی می‌شن
 - **دیگه تو `Start()` خودکار کارت لود نمی‌کنه** — منتظر می‌مونه `BeginGame()` از `MainMenuUI` صدا زده بشه (تا وقتی منوی اصلی بسته نشده، بازی شروع نمی‌شه)
+- **`EnsureTextRendersAboveCard()`**: چون Card cover یه SpriteRenderer ماته (sortingOrder=۰) و Canvasِ متنِ کارت هم پیش‌فرض sortingOrder=۰ داشت، کارت روی متن می‌افتاد و متن دیده نمی‌شد. این متد موقع Start، Canvasِ متن رو `overrideSorting=true` و `sortingOrder = cardOrder+1` می‌کنه تا متن همیشه روی کارت رندر بشه.
 
 ### StatBarUI.cs — روی هر Slider نوار وضعیت
 - `statType` (کدوم شاخص) و `slider` (کامپوننت UI Slider) تو Inspector ست می‌شه
