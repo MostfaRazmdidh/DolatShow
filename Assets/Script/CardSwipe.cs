@@ -60,7 +60,7 @@ public class CardSwipe : MonoBehaviour
 
     // دکمه‌ی راست‌کلیک روی کامپوننت (تو حالت Edit) — چیدمان متن رو یه‌بار روی صحنه اعمال می‌کنه
     // تا بعدش بتونی autoConfigureCardText رو خاموش کنی و خودت دستی تنظیمش کنی بدون اینکه Play بازنویسیش کنه.
-    [ContextMenu("اعمال چیدمان متن کارت روی صحنه")]
+    [UnityEngine.ContextMenu("اعمال چیدمان متن کارت روی صحنه")]
     void ApplyCardTextLayoutInEditor()
     {
         ConfigureCardText();
