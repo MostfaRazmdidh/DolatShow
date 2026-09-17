@@ -19,7 +19,11 @@ public class CardSwipe : MonoBehaviour
     [Tooltip("روشن: سوایپ راست = تایید (بله)، چپ = رد (خیر). خاموش: برعکس.")]
     [SerializeField] private bool swipeRightMeansApprove = true;
 
-    [Header("چیدمان متن کارت (تو Play با کد اعمال می‌شه — از همین‌جا تنظیم کن)")]
+    [Header("چیدمان متن کارت")]
+    [Tooltip("روشن: کد موقع Start چیدمان متن رو از روی مقادیر پایین اعمال می‌کنه. اگه می‌خوای خودت دستی " +
+        "متن رو تو صحنه تنظیم کنی، این رو خاموش کن تا Play دیگه روش ننویسه (اول یه‌بار از راست‌کلیکِ " +
+        "کامپوننت «اعمال چیدمان متن کارت» رو بزن تا مقدار اولیه‌ی درست رو بگیری).")]
+    [SerializeField] private bool autoConfigureCardText = true;
     [SerializeField] private Color cardTextColor = new Color(0.96f, 0.90f, 0.78f); // کرمِ روشن
     [Tooltip("پهنای ناحیه‌ی متن نسبت به کارت — کمترش کنی، متن از لبه‌ها بیشتر فاصله می‌گیره")]
     [SerializeField, Range(0.3f, 1f)] private float textWidthFraction = 0.7f;
@@ -50,8 +54,16 @@ public class CardSwipe : MonoBehaviour
         startPosition = transform.position;
         mainCamera = Camera.main;
         FitColliderToCard();
-        ConfigureCardText();
+        if (autoConfigureCardText) ConfigureCardText();
         EnsureTextRendersAboveCard();
+    }
+
+    // دکمه‌ی راست‌کلیک روی کامپوننت (تو حالت Edit) — چیدمان متن رو یه‌بار روی صحنه اعمال می‌کنه
+    // تا بعدش بتونی autoConfigureCardText رو خاموش کنی و خودت دستی تنظیمش کنی بدون اینکه Play بازنویسیش کنه.
+    [ContextMenu("اعمال چیدمان متن کارت روی صحنه")]
+    void ApplyCardTextLayoutInEditor()
+    {
+        ConfigureCardText();
     }
 
     // متن‌های کارت (اسم مشاور + متن تصمیم) رنگ مشکی و اندازه‌ی میکروسکوپی داشتن (fontSize ۰.۳-۰.۵
