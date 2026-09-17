@@ -14,6 +14,10 @@ public class StatBarUI : MonoBehaviour
 
     [Header("آیکون شاخص (اختیاری)")]
     [SerializeField] private Sprite icon;
+    [Tooltip("اندازه‌ی آیکون (پیکسل). بزرگ‌ترش کنی آیکون درشت‌تر می‌شه.")]
+    [SerializeField] private float iconSize = 90f;
+    [Tooltip("جابه‌جایی آیکون نسبت به لبه‌ی چپِ نوار")]
+    [SerializeField] private Vector2 iconOffset = new Vector2(-8f, 0f);
 
     [Header("ظاهر نوار (تم چرمی/طلایی)")]
     [SerializeField] private Color trackColor = new Color(0.18f, 0.12f, 0.07f, 0.95f); // چرم تیره
@@ -112,8 +116,8 @@ public class StatBarUI : MonoBehaviour
         rect.anchorMin = new Vector2(0, 0.5f);
         rect.anchorMax = new Vector2(0, 0.5f);
         rect.pivot = new Vector2(1, 0.5f);
-        rect.anchoredPosition = new Vector2(-8, 0);
-        rect.sizeDelta = new Vector2(48, 48);
+        rect.anchoredPosition = iconOffset;
+        rect.sizeDelta = new Vector2(iconSize, iconSize);
 
         Image img = iconGO.AddComponent<Image>();
         img.sprite = icon;
