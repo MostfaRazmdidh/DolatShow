@@ -1,9 +1,10 @@
 using UnityEngine;
+using UnityEngine.UI;
 using RTLTMPro;
 using TMPro;
 
-// متن بالای صفحه که هم سالِ ریاست‌جمهوری و هم ماهِ جاری رو نشون می‌ده
-// (سال اول = ماه ۱ تا ۱۲، سال دوم = ۱۳ تا ۲۴، ...) و ماه رو ماه‌به‌ماه می‌شمره
+// سال و ماهِ جاریِ ریاست‌جمهوری رو نشون می‌ده، داخل یه باکس (تصویر History) پایینِ صفحه.
+// (سال اول = ماه ۱ تا ۱۲، ...) و ماه رو ماه‌به‌ماه می‌شمره.
 public class YearDisplayUI : MonoBehaviour
 {
     [Header("فونت فارسی")]
@@ -11,6 +12,17 @@ public class YearDisplayUI : MonoBehaviour
 
     [Header("Canvas اصلی صحنه (همونی که نوارهای وضعیت زیرشن)")]
     [SerializeField] private Canvas targetCanvas;
+
+    [Header("باکس تاریخ (تصویر History) پایینِ صفحه")]
+    [SerializeField] private Sprite boxSprite;
+    [Tooltip("فاصله‌ی باکس از پایینِ صفحه (پیکسل)")]
+    [SerializeField] private float bottomMargin = 120f;
+    [Tooltip("اندازه‌ی باکس (پیکسل)")]
+    [SerializeField] private Vector2 boxSize = new Vector2(760f, 200f);
+    [Tooltip("اندازه‌ی فونتِ متن داخل باکس")]
+    [SerializeField] private float fontSize = 34f;
+    [Tooltip("رنگ متن")]
+    [SerializeField] private Color textColor = new Color(0.96f, 0.90f, 0.78f);
 
     private static readonly string[] yearNames = { "سال اول", "سال دوم", "سال سوم", "سال چهارم" };
     private static readonly string[] monthNames =
@@ -23,11 +35,26 @@ public class YearDisplayUI : MonoBehaviour
 
     void Start()
     {
-        yearText = RuntimeUIHelper.CreateRTLText(targetCanvas.transform, "YearText", new Vector2(0.2f, 0.9f), new Vector2(0.8f, 0.98f), 30, persianFont);
-        yearText.color = Color.white;
+        // باکس، پایین-وسطِ صفحه
+        GameObject box = new GameObject("DateBox", typeof(RectTransform));
+        box.transform.SetParent(targetCanvas.transform, false);
+        RectTransform boxRT = box.GetComponent<RectTransform>();
+        boxRT.anchorMin = boxRT.anchorMax = new Vector2(0.5f, 0f); // پایین-وسط
+        boxRT.pivot = new Vector2(0.5f, 0f);
+        boxRT.anchoredPosition = new Vector2(0f, bottomMargin);
+        boxRT.sizeDelta = boxSize;
+
+        if (boxSprite != null)
+        {
+            Image img = box.AddComponent<Image>();
+            img.sprite = boxSprite;
+            img.preserveAspect = true;
+        }
+
+        // متن، وسطِ باکس
+        yearText = RuntimeUIHelper.CreateRTLText(box.transform, "YearText", Vector2.zero, Vector2.one, fontSize, persianFont);
+        yearText.color = textColor;
         yearText.fontStyle = FontStyles.Bold;
-        yearText.outlineWidth = 0.2f;
-        yearText.outlineColor = Color.black;
 
         UpdateDisplay(GameStats.Instance.CurrentMonth);
         GameStats.Instance.OnMonthChanged += UpdateDisplay;

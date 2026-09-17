@@ -2089,6 +2089,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::YearDisplayUI
   persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
   targetCanvas: {fileID: 1964030836}
+  boxSprite: {fileID: 320218474723957359, guid: 6e0ad40e9ce14b44c83cb2df027e460f, type: 3}
+  bottomMargin: 120
+  boxSize: {x: 760, y: 200}
+  fontSize: 34
+  textColor: {r: 0.96, g: 0.9, b: 0.78, a: 1}
 --- !u!1 &1077233619
 GameObject:
   m_ObjectHideFlags: 0

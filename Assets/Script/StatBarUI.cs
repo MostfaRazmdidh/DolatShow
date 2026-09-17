@@ -15,9 +15,9 @@ public class StatBarUI : MonoBehaviour
     [Header("آیکون شاخص (اختیاری)")]
     [SerializeField] private Sprite icon;
     [Tooltip("اندازه‌ی آیکون (پیکسل). بزرگ‌ترش کنی آیکون درشت‌تر می‌شه.")]
-    [SerializeField] private float iconSize = 90f;
-    [Tooltip("جابه‌جایی آیکون نسبت به لبه‌ی چپِ نوار")]
-    [SerializeField] private Vector2 iconOffset = new Vector2(-8f, 0f);
+    [SerializeField] private float iconSize = 150f;
+    [Tooltip("جابه‌جایی آیکون نسبت به وسطِ زیرِ نوار (y منفی = پایین‌تر)")]
+    [SerializeField] private Vector2 iconOffset = new Vector2(0f, -10f);
 
     [Header("ظاهر نوار (تم چرمی/طلایی)")]
     [SerializeField] private Color trackColor = new Color(0.18f, 0.12f, 0.07f, 0.95f); // چرم تیره
@@ -113,9 +113,9 @@ public class StatBarUI : MonoBehaviour
         GameObject iconGO = new GameObject("Icon", typeof(RectTransform));
         iconGO.transform.SetParent(transform, false);
         RectTransform rect = iconGO.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0, 0.5f);
-        rect.anchorMax = new Vector2(0, 0.5f);
-        rect.pivot = new Vector2(1, 0.5f);
+        rect.anchorMin = new Vector2(0.5f, 0f); // وسط-پایینِ نوار
+        rect.anchorMax = new Vector2(0.5f, 0f);
+        rect.pivot = new Vector2(0.5f, 1f);     // آیکون از زیرِ نوار آویزون می‌شه
         rect.anchoredPosition = iconOffset;
         rect.sizeDelta = new Vector2(iconSize, iconSize);
 
