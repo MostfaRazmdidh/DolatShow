@@ -56,6 +56,14 @@ public class CardSwipe : MonoBehaviour
     [SerializeField] private StatBarUI[] statBars; // هر ۴ نوار وضعیت رو اینجا بریز
     [SerializeField] private float hintThreshold = 0.3f; // از این فاصله به بعد پیش‌نمایش ظاهر می‌شه
 
+    [Header("افکت صوتیِ تصمیم (پوشه‌ی Assets/Sound)")]
+    [Tooltip("صدای «بله» — وقتی کارت به سمتِ تایید کشیده و رها می‌شه (yesEffect)")]
+    [SerializeField] private AudioClip approveClip;
+    [Tooltip("صدای «خیر» — وقتی کارت به سمتِ رد کشیده و رها می‌شه (noEffect)")]
+    [SerializeField] private AudioClip rejectClip;
+    [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
+    private AudioSource audioSource;
+
     private Vector3 startPosition;
     private Vector3 dragOffset;
     private bool isDragging = false;
@@ -71,6 +79,12 @@ public class CardSwipe : MonoBehaviour
     {
         startPosition = transform.position;
         mainCamera = Camera.main;
+
+        // یه AudioSource برای پخشِ افکت‌های صوتی — اگه رو کارت نبود، با کد اضافه می‌شه (نیازی به وایرینگ نیست)
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+
         FitColliderToCard();
         if (autoConfigureCardText) ConfigureCardText();
         EnsureTextRendersAboveCard();
@@ -356,6 +370,7 @@ public class CardSwipe : MonoBehaviour
             bool draggedRight = xOffset > 0;      // کارت به کدوم سمت کشیده شد
             bool approved = IsApprove(xOffset);   // اون سمت یعنی تایید یا رد
             decided = true;
+            PlayDecisionSound(approved);          // صدای بله/خیر
             ApplyCardEffects(approved);
             StartCoroutine(FlyOffScreen(draggedRight)); // کارت به سمتی که کشیده شد پرت می‌شه
         }
@@ -363,6 +378,13 @@ public class CardSwipe : MonoBehaviour
         {
             StartCoroutine(ReturnToCenter());
         }
+    }
+
+    // صدای مناسبِ تصمیم رو پخش می‌کنه: تایید = approveClip (بله)، رد = rejectClip (خیر)
+    void PlayDecisionSound(bool approved)
+    {
+        AudioClip clip = approved ? approveClip : rejectClip;
+        if (clip != null && audioSource != null) audioSource.PlayOneShot(clip, sfxVolume);
     }
 
     // بر اساس گزینه‌ی swipeRightMeansApprove مشخص می‌کنه سوایپ به این جهت یعنی تایید یا رد
