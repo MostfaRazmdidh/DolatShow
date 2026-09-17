@@ -31,7 +31,54 @@ public class CardSwipe : MonoBehaviour
         startPosition = transform.position;
         mainCamera = Camera.main;
         FitColliderToCard();
+        ConfigureCardText();
         EnsureTextRendersAboveCard();
+    }
+
+    // متن‌های کارت (اسم مشاور + متن تصمیم) رنگ مشکی و اندازه‌ی میکروسکوپی داشتن (fontSize ۰.۳-۰.۵
+    // روی یه Canvasِ ۳۰۰×۴۰۰ که با اسکیل‌های تودرتو کوچیک شده بود) — عملاً نامرئی. اینجا Canvasِ متن و
+    // خودِ متن‌ها رو بر اساس اندازه‌ی واقعیِ اسپرایت کارت از نو و تمیز می‌چینیم و رنگ رو روشن می‌کنیم.
+    void ConfigureCardText()
+    {
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr == null || sr.sprite == null || advisorText == null || bodyText == null) return;
+
+        Vector2 cardSize = sr.sprite.bounds.size; // واحدهای محلیِ کارت، مثلاً 10.86 × 14.48
+
+        // Canvasِ متن رو دقیقاً هم‌اندازه‌ی صفحه‌ی کارت کن (نسبت ۱:۱ با فضای محلیِ کارت)
+        Canvas textCanvas = advisorText.GetComponentInParent<Canvas>();
+        if (textCanvas != null)
+        {
+            RectTransform canvasRT = textCanvas.GetComponent<RectTransform>();
+            canvasRT.localScale = Vector3.one;
+            canvasRT.sizeDelta = cardSize;
+            canvasRT.anchoredPosition = Vector2.zero;
+        }
+
+        Color cream = new Color(0.96f, 0.90f, 0.78f); // کرمِ روشن، خوانا روی چرم تیره
+
+        // اسم مشاور — بالای کارت
+        StyleCardText(advisorText, new Vector2(0f, cardSize.y * 0.30f),
+            new Vector2(cardSize.x * 0.82f, cardSize.y * 0.14f), cardSize.y * 0.055f, cream);
+
+        // متن تصمیم — وسط کارت، بزرگ‌تر و چندخطی
+        StyleCardText(bodyText, new Vector2(0f, -cardSize.y * 0.02f),
+            new Vector2(cardSize.x * 0.82f, cardSize.y * 0.5f), cardSize.y * 0.045f, cream);
+    }
+
+    void StyleCardText(RTLTextMeshPro t, Vector2 pos, Vector2 size, float maxFontSize, Color color)
+    {
+        RectTransform rt = t.rectTransform;
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = pos;
+        rt.sizeDelta = size;
+
+        t.alignment = TMPro.TextAlignmentOptions.Center;
+        t.enableAutoSizing = true;
+        t.fontSizeMin = 0.05f;
+        t.fontSizeMax = maxFontSize;
+        t.color = color;
     }
 
     // Collider کارت تو صحنه فقط ۱×۱ واحد بود، ولی خودِ کارت خیلی بزرگ‌تره — برای همین بیشترِ

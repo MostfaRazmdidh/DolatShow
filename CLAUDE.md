@@ -92,7 +92,9 @@
 - `advisorText` و `bodyText` (نوع RTLTextMeshPro) باید تو Inspector به دو تا متن زیر Canvas داخل کارت وصل بشن
 - `statBars` (آرایه‌ی ۴ تایی از StatBarUI) — موقع کشیدن کارت (`OnMouseDrag`)، بر اساس جهت کشیدن (راست=approveEffects، چپ=rejectEffects) به هر نوار می‌گه چه اثری روش میاد؛ اگه فاصله‌ی کشیدن کمتر از `hintThreshold` باشه یا رها بشه، پیش‌نمایش‌ها مخفی می‌شن
 - **دیگه تو `Start()` خودکار کارت لود نمی‌کنه** — منتظر می‌مونه `BeginGame()` از `MainMenuUI` صدا زده بشه (تا وقتی منوی اصلی بسته نشده، بازی شروع نمی‌شه)
-- **`EnsureTextRendersAboveCard()`**: چون Card cover یه SpriteRenderer ماته (sortingOrder=۰) و Canvasِ متنِ کارت هم پیش‌فرض sortingOrder=۰ داشت، کارت روی متن می‌افتاد و متن دیده نمی‌شد. این متد موقع Start، Canvasِ متن رو `overrideSorting=true` و `sortingOrder = cardOrder+1` می‌کنه تا متن همیشه روی کارت رندر بشه.
+- **`FitColliderToCard()`**: BoxCollider2D کارت تو صحنه فقط ۱×۱ واحد بود ولی خودِ کارت بزرگ‌تره؛ این متد Collider رو هم‌اندازه‌ی اسپرایت کارت می‌کنه تا کل کارت سوایپ بشه.
+- **`EnsureTextRendersAboveCard()`**: چون Card cover یه SpriteRenderer ماته (sortingOrder=۰) و Canvasِ متنِ کارت هم پیش‌فرض sortingOrder=۰ داشت، کارت روی متن می‌افتاد. این متد Canvasِ متن رو `overrideSorting=true` و sortingOrder بالاتر می‌کنه.
+- **`ConfigureCardText()`**: متن‌های کارت تو صحنه رنگ مشکی و fontSize میکروسکوپی (۰.۳-۰.۵ روی Canvasِ ۳۰۰×۴۰۰ با اسکیل تودرتو) داشتن → نامرئی. این متد موقع Start، Canvasِ متن و خودِ AdvisorText/BodyText رو بر اساس اندازه‌ی واقعیِ اسپرایت کارت از نو می‌چینه (سایز، موقعیت، auto-size فونت) و رنگ رو کرمِ روشن می‌کنه. **پس اندازه/موقعیت/رنگ متن کارت الان با کد کنترل می‌شه، نه از Inspector** — اگه خواستی تغییرش بدی، تو این متد عوض کن.
 
 ### StatBarUI.cs — روی هر Slider نوار وضعیت
 - `statType` (کدوم شاخص) و `slider` (کامپوننت UI Slider) تو Inspector ست می‌شه
