@@ -20,13 +20,13 @@ public class StatBarUI : MonoBehaviour
     [SerializeField] private float nameFontSize = 50f;
     [Tooltip("رنگ اسم شاخص")]
     [SerializeField] private Color nameColor = new Color(0.96f, 0.90f, 0.78f);
-    [Tooltip("فاصله‌ی اسم از پایینِ نوار (پیکسل، تو دنیای صفحه)")]
-    [SerializeField] private float nameGap = 45f;
+    [Tooltip("فاصله‌ی اسم از بالای نوار (پیکسل). چون بالای همه‌ی نوارها هم‌تراز است، با این مقدارِ ثابت " +
+        "اسمِ همه‌ی نوارها هم‌ترازِ هم می‌شه — حتی اگه طولِ نوارها فرق داشته باشه.")]
+    [SerializeField] private float nameDropFromTop = 380f;
     [Tooltip("اندازه‌ی جعبه‌ی متنِ اسم شاخص")]
     [SerializeField] private Vector2 nameBoxSize = new Vector2(260f, 80f);
 
-    [Header("ظاهر نوار (تم چرمی/طلایی)")]
-    [SerializeField] private Color trackColor = new Color(0.18f, 0.12f, 0.07f, 0.95f); // چرم تیره
+    [Header("ظاهر نوار (رنگِ بخشِ پرشده)")]
     [SerializeField] private Color fillColor = new Color(0.92f, 0.71f, 0.28f, 1f);      // طلایی گرم و روشن
 
     public GameStats.StatType StatType => statType;
@@ -60,18 +60,11 @@ public class StatBarUI : MonoBehaviour
         GameStats.Instance.OnStatChanged += HandleStatChanged;
     }
 
-    // اسلایدر پیش‌فرض یونیتی سفید و زشته؛ اینجا با کد رنگ چرمی/طلایی بهش می‌دیم و دستگیره‌ی
-    // اضافی رو مخفی می‌کنیم (چون این اسلایدر فقط نمایشیه و تعاملی نیست)
+    // فقط رنگِ بخشِ پرشده (Fill) رو طلایی می‌کنیم و دستگیره رو مخفی می‌کنیم.
+    // نکته: پس‌زمینه‌ی نوار (Background) دیگه اینجا رنگ نمی‌شه — چون توسعه‌دهنده براش اسپرایتِ
+    // آماده (BG_slidr) گذاشته؛ اگه رنگش کنیم اون اسپرایت تیره و کم‌رنگ («سایه‌مانند») می‌شه.
     void StyleSlider()
     {
-        // track (پس‌زمینه‌ی خالی نوار)
-        Transform bg = slider.transform.Find("Background");
-        if (bg != null)
-        {
-            Image bgImg = bg.GetComponent<Image>();
-            if (bgImg != null) bgImg.color = trackColor;
-        }
-
         // fill (بخش پر شده)
         if (slider.fillRect != null)
         {
@@ -140,10 +133,12 @@ public class StatBarUI : MonoBehaviour
         // چرخشِ متن رو صاف کن: چون والد ۹۰+ چرخیده، متن رو ۹۰- می‌چرخونیم تا در نهایت افقی بشه
         rect.localRotation = Quaternion.Euler(0f, 0f, -90f);
 
-        // «پایینِ نوار» تو دنیای صفحه = محورِ x محلیِ منفیِ والد (چون والد ۹۰+ چرخیده).
-        // نصفِ طولِ نوار (بعدِ بلندِ اسلایدر) + یه فاصله
+        // موقعیتِ عمودی: چون نوارها طولِ متفاوتی دارن، اگه اسم رو نسبت به «پایینِ» هر نوار بذاریم،
+        // اسمِ نوارهای بلندتر پایین‌تر می‌افته (باگی که «محبوبیت پایینه» رو می‌ساخت). ولی «بالای» همه‌ی
+        // نوارها هم‌تراز است؛ پس اسم رو یه فاصله‌ی ثابت (nameDropFromTop) پایین‌ترِ بالای نوار می‌ذاریم
+        // تا اسمِ همه‌ی نوارها هم‌ترازِ هم بشه. (والد ۹۰+ چرخیده: محورِ x محلیِ مثبت = بالای نوار.)
         float halfLen = GetComponent<RectTransform>().rect.width * 0.5f;
-        rect.anchoredPosition = new Vector2(-(halfLen + nameGap), 0f);
+        rect.anchoredPosition = new Vector2(halfLen - nameDropFromTop, 0f);
         rect.sizeDelta = nameBoxSize;
 
         RTLTextMeshPro nameText = nameGO.AddComponent<RTLTextMeshPro>();

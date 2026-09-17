@@ -389,9 +389,8 @@ MonoBehaviour:
   persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
   nameFontSize: 50
   nameColor: {r: 0.96, g: 0.9, b: 0.78, a: 1}
-  nameGap: 45
+  nameDropFromTop: 380
   nameBoxSize: {x: 260, y: 80}
-  trackColor: {r: 0.18, g: 0.12, b: 0.07, a: 0.95}
   fillColor: {r: 0.92, g: 0.71, b: 0.28, a: 1}
 --- !u!114 &163289116
 MonoBehaviour:
@@ -2157,9 +2156,8 @@ MonoBehaviour:
   persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
   nameFontSize: 50
   nameColor: {r: 0.96, g: 0.9, b: 0.78, a: 1}
-  nameGap: 45
+  nameDropFromTop: 380
   nameBoxSize: {x: 260, y: 80}
-  trackColor: {r: 0.18, g: 0.12, b: 0.07, a: 0.95}
   fillColor: {r: 0.92, g: 0.71, b: 0.28, a: 1}
 --- !u!114 &1077233622
 MonoBehaviour:
@@ -2271,9 +2269,8 @@ MonoBehaviour:
   persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
   nameFontSize: 50
   nameColor: {r: 0.96, g: 0.9, b: 0.78, a: 1}
-  nameGap: 45
+  nameDropFromTop: 380
   nameBoxSize: {x: 260, y: 80}
-  trackColor: {r: 0.18, g: 0.12, b: 0.07, a: 0.95}
   fillColor: {r: 0.92, g: 0.71, b: 0.28, a: 1}
 --- !u!114 &1095585443
 MonoBehaviour:
@@ -2721,9 +2718,8 @@ MonoBehaviour:
   persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
   nameFontSize: 50
   nameColor: {r: 0.96, g: 0.9, b: 0.78, a: 1}
-  nameGap: 45
+  nameDropFromTop: 380
   nameBoxSize: {x: 260, y: 80}
-  trackColor: {r: 0.18, g: 0.12, b: 0.07, a: 0.95}
   fillColor: {r: 0.92, g: 0.71, b: 0.28, a: 1}
 --- !u!114 &1732478015
 MonoBehaviour:
