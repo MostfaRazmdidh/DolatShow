@@ -30,6 +30,27 @@ public class CardSwipe : MonoBehaviour
     {
         startPosition = transform.position;
         mainCamera = Camera.main;
+        EnsureTextRendersAboveCard();
+    }
+
+    // کارت (Card cover) یه SpriteRenderer ماته با sortingOrder=۰. Canvasِ متنِ کارت (World Space)
+    // هم پیش‌فرض sortingOrder=۰ داره، برای همین کارت روی متن می‌افته و متن دیده نمی‌شه.
+    // اینجا Canvasِ متن رو مجبور می‌کنیم با sortingOrder بالاتر رندر بشه تا روی کارت بیاد.
+    void EnsureTextRendersAboveCard()
+    {
+        int cardOrder = 0;
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr != null) cardOrder = sr.sortingOrder;
+
+        if (advisorText != null)
+        {
+            Canvas textCanvas = advisorText.GetComponentInParent<Canvas>();
+            if (textCanvas != null)
+            {
+                textCanvas.overrideSorting = true;
+                textCanvas.sortingOrder = cardOrder + 1;
+            }
+        }
     }
 
     // با «بازی جدید» یا «ادامه‌ی بازی» از منوی اصلی صدا زده می‌شه
