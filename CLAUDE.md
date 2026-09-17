@@ -99,6 +99,7 @@
   - مقادیر چیدمان (وقتی auto روشنه): `cardTextColor`, `textWidthFraction`, `advisorYFraction`/`advisorFontFraction`, `bodyYFraction`/`bodyFontFraction`/`bodyHeightFraction`.
 - **`swipeRightMeansApprove`** (فیلد Inspector): تعیین می‌کنه کدوم جهتِ سوایپ «بله/تایید» باشه — روشن: راست=تایید، چپ=رد؛ خاموش: برعکس. کارت همیشه به سمتی که کشیده شد پرت می‌شه (فیزیکِ سوایپ)، ولی تایید/رد بودنش از این گزینه میاد.
 - **نشانگرِ بله/خیر (`CreateSwipeIndicators`):** برای اینکه کاربر بفهمه هر سمت یعنی چی، موقع اجرا دو تا متنِ `RTLTextMeshPro` سمتِ راست و چپِ صفحه ساخته می‌شه — سمتِ تایید «بله» (سبز)، سمتِ رد «خیر» (قرمز)، بر اساس `swipeRightMeansApprove`. فونت رو از خودِ `advisorText.font` قرض می‌گیره و روی همون Canvasِ اصلی (که از روی `statBars` پیدا می‌شه) می‌ذاره — پس وایرینگِ دستیِ جدید لازم نیست. موقع کشیدن، سمتی که کارت به سمتش می‌ره پررنگ‌تر و بزرگ‌تر می‌شه و سمتِ دیگه محو می‌شه (`UpdateSwipeIndicators`). فیلدهای قابل‌تنظیم: `approveColor`, `rejectColor`, `indicatorFontSize`, `indicatorMargin`, `indicatorYOffset`, `indicatorBaseAlpha`. نشانگرها موقع `BeginGame()` روشن می‌شن.
+- **افکت صوتیِ تصمیم (`PlayDecisionSound`):** موقعِ تصمیم، صدای مناسب پخش می‌شه — `approveClip` (فایلِ `yesEffect` از پوشه‌ی `Assets/Sound`) برای تایید، `rejectClip` (`noEffect`) برای رد. یه `AudioSource` موقعِ Start با کد رو خودِ کارت اضافه می‌شه (نیازی به وایرینگ نداره)، فقط دو تا کلیپ تو Inspector وصلن. `sfxVolume` هم قابل تنظیمه.
 
 ### StatBarUI.cs — روی هر Slider نوار وضعیت
 - `statType` (کدوم شاخص) و `slider` (کامپوننت UI Slider) تو Inspector ست می‌شه
@@ -124,10 +125,14 @@
 
 ### MainMenuUI.cs — منوی اصلی
 - رو `GameManager` نصب شده، سه فیلد اصلی داره: `Persian Font`، `Target Canvas`، و `Card Swipe` (رفرنس به اسکریپت CardSwipe رو آبجکت Card)
-- مثل GameOverUI کل UI رو با کد می‌سازه (دو دکمه: «بازی جدید» و «ادامه‌ی بازی» — دومی فقط اگه فایل سیو وجود داشته باشه نشون داده می‌شه)
-- «بازی جدید»: `GameStats.ResetState()` + `CardDatabase.ClearFlags()` + سیو قبلی پاک می‌شه، بعد `CardSwipe.BeginGame()`
-- «ادامه‌ی بازی»: `SaveSystem.Load()` رو می‌خونه، `GameStats.LoadFromSaveData()` و `CardDatabase.SetActiveFlags()` صداش می‌زنه، بعد `CardSwipe.BeginGame()`
-- سه فیلد تصویری اختیاری: `backgroundSprite` (پس‌زمینه‌ی منو)، `logoSprite` (به‌جای متن «دولت شو»)، `newGameButtonSprite` (به‌جای دکمه‌ی رنگی «بازی جدید») — هر کدوم خالی بمونن، همون حالت قبلی (رنگ ساده/متن) باقی می‌مونه
+- مثل GameOverUI کل UI رو با کد می‌سازه. **چیدمانِ جدید (طبق طرحِ توسعه‌دهنده):** پس‌زمینه‌ی دفترِ ریاست‌جمهوری (`BG`) + سه دکمه‌ی وسط‌چین از بالا به پایین: **«شروع بازی»**, **«تنظیمات»**, **«خروج»**. (دکمه‌ی جداگانه‌ی «ادامه» حذف شد.)
+- فیلدهای تصویری: `backgroundSprite` (BG)، `startButtonSprite` (اسلایسِ «شروع بازی» از ButtonAssets)، `settingsButtonSprite` (`Settings.png`)، `exitButtonSprite` (`Exit.png`). اگه هر کدوم خالی بمونه، به‌جاش دکمه‌ی رنگ‌ساده‌ی متنی ساخته می‌شه.
+- **چیدمان (`AddMenuButton`):** هر دکمه پهنای ثابت (`buttonWidthFraction`، پیش‌فرض ۰.۴۴) داره و **ارتفاعش خودکار از نسبتِ خودِ تصویر** حساب می‌شه (با `preserveAspect`) تا دکمه کش نیاد؛ جای هر دکمه با `startButtonCenter`/`settingsButtonCenter`/`exitButtonCenter` (کسری از صفحه) تنظیم می‌شه.
+- **رفتارِ دکمه‌ها:**
+  - «شروع بازی» (`StartGame`): اگه سیوِ قبلی باشه بازی رو **ادامه** می‌ده (`ContinueGame`)، وگرنه بازیِ **جدید** (`StartNewGame`). چون دکمه‌ی جدا برای «ادامه» تو این چیدمان نداریم.
+  - «تنظیمات» (`OpenSettings`): فعلاً **جای خالی/placeholder** است (فقط Debug.Log) — صفحه‌ی تنظیمات هنوز ساخته نشده.
+  - «خروج» (`QuitGame`): `Application.Quit()` (و تو Editor، توقفِ Play).
+- **نکته‌ی import:** `Settings.png` و `Exit.png` اولش spriteMode=Multiple بودن (خودکار اسلایس شده بودن)؛ تو meta به **spriteMode=Single** تغییر داده شدن تا کلِ تصویر یه اسپرایتِ واحد (fileID 21300000) باشه و به‌عنوان یه دکمه استفاده بشه.
 
 ### SaveSystem.cs / SaveData.cs — ذخیره‌سازی
 - `SaveData`: یه کلاس ساده (Serializable) با ۴ شاخص، ماه فعلی، و لیست پرچم‌های فعال

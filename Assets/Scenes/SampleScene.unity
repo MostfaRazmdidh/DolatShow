@@ -597,8 +597,9 @@ MonoBehaviour:
   targetCanvas: {fileID: 1964030836}
   cardSwipe: {fileID: 718640286}
   backgroundSprite: {fileID: -6695950386315148514, guid: 39e9389fb69f7d0449b905440f103462, type: 3}
-  logoSprite: {fileID: 5799068408523222823, guid: 9a4c833302fbf0b40b8c7b97c8b80e85, type: 3}
-  newGameButtonSprite: {fileID: 2596368825315108945, guid: 3827320648d98d8419f39c6e8cd0eb48, type: 3}
+  startButtonSprite: {fileID: 2596368825315108945, guid: 3827320648d98d8419f39c6e8cd0eb48, type: 3}
+  settingsButtonSprite: {fileID: 21300000, guid: 4b53e61016c443847b89ab9eb1afd012, type: 3}
+  exitButtonSprite: {fileID: 21300000, guid: 9c8b8b95578683341ae8287eb70613b8, type: 3}
 --- !u!114 &352642747
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1483,6 +1484,9 @@ MonoBehaviour:
   - {fileID: 1095585442}
   - {fileID: 1077233621}
   hintThreshold: 0.3
+  approveClip: {fileID: 8300000, guid: 49f35959965f3f74cb47f7c376d9e46c, type: 3}
+  rejectClip: {fileID: 8300000, guid: 60dd9b0240c4a1d4baa258efa8d0273b, type: 3}
+  sfxVolume: 1
 --- !u!61 &718640287
 BoxCollider2D:
   m_ObjectHideFlags: 0
