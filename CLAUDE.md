@@ -94,7 +94,9 @@
 - **دیگه تو `Start()` خودکار کارت لود نمی‌کنه** — منتظر می‌مونه `BeginGame()` از `MainMenuUI` صدا زده بشه (تا وقتی منوی اصلی بسته نشده، بازی شروع نمی‌شه)
 - **`FitColliderToCard()`**: BoxCollider2D کارت تو صحنه فقط ۱×۱ واحد بود ولی خودِ کارت بزرگ‌تره؛ این متد Collider رو هم‌اندازه‌ی اسپرایت کارت می‌کنه تا کل کارت سوایپ بشه.
 - **`EnsureTextRendersAboveCard()`**: چون Card cover یه SpriteRenderer ماته (sortingOrder=۰) و Canvasِ متنِ کارت هم پیش‌فرض sortingOrder=۰ داشت، کارت روی متن می‌افتاد. این متد Canvasِ متن رو `overrideSorting=true` و sortingOrder بالاتر می‌کنه.
-- **`ConfigureCardText()`**: متن‌های کارت تو صحنه رنگ مشکی و fontSize میکروسکوپی (۰.۳-۰.۵ روی Canvasِ ۳۰۰×۴۰۰ با اسکیل تودرتو) داشتن → نامرئی. این متد موقع Start، Canvasِ متن و خودِ AdvisorText/BodyText رو بر اساس اندازه‌ی واقعیِ اسپرایت کارت از نو می‌چینه (سایز، موقعیت، auto-size فونت) و رنگ رو کرمِ روشن می‌کنه. **پس اندازه/موقعیت/رنگ متن کارت الان با کد کنترل می‌شه، نه از Inspector** — اگه خواستی تغییرش بدی، تو این متد عوض کن.
+- **`ConfigureCardText()`**: متن‌های کارت تو صحنه رنگ مشکی و fontSize میکروسکوپی داشتن → نامرئی. این متد موقع Start، Canvasِ متن و خودِ AdvisorText/BodyText رو بر اساس اندازه‌ی واقعیِ اسپرایت کارت از نو می‌چینه. **چون کد موقع Start این‌ها رو ست می‌کنه، تغییرِ مستقیمِ RectTransform/رنگِ متن تو Inspector بی‌اثره (کد روش می‌نویسه).** برای همین مقادیر چیدمان به فیلدهای قابل‌تنظیمِ CardSwipe تبدیل شدن — از اون‌ها تنظیم کن:
+  - `cardTextColor` (رنگ متن)، `textWidthFraction` (پهنای ناحیه‌ی متن؛ کمترش کنی از لبه‌ها فاصله می‌گیره)، `advisorYFraction`/`advisorFontFraction` (موقعیت و فونت اسم مشاور)، `bodyYFraction`/`bodyFontFraction`/`bodyHeightFraction` (متن تصمیم). این‌ها رو تو حالت Edit (نه Play) عوض کن تا ذخیره بشن و دفعه‌ی بعد اعمال بشن.
+- **`swipeRightMeansApprove`** (فیلد Inspector): تعیین می‌کنه کدوم جهتِ سوایپ «بله/تایید» باشه — روشن: راست=تایید، چپ=رد؛ خاموش: برعکس. کارت همیشه به سمتی که کشیده شد پرت می‌شه (فیزیکِ سوایپ)، ولی تایید/رد بودنش از این گزینه میاد.
 
 ### StatBarUI.cs — روی هر Slider نوار وضعیت
 - `statType` (کدوم شاخص) و `slider` (کامپوننت UI Slider) تو Inspector ست می‌شه

@@ -15,6 +15,25 @@ public class CardSwipe : MonoBehaviour
     [SerializeField] private float returnSpeed = 10f;
     [SerializeField] private float flyOffDistance = 15f;
 
+    [Header("جهت تصمیم (بله / خیر)")]
+    [Tooltip("روشن: سوایپ راست = تایید (بله)، چپ = رد (خیر). خاموش: برعکس.")]
+    [SerializeField] private bool swipeRightMeansApprove = true;
+
+    [Header("چیدمان متن کارت (تو Play با کد اعمال می‌شه — از همین‌جا تنظیم کن)")]
+    [SerializeField] private Color cardTextColor = new Color(0.96f, 0.90f, 0.78f); // کرمِ روشن
+    [Tooltip("پهنای ناحیه‌ی متن نسبت به کارت — کمترش کنی، متن از لبه‌ها بیشتر فاصله می‌گیره")]
+    [SerializeField, Range(0.3f, 1f)] private float textWidthFraction = 0.7f;
+    [Tooltip("موقعیت عمودی اسم مشاور (کسری از ارتفاع کارت؛ مثبت = بالاتر)")]
+    [SerializeField] private float advisorYFraction = 0.28f;
+    [Tooltip("اندازه‌ی فونت اسم مشاور (کسری از ارتفاع کارت)")]
+    [SerializeField] private float advisorFontFraction = 0.05f;
+    [Tooltip("موقعیت عمودی متن تصمیم")]
+    [SerializeField] private float bodyYFraction = -0.02f;
+    [Tooltip("اندازه‌ی فونت متن تصمیم")]
+    [SerializeField] private float bodyFontFraction = 0.04f;
+    [Tooltip("ارتفاع ناحیه‌ی متن تصمیم (کسری از ارتفاع کارت)")]
+    [SerializeField] private float bodyHeightFraction = 0.45f;
+
     [Header("پیش‌نمایش اثر تصمیم (اختیاری)")]
     [SerializeField] private StatBarUI[] statBars; // هر ۴ نوار وضعیت رو اینجا بریز
     [SerializeField] private float hintThreshold = 0.3f; // از این فاصله به بعد پیش‌نمایش ظاهر می‌شه
@@ -55,15 +74,13 @@ public class CardSwipe : MonoBehaviour
             canvasRT.anchoredPosition = Vector2.zero;
         }
 
-        Color cream = new Color(0.96f, 0.90f, 0.78f); // کرمِ روشن، خوانا روی چرم تیره
-
         // اسم مشاور — بالای کارت
-        StyleCardText(advisorText, new Vector2(0f, cardSize.y * 0.30f),
-            new Vector2(cardSize.x * 0.82f, cardSize.y * 0.14f), cardSize.y * 0.055f, cream);
+        StyleCardText(advisorText, new Vector2(0f, cardSize.y * advisorYFraction),
+            new Vector2(cardSize.x * textWidthFraction, cardSize.y * 0.14f), cardSize.y * advisorFontFraction, cardTextColor);
 
         // متن تصمیم — وسط کارت، بزرگ‌تر و چندخطی
-        StyleCardText(bodyText, new Vector2(0f, -cardSize.y * 0.02f),
-            new Vector2(cardSize.x * 0.82f, cardSize.y * 0.5f), cardSize.y * 0.045f, cream);
+        StyleCardText(bodyText, new Vector2(0f, cardSize.y * bodyYFraction),
+            new Vector2(cardSize.x * textWidthFraction, cardSize.y * bodyHeightFraction), cardSize.y * bodyFontFraction, cardTextColor);
     }
 
     void StyleCardText(RTLTextMeshPro t, Vector2 pos, Vector2 size, float maxFontSize, Color color)
@@ -178,7 +195,7 @@ public class CardSwipe : MonoBehaviour
             return;
         }
 
-        var effects = xOffset > 0 ? currentCard.approveEffects : currentCard.rejectEffects;
+        var effects = IsApprove(xOffset) ? currentCard.approveEffects : currentCard.rejectEffects;
 
         foreach (var bar in statBars)
         {
@@ -206,15 +223,23 @@ public class CardSwipe : MonoBehaviour
 
         if (Mathf.Abs(xOffset) > swipeThreshold)
         {
-            bool approved = xOffset > 0;
+            bool draggedRight = xOffset > 0;      // کارت به کدوم سمت کشیده شد
+            bool approved = IsApprove(xOffset);   // اون سمت یعنی تایید یا رد
             decided = true;
             ApplyCardEffects(approved);
-            StartCoroutine(FlyOffScreen(approved));
+            StartCoroutine(FlyOffScreen(draggedRight)); // کارت به سمتی که کشیده شد پرت می‌شه
         }
         else
         {
             StartCoroutine(ReturnToCenter());
         }
+    }
+
+    // بر اساس گزینه‌ی swipeRightMeansApprove مشخص می‌کنه سوایپ به این جهت یعنی تایید یا رد
+    bool IsApprove(float xOffset)
+    {
+        bool draggedRight = xOffset > 0;
+        return swipeRightMeansApprove ? draggedRight : !draggedRight;
     }
 
     // اثرات تصمیم رو روی شاخص‌ها اعمال می‌کنه و پرچم مربوطه رو (اگه بود) ست می‌کنه
@@ -257,9 +282,10 @@ public class CardSwipe : MonoBehaviour
         transform.rotation = Quaternion.identity;
     }
 
-    IEnumerator FlyOffScreen(bool approved)
+    // toRight = کارت به کدوم سمت (فیزیکی) پرت بشه — همون سمتی که کاربر کشیدش
+    IEnumerator FlyOffScreen(bool toRight)
     {
-        Vector3 direction = approved ? Vector3.right : Vector3.left;
+        Vector3 direction = toRight ? Vector3.right : Vector3.left;
         Vector3 fromPos = transform.position;
         Vector3 toPos = fromPos + direction * flyOffDistance;
 
@@ -273,7 +299,6 @@ public class CardSwipe : MonoBehaviour
             yield return null;
         }
 
-        Debug.Log(approved ? "APPROVED (تایید شد)" : "REJECTED (رد شد)");
         LoadNextCard(); // کارت بعدی رو بیار
     }
 }
