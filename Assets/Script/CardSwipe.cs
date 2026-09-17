@@ -19,6 +19,20 @@ public class CardSwipe : MonoBehaviour
     [Tooltip("روشن: سوایپ راست = تایید (بله)، چپ = رد (خیر). خاموش: برعکس.")]
     [SerializeField] private bool swipeRightMeansApprove = true;
 
+    [Header("نشانگرِ بله/خیر موقع کشیدنِ کارت (برای کاربر مشخص می‌کنه هر سمت یعنی چی)")]
+    [Tooltip("رنگِ سمتِ تایید (بله)")]
+    [SerializeField] private Color approveColor = new Color(0.40f, 0.85f, 0.45f, 1f); // سبز
+    [Tooltip("رنگِ سمتِ رد (خیر)")]
+    [SerializeField] private Color rejectColor = new Color(0.92f, 0.38f, 0.32f, 1f);  // قرمز
+    [Tooltip("اندازه‌ی فونتِ نشانگر")]
+    [SerializeField] private float indicatorFontSize = 90f;
+    [Tooltip("فاصله‌ی نشانگر از لبه‌ی چپ/راستِ صفحه (پیکسل)")]
+    [SerializeField] private float indicatorMargin = 40f;
+    [Tooltip("جابه‌جاییِ عمودیِ نشانگر نسبت به وسطِ صفحه (مثبت = بالاتر)")]
+    [SerializeField] private float indicatorYOffset = 150f;
+    [Tooltip("شفافیتِ پیش‌فرضِ نشانگر وقتی کارت وسطه (۰ تا ۱)")]
+    [SerializeField, Range(0f, 1f)] private float indicatorBaseAlpha = 0.35f;
+
     [Header("چیدمان متن کارت")]
     [Tooltip("روشن: کد موقع Start چیدمان متن رو از روی مقادیر پایین اعمال می‌کنه. اگه می‌خوای خودت دستی " +
         "متن رو تو صحنه تنظیم کنی، این رو خاموش کن تا Play دیگه روش ننویسه (اول یه‌بار از راست‌کلیکِ " +
@@ -48,6 +62,10 @@ public class CardSwipe : MonoBehaviour
     private bool decided = false;
     private Camera mainCamera;
     private CardData currentCard;
+
+    // نشانگرهای بله/خیر — سمتِ راست و چپِ صفحه، موقع اجرا ساخته می‌شن
+    private RTLTextMeshPro rightIndicator;
+    private RTLTextMeshPro leftIndicator;
 
     void Start()
     {
@@ -147,7 +165,105 @@ public class CardSwipe : MonoBehaviour
     // با «بازی جدید» یا «ادامه‌ی بازی» از منوی اصلی صدا زده می‌شه
     public void BeginGame()
     {
+        if (rightIndicator == null && leftIndicator == null) CreateSwipeIndicators();
+        ShowSwipeIndicators(true);
+        ResetSwipeIndicators();
         LoadNextCard();
+    }
+
+    // دو تا نشانگرِ «بله» و «خیر» رو سمتِ راست و چپِ صفحه می‌سازه تا کاربر بفهمه هر جهتِ سوایپ یعنی چی.
+    // فونت رو از خودِ متنِ کارت (advisorText) قرض می‌گیریم و روی همون Canvasِ اصلیِ صحنه (که نوارها زیرشن)
+    // می‌ذاریمشون، تا نیازی به وایرینگِ دستیِ جدید تو Inspector نباشه.
+    void CreateSwipeIndicators()
+    {
+        Canvas canvas = GetUICanvas();
+        if (canvas == null) return;
+        TMPro.TMP_FontAsset font = advisorText != null ? advisorText.font : null;
+
+        // سمتِ راست: اگه راست=تایید باشه «بله» (سبز)، وگرنه «خیر» (قرمز)
+        rightIndicator = CreateSwipeLabel(canvas.transform, font, true,
+            swipeRightMeansApprove ? "بله" : "خیر",
+            swipeRightMeansApprove ? approveColor : rejectColor);
+
+        // سمتِ چپ: برعکسِ سمتِ راست
+        leftIndicator = CreateSwipeLabel(canvas.transform, font, false,
+            swipeRightMeansApprove ? "خیر" : "بله",
+            swipeRightMeansApprove ? rejectColor : approveColor);
+    }
+
+    // Canvasِ اصلیِ صحنه رو از روی یکی از نوارهای وضعیت پیدا می‌کنه
+    Canvas GetUICanvas()
+    {
+        if (statBars != null)
+        {
+            foreach (var bar in statBars)
+            {
+                if (bar == null) continue;
+                Canvas c = bar.GetComponentInParent<Canvas>();
+                if (c != null) return c.rootCanvas;
+            }
+        }
+        return null;
+    }
+
+    RTLTextMeshPro CreateSwipeLabel(Transform parent, TMPro.TMP_FontAsset font, bool rightSide, string text, Color color)
+    {
+        GameObject go = new GameObject(rightSide ? "SwipeIndicatorRight" : "SwipeIndicatorLeft", typeof(RectTransform));
+        go.transform.SetParent(parent, false);
+        RectTransform rt = go.GetComponent<RectTransform>();
+        // به وسطِ لبه‌ی راست/چپ بچسبون
+        rt.anchorMin = rt.anchorMax = new Vector2(rightSide ? 1f : 0f, 0.5f);
+        rt.pivot = new Vector2(rightSide ? 1f : 0f, 0.5f);
+        rt.anchoredPosition = new Vector2(rightSide ? -indicatorMargin : indicatorMargin, indicatorYOffset);
+        rt.sizeDelta = new Vector2(320f, 150f);
+
+        RTLTextMeshPro t = go.AddComponent<RTLTextMeshPro>();
+        t.font = font;
+        t.fontSize = indicatorFontSize;
+        t.alignment = TMPro.TextAlignmentOptions.Center;
+        t.fontStyle = TMPro.FontStyles.Bold;
+        t.color = color;
+        t.text = text;
+        t.raycastTarget = false;
+        SetIndicatorAlpha(t, indicatorBaseAlpha);
+        return t;
+    }
+
+    void ShowSwipeIndicators(bool show)
+    {
+        if (rightIndicator != null) rightIndicator.gameObject.SetActive(show);
+        if (leftIndicator != null) leftIndicator.gameObject.SetActive(show);
+    }
+
+    // موقع کشیدنِ کارت: سمتی که کارت به سمتش می‌ره پررنگ‌تر و بزرگ‌تر می‌شه، سمتِ دیگه محو می‌شه
+    void UpdateSwipeIndicators(float xOffset)
+    {
+        if (rightIndicator == null || leftIndicator == null) return;
+
+        float t = Mathf.Clamp01(Mathf.Abs(xOffset) / swipeThreshold);
+        bool draggedRight = xOffset > 0;
+        RTLTextMeshPro active = draggedRight ? rightIndicator : leftIndicator;
+        RTLTextMeshPro other = draggedRight ? leftIndicator : rightIndicator;
+
+        SetIndicatorAlpha(active, Mathf.Lerp(indicatorBaseAlpha, 1f, t));
+        active.rectTransform.localScale = Vector3.one * (1f + 0.35f * t);
+
+        SetIndicatorAlpha(other, indicatorBaseAlpha * (1f - t));
+        other.rectTransform.localScale = Vector3.one;
+    }
+
+    void ResetSwipeIndicators()
+    {
+        if (rightIndicator != null) { SetIndicatorAlpha(rightIndicator, indicatorBaseAlpha); rightIndicator.rectTransform.localScale = Vector3.one; }
+        if (leftIndicator != null) { SetIndicatorAlpha(leftIndicator, indicatorBaseAlpha); leftIndicator.rectTransform.localScale = Vector3.one; }
+    }
+
+    void SetIndicatorAlpha(RTLTextMeshPro t, float a)
+    {
+        if (t == null) return;
+        Color c = t.color;
+        c.a = a;
+        t.color = c;
     }
 
     // کارت بعدی رو از دیتابیس می‌گیره و متنش رو نمایش می‌ده
@@ -194,6 +310,7 @@ public class CardSwipe : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, 0, -xOffset * rotationFactor);
 
         UpdateHints(xOffset);
+        UpdateSwipeIndicators(xOffset);
     }
 
     // بر اساس جهت و فاصله‌ی کشیدن، نشون می‌ده اگه همین الان رها کنی چه اثری رخ می‌ده
@@ -230,6 +347,7 @@ public class CardSwipe : MonoBehaviour
         if (!isDragging) return;
         isDragging = false;
         HideAllHints();
+        ResetSwipeIndicators();
 
         float xOffset = transform.position.x - startPosition.x;
 
