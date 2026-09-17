@@ -17,13 +17,13 @@ public class StatBarUI : MonoBehaviour
     [Tooltip("فونت فارسی — همون NotoNaskhArabic که بقیه‌ی متن‌ها ازش استفاده می‌کنن")]
     [SerializeField] private TMP_FontAsset persianFont;
     [Tooltip("اندازه‌ی فونتِ اسم شاخص")]
-    [SerializeField] private float nameFontSize = 26f;
+    [SerializeField] private float nameFontSize = 50f;
     [Tooltip("رنگ اسم شاخص")]
     [SerializeField] private Color nameColor = new Color(0.96f, 0.90f, 0.78f);
-    [Tooltip("جابه‌جایی اسم شاخص نسبت به وسطِ زیرِ نوار (y منفی = پایین‌تر)")]
-    [SerializeField] private Vector2 nameOffset = new Vector2(0f, -8f);
+    [Tooltip("فاصله‌ی اسم از پایینِ نوار (پیکسل، تو دنیای صفحه)")]
+    [SerializeField] private float nameGap = 45f;
     [Tooltip("اندازه‌ی جعبه‌ی متنِ اسم شاخص")]
-    [SerializeField] private Vector2 nameBoxSize = new Vector2(220f, 50f);
+    [SerializeField] private Vector2 nameBoxSize = new Vector2(260f, 80f);
 
     [Header("ظاهر نوار (تم چرمی/طلایی)")]
     [SerializeField] private Color trackColor = new Color(0.18f, 0.12f, 0.07f, 0.95f); // چرم تیره
@@ -124,16 +124,26 @@ public class StatBarUI : MonoBehaviour
         if (valueText != null) valueText.text = ((int)value).ToString();
     }
 
-    // اسم فارسیِ شاخص رو وسطِ زیرِ نوار می‌نویسه (به‌جای آیکونِ قبلی)
+    // اسم فارسیِ شاخص رو وسطِ زیرِ نوار می‌نویسه (به‌جای آیکونِ قبلی).
+    // نکته‌ی مهم: خودِ آبجکتِ نوار تو صحنه ۹۰ درجه چرخیده (m_LocalEulerAngles z=90) تا اسلایدرِ
+    // افقی به‌صورت عمودی وایسته. چون این متن فرزندِ همون آبجکته، اون چرخش ۹۰ درجه رو به ارث می‌بره
+    // و کج/زاویه‌دار دیده می‌شه. برای همین متن رو ۹۰- درجه برعکس می‌چرخونیم تا صاف و افقی بشه،
+    // و چون محورهای محلی هم چرخیدن، برای «پایینِ نوار» باید تو محورِ x محلیِ منفی جابه‌جاش کنیم.
     void CreateNameLabel()
     {
         GameObject nameGO = new GameObject("NameLabel", typeof(RectTransform));
         nameGO.transform.SetParent(transform, false);
         RectTransform rect = nameGO.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0.5f, 0f); // وسط-پایینِ نوار
-        rect.anchorMax = new Vector2(0.5f, 0f);
-        rect.pivot = new Vector2(0.5f, 1f);     // متن از زیرِ نوار آویزون می‌شه
-        rect.anchoredPosition = nameOffset;
+        rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f); // وسطِ نوار
+        rect.pivot = new Vector2(0.5f, 0.5f);
+
+        // چرخشِ متن رو صاف کن: چون والد ۹۰+ چرخیده، متن رو ۹۰- می‌چرخونیم تا در نهایت افقی بشه
+        rect.localRotation = Quaternion.Euler(0f, 0f, -90f);
+
+        // «پایینِ نوار» تو دنیای صفحه = محورِ x محلیِ منفیِ والد (چون والد ۹۰+ چرخیده).
+        // نصفِ طولِ نوار (بعدِ بلندِ اسلایدر) + یه فاصله
+        float halfLen = GetComponent<RectTransform>().rect.width * 0.5f;
+        rect.anchoredPosition = new Vector2(-(halfLen + nameGap), 0f);
         rect.sizeDelta = nameBoxSize;
 
         RTLTextMeshPro nameText = nameGO.AddComponent<RTLTextMeshPro>();
