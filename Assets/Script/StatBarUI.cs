@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using RTLTMPro;
 using TMPro;
 
 // این اسکریپت رو روی هر کدوم از ۴ آبجکت نوار وضعیت می‌ذاریم
@@ -12,26 +13,44 @@ public class StatBarUI : MonoBehaviour
     [Header("پیش‌نمایش اثر تصمیم (اختیاری — موقع کشیدن کارت نشون داده می‌شه)")]
     [SerializeField] private TMP_Text hintText; // یه متن کوچیک کنار نوار، مثلاً +۱۵ یا -۲۰ (نیازی به RTL نداره چون فقط عدد و علامته)
 
-    [Header("آیکون شاخص (اختیاری)")]
-    [SerializeField] private Sprite icon;
-    [Tooltip("اندازه‌ی آیکون (پیکسل). بزرگ‌ترش کنی آیکون درشت‌تر می‌شه.")]
-    [SerializeField] private float iconSize = 150f;
-    [Tooltip("جابه‌جایی آیکون نسبت به وسطِ زیرِ نوار (y منفی = پایین‌تر)")]
-    [SerializeField] private Vector2 iconOffset = new Vector2(0f, -10f);
+    [Header("اسم شاخص (زیرِ نوار نوشته می‌شه)")]
+    [Tooltip("فونت فارسی — همون NotoNaskhArabic که بقیه‌ی متن‌ها ازش استفاده می‌کنن")]
+    [SerializeField] private TMP_FontAsset persianFont;
+    [Tooltip("اندازه‌ی فونتِ اسم شاخص")]
+    [SerializeField] private float nameFontSize = 26f;
+    [Tooltip("رنگ اسم شاخص")]
+    [SerializeField] private Color nameColor = new Color(0.96f, 0.90f, 0.78f);
+    [Tooltip("جابه‌جایی اسم شاخص نسبت به وسطِ زیرِ نوار (y منفی = پایین‌تر)")]
+    [SerializeField] private Vector2 nameOffset = new Vector2(0f, -8f);
+    [Tooltip("اندازه‌ی جعبه‌ی متنِ اسم شاخص")]
+    [SerializeField] private Vector2 nameBoxSize = new Vector2(220f, 50f);
 
     [Header("ظاهر نوار (تم چرمی/طلایی)")]
     [SerializeField] private Color trackColor = new Color(0.18f, 0.12f, 0.07f, 0.95f); // چرم تیره
-    [SerializeField] private Color fillColor = new Color(0.79f, 0.62f, 0.24f, 1f);      // طلایی
+    [SerializeField] private Color fillColor = new Color(0.92f, 0.71f, 0.28f, 1f);      // طلایی گرم و روشن
 
     public GameStats.StatType StatType => statType;
 
     private TMP_Text valueText; // عدد فعلی شاخص، روی خودِ اسلایدر — با کد ساخته می‌شه، نیازی به وایرینگ دستی نداره
 
+    // اسم فارسیِ هر شاخص برای نمایش زیرِ نوار
+    private static string GetStatName(GameStats.StatType type)
+    {
+        switch (type)
+        {
+            case GameStats.StatType.Budget:     return "بودجه";
+            case GameStats.StatType.Popularity: return "محبوبیت";
+            case GameStats.StatType.Security:   return "امنیت";
+            case GameStats.StatType.Diplomacy:  return "دیپلماسی";
+            default: return "";
+        }
+    }
+
     void Start()
     {
         StyleSlider();
         CreateValueText();
-        CreateIcon();
+        CreateNameLabel();
 
         // مقدار اولیه رو بگیر و نمایش بده
         slider.value = GameStats.Instance.GetStat(statType);
@@ -105,23 +124,26 @@ public class StatBarUI : MonoBehaviour
         if (valueText != null) valueText.text = ((int)value).ToString();
     }
 
-    // آیکون شاخص رو کنار (سمت چپ) خودِ نوار می‌ذاره — اگه آیکونی وصل نشده باشه کاری نمی‌کنه
-    void CreateIcon()
+    // اسم فارسیِ شاخص رو وسطِ زیرِ نوار می‌نویسه (به‌جای آیکونِ قبلی)
+    void CreateNameLabel()
     {
-        if (icon == null) return;
-
-        GameObject iconGO = new GameObject("Icon", typeof(RectTransform));
-        iconGO.transform.SetParent(transform, false);
-        RectTransform rect = iconGO.GetComponent<RectTransform>();
+        GameObject nameGO = new GameObject("NameLabel", typeof(RectTransform));
+        nameGO.transform.SetParent(transform, false);
+        RectTransform rect = nameGO.GetComponent<RectTransform>();
         rect.anchorMin = new Vector2(0.5f, 0f); // وسط-پایینِ نوار
         rect.anchorMax = new Vector2(0.5f, 0f);
-        rect.pivot = new Vector2(0.5f, 1f);     // آیکون از زیرِ نوار آویزون می‌شه
-        rect.anchoredPosition = iconOffset;
-        rect.sizeDelta = new Vector2(iconSize, iconSize);
+        rect.pivot = new Vector2(0.5f, 1f);     // متن از زیرِ نوار آویزون می‌شه
+        rect.anchoredPosition = nameOffset;
+        rect.sizeDelta = nameBoxSize;
 
-        Image img = iconGO.AddComponent<Image>();
-        img.sprite = icon;
-        img.preserveAspect = true;
+        RTLTextMeshPro nameText = nameGO.AddComponent<RTLTextMeshPro>();
+        nameText.font = persianFont;
+        nameText.fontSize = nameFontSize;
+        nameText.alignment = TextAlignmentOptions.Center;
+        nameText.color = nameColor;
+        nameText.fontStyle = FontStyles.Bold;
+        nameText.raycastTarget = false;
+        nameText.text = GetStatName(statType);
     }
 
     // موقع کشیدن کارت صدا زده می‌شه تا نشون بده اگه همین الان رها کنی، این شاخص چقدر تغییر می‌کنه

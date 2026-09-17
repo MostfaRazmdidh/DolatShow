@@ -386,11 +386,13 @@ MonoBehaviour:
   statType: 0
   slider: {fileID: 163289116}
   hintText: {fileID: 814085525}
-  icon: {fileID: -3122057824612373263, guid: d844e6d476c1c7b4691773e03eb1bdea, type: 3}
-  iconSize: 150
-  iconOffset: {x: 0, y: -10}
+  persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
+  nameFontSize: 26
+  nameColor: {r: 0.96, g: 0.9, b: 0.78, a: 1}
+  nameOffset: {x: 0, y: -8}
+  nameBoxSize: {x: 220, y: 50}
   trackColor: {r: 0.18, g: 0.12, b: 0.07, a: 0.95}
-  fillColor: {r: 0.79, g: 0.62, b: 0.24, a: 1}
+  fillColor: {r: 0.92, g: 0.71, b: 0.28, a: 1}
 --- !u!114 &163289116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2152,11 +2154,13 @@ MonoBehaviour:
   statType: 3
   slider: {fileID: 1077233622}
   hintText: {fileID: 906075495}
-  icon: {fileID: 7865482556308654359, guid: 49cff2bc9fbe2484ebd77b263b96858a, type: 3}
-  iconSize: 150
-  iconOffset: {x: 0, y: -10}
+  persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
+  nameFontSize: 26
+  nameColor: {r: 0.96, g: 0.9, b: 0.78, a: 1}
+  nameOffset: {x: 0, y: -8}
+  nameBoxSize: {x: 220, y: 50}
   trackColor: {r: 0.18, g: 0.12, b: 0.07, a: 0.95}
-  fillColor: {r: 0.79, g: 0.62, b: 0.24, a: 1}
+  fillColor: {r: 0.92, g: 0.71, b: 0.28, a: 1}
 --- !u!114 &1077233622
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2264,11 +2268,13 @@ MonoBehaviour:
   statType: 2
   slider: {fileID: 1095585443}
   hintText: {fileID: 329463124}
-  icon: {fileID: 5982966662427526503, guid: af86a573e0791e24ea59fa2b5092c333, type: 3}
-  iconSize: 150
-  iconOffset: {x: 0, y: -10}
+  persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
+  nameFontSize: 26
+  nameColor: {r: 0.96, g: 0.9, b: 0.78, a: 1}
+  nameOffset: {x: 0, y: -8}
+  nameBoxSize: {x: 220, y: 50}
   trackColor: {r: 0.18, g: 0.12, b: 0.07, a: 0.95}
-  fillColor: {r: 0.79, g: 0.62, b: 0.24, a: 1}
+  fillColor: {r: 0.92, g: 0.71, b: 0.28, a: 1}
 --- !u!114 &1095585443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2712,11 +2718,13 @@ MonoBehaviour:
   statType: 1
   slider: {fileID: 1732478015}
   hintText: {fileID: 352642747}
-  icon: {fileID: 6027132739694103897, guid: 3aad64315c7ba244cb154987ea116e90, type: 3}
-  iconSize: 150
-  iconOffset: {x: 0, y: -10}
+  persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
+  nameFontSize: 26
+  nameColor: {r: 0.96, g: 0.9, b: 0.78, a: 1}
+  nameOffset: {x: 0, y: -8}
+  nameBoxSize: {x: 220, y: 50}
   trackColor: {r: 0.18, g: 0.12, b: 0.07, a: 0.95}
-  fillColor: {r: 0.79, g: 0.62, b: 0.24, a: 1}
+  fillColor: {r: 0.92, g: 0.71, b: 0.28, a: 1}
 --- !u!114 &1732478015
 MonoBehaviour:
   m_ObjectHideFlags: 0
