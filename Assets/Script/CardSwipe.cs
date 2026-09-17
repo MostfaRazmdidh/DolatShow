@@ -30,7 +30,21 @@ public class CardSwipe : MonoBehaviour
     {
         startPosition = transform.position;
         mainCamera = Camera.main;
+        FitColliderToCard();
         EnsureTextRendersAboveCard();
+    }
+
+    // Collider کارت تو صحنه فقط ۱×۱ واحد بود، ولی خودِ کارت خیلی بزرگ‌تره — برای همین بیشترِ
+    // سطح کارت کلیک/سوایپ نمی‌گرفت. اینجا Collider رو دقیقاً هم‌اندازه‌ی اسپرایت کارت می‌کنیم.
+    void FitColliderToCard()
+    {
+        var sr = GetComponent<SpriteRenderer>();
+        var box = GetComponent<BoxCollider2D>();
+        if (sr != null && sr.sprite != null && box != null)
+        {
+            box.size = sr.sprite.bounds.size;   // اندازه‌ی محلیِ اسپرایت (قبل از اسکیلِ ترنسفورم)
+            box.offset = sr.sprite.bounds.center;
+        }
     }
 
     // کارت (Card cover) یه SpriteRenderer ماته با sortingOrder=۰. Canvasِ متنِ کارت (World Space)
@@ -48,7 +62,8 @@ public class CardSwipe : MonoBehaviour
             if (textCanvas != null)
             {
                 textCanvas.overrideSorting = true;
-                textCanvas.sortingOrder = cardOrder + 1;
+                textCanvas.sortingLayerID = sr != null ? sr.sortingLayerID : 0;
+                textCanvas.sortingOrder = cardOrder + 5;
             }
         }
     }
