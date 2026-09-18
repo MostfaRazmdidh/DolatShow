@@ -66,6 +66,10 @@ public class CardSwipe : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
     private AudioSource audioSource;
 
+    [Header("جای کارت (ارتفاعِ عمودی — منفی = پایین‌تر)")]
+    [Tooltip("موقعیتِ عمودیِ کارت تو دنیا. با کد مجبور می‌شه، پس هرچی اینجا بذاری همون می‌شه (مستقلِ از صحنه).")]
+    [SerializeField] private float cardCenterY = -0.9f;
+
     private Vector3 startPosition;
     private Vector3 startScale;
     private Vector3 dragOffset;
@@ -81,6 +85,8 @@ public class CardSwipe : MonoBehaviour
 
     void Start()
     {
+        // موقعیتِ کارت رو با کد پایین می‌آریم (مستقلِ از مقدارِ صحنه، تا حتماً اثر کنه)
+        transform.position = new Vector3(transform.position.x, cardCenterY, transform.position.z);
         startPosition = transform.position;
         startScale = transform.localScale;
         mainCamera = Camera.main;
