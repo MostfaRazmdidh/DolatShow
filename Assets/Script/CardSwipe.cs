@@ -52,9 +52,11 @@ public class CardSwipe : MonoBehaviour
     [Tooltip("ارتفاع ناحیه‌ی متن تصمیم (کسری از ارتفاع کارت)")]
     [SerializeField] private float bodyHeightFraction = 0.45f;
 
-    [Header("پیش‌نمایش اثر تصمیم (اختیاری)")]
+    [Header("نمایشِ اثرِ تصمیم روی نوارها (بعد از انتخاب)")]
     [SerializeField] private StatBarUI[] statBars; // هر ۴ نوار وضعیت رو اینجا بریز
-    [SerializeField] private float hintThreshold = 0.3f; // از این فاصله به بعد پیش‌نمایش ظاهر می‌شه
+    [SerializeField] private float hintThreshold = 0.3f; // (دیگه برای پیش‌نمایش استفاده نمی‌شه؛ نگه داشته شد برای سازگاری)
+    [Tooltip("چند ثانیه بعد از انتخاب، اثرِ +/- روی نوارها بمونه تا بازیکن ببینتش")]
+    [SerializeField] private float hintHoldTime = 0.7f;
 
     [Header("افکت صوتیِ تصمیم (پوشه‌ی Assets/Sound)")]
     [Tooltip("صدای «بله» — وقتی کارت به سمتِ تایید کشیده و رها می‌شه (yesEffect)")]
@@ -322,6 +324,8 @@ public class CardSwipe : MonoBehaviour
             return;
         }
 
+        HideAllHints(); // اثرهای کارتِ قبلی رو پاک کن
+
         advisorText.text = currentCard.advisorName;
         bodyText.text = currentCard.cardText;
 
@@ -374,22 +378,17 @@ public class CardSwipe : MonoBehaviour
         float xOffset = transform.position.x - startPosition.x;
         transform.rotation = Quaternion.Euler(0, 0, -xOffset * rotationFactor);
 
-        UpdateHints(xOffset);
+        // دیگه پیش‌نمایشِ اثرها موقعِ کشیدن نشون داده نمی‌شه — طبق خواسته‌ی توسعه‌دهنده اثرها
+        // فقط «بعد از انتخاب» نشون داده می‌شن (تو ShowAppliedHints). فقط جهتِ بله/خیر رو نشون می‌دیم.
         UpdateSwipeIndicators(xOffset);
     }
 
-    // بر اساس جهت و فاصله‌ی کشیدن، نشون می‌ده اگه همین الان رها کنی چه اثری رخ می‌ده
-    void UpdateHints(float xOffset)
+    // بعد از اینکه تصمیم گرفته شد، اثرِ واقعیِ اون تصمیم رو روی هر نوار نشون می‌ده (+ یا -)
+    void ShowAppliedHints(bool approved)
     {
         if (statBars == null || currentCard == null) return;
 
-        if (Mathf.Abs(xOffset) < hintThreshold)
-        {
-            HideAllHints();
-            return;
-        }
-
-        var effects = IsApprove(xOffset) ? currentCard.approveEffects : currentCard.rejectEffects;
+        var effects = approved ? currentCard.approveEffects : currentCard.rejectEffects;
 
         foreach (var bar in statBars)
         {
@@ -411,7 +410,6 @@ public class CardSwipe : MonoBehaviour
     {
         if (!isDragging) return;
         isDragging = false;
-        HideAllHints();
         ResetSwipeIndicators();
 
         float xOffset = transform.position.x - startPosition.x;
@@ -423,6 +421,7 @@ public class CardSwipe : MonoBehaviour
             decided = true;
             PlayDecisionSound(approved);          // صدای بله/خیر
             ApplyCardEffects(approved);
+            ShowAppliedHints(approved);           // اثرها «بعد از انتخاب» نشون داده می‌شن
             StartCoroutine(FlyOffScreen(draggedRight)); // کارت به سمتی که کشیده شد پرت می‌شه
         }
         else
@@ -506,6 +505,9 @@ public class CardSwipe : MonoBehaviour
             elapsed += Time.deltaTime;
             yield return null;
         }
+
+        // یه مکثِ کوتاه تا بازیکن اثرِ تصمیمش (+/-) رو روی نوارها ببینه، بعد کارتِ بعدی
+        yield return new WaitForSeconds(hintHoldTime);
 
         LoadNextCard(); // کارت بعدی رو بیار
     }
