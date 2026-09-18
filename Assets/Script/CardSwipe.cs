@@ -190,6 +190,10 @@ public class CardSwipe : MonoBehaviour
         ShowSwipeIndicators(true);
         ResetSwipeIndicators();
 
+        // نوارهای وضعیت تا اینجا مخفی بودن (تو منو دیده نشن)؛ حالا با شروعِ بازی نشونشون بده
+        if (statBars != null)
+            foreach (var bar in statBars) if (bar != null) bar.SetVisible(true);
+
         // کارنامه‌ی پایانِ ماه رو (یه‌بار) بساز و مخفی نگه‌دار
         if (monthReport == null)
         {

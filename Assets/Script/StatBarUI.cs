@@ -22,17 +22,17 @@ public class StatBarUI : MonoBehaviour
     [Tooltip("فاصله‌ی بج از بالای صفحه (پیکسل)")]
     [SerializeField] private float topMargin = 30f;
 
-    [Header("محدوده‌ی پُرشدنِ طلایی داخلِ بج (کسری از خودِ تصویرِ بج)")]
-    [Tooltip("لبه‌ی چپِ پنلِ پایینی (۰ تا ۱)")]
-    [SerializeField] private float fillLeftFrac = 0.30f;
-    [SerializeField] private float fillRightFrac = 0.70f;
+    [Header("محدوده‌ی پُرشدنِ طلایی داخلِ پنلِ مستطیلیِ پایین (کسری از خودِ تصویرِ بج)")]
+    [Tooltip("لبه‌ی چپِ پنلِ پایینی (۰ تا ۱) — اندازه‌گیری‌شده از روی تصویرِ Sagsa")]
+    [SerializeField] private float fillLeftFrac = 0.16f;
+    [SerializeField] private float fillRightFrac = 0.84f;
     [Tooltip("کفِ پنلِ پایینی از پایینِ تصویر (۰ تا ۱)")]
-    [SerializeField] private float fillBottomFrac = 0.06f;
+    [SerializeField] private float fillBottomFrac = 0.03f;
     [Tooltip("سقفِ پنلِ پایینی از پایینِ تصویر (۰ تا ۱)")]
-    [SerializeField] private float fillTopFrac = 0.42f;
+    [SerializeField] private float fillTopFrac = 0.43f;
 
     [Header("رنگ‌ها و اندازه")]
-    [SerializeField] private Color fillColor = new Color(0.92f, 0.71f, 0.28f, 1f); // طلایی
+    [SerializeField] private Color fillColor = new Color(0.90f, 0.66f, 0.20f, 1f); // طلاییِ گرم
     [SerializeField] private float valueFontSize = 34f;
 
     public GameStats.StatType StatType => statType;
@@ -40,6 +40,7 @@ public class StatBarUI : MonoBehaviour
     private RectTransform fillRT;   // بخشِ طلاییِ پرشونده — ارتفاعش با مقدارِ شاخص عوض می‌شه
     private TMP_Text valueText;     // عددِ شاخص
     private TMP_Text hintRuntime;   // +/- که بعد از تصمیم نشون داده می‌شه
+    private GameObject badgeGO;     // خودِ بج — تا شروعِ بازی مخفیه (تو منو دیده نشه)
 
     void Start()
     {
@@ -95,7 +96,7 @@ public class StatBarUI : MonoBehaviour
         }
 
         // خودِ بج — بالای صفحه، وسطِ اسلاتِ افقیِ خودش
-        GameObject badgeGO = new GameObject("Badge_" + statType, typeof(RectTransform));
+        badgeGO = new GameObject("Badge_" + statType, typeof(RectTransform));
         badgeGO.transform.SetParent(canvas.transform, false);
         RectTransform badgeRT = badgeGO.GetComponent<RectTransform>();
         float xFrac = SlotXFraction(statType);
@@ -146,6 +147,15 @@ public class StatBarUI : MonoBehaviour
         hintRuntime.outlineWidth = 0.25f;
         hintRuntime.outlineColor = new Color(0f, 0f, 0f, 1f);
         hintRuntime.gameObject.SetActive(false);
+
+        // تا شروعِ بازی بج مخفیه تا تو منوی اصلی دیده نشه (CardSwipe.BeginGame نشونش می‌ده)
+        badgeGO.SetActive(false);
+    }
+
+    // با شروعِ بازی (CardSwipe.BeginGame) صدا زده می‌شه تا نوارها ظاهر بشن
+    public void SetVisible(bool visible)
+    {
+        if (badgeGO != null) badgeGO.SetActive(visible);
     }
 
     TMP_Text CreatePlainText(Transform parent, string name, float size, FontStyles style)
