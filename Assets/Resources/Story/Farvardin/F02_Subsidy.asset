@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0885a2500c18ea546ad854f4a80bd1ef, type: 3}
+  m_Name: F02_Subsidy
+  m_EditorClassIdentifier: Assembly-CSharp::CardData
+  cardId: F02_Subsidy
+  advisorName: "رئیسِ ستاد"
+  cardText: "رقیبت وعده‌ی سه‌برابر کردنِ یارانه‌ی نقدی رو داده و داره ازت جلو می‌زنه. ما هم بزنیم رو دستش؟"
+  category: 2
+  approveEffects:
+  - type: 1
+    amount: 12
+  - type: 0
+    amount: -12
+  rejectEffects:
+  - type: 1
+    amount: -7
+  - type: 0
+    amount: 8
+  requiredFlag: 
+  setFlagOnApprove: 
+  setFlagOnReject: 
+  orderInMonth: 2
+  illustration: {fileID: 0}
+  approveSfx: {fileID: 0}
+  rejectSfx: {fileID: 0}

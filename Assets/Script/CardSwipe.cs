@@ -65,11 +65,13 @@ public class CardSwipe : MonoBehaviour
     private AudioSource audioSource;
 
     private Vector3 startPosition;
+    private Vector3 startScale;
     private Vector3 dragOffset;
     private bool isDragging = false;
     private bool decided = false;
     private Camera mainCamera;
     private CardData currentCard;
+    private MonthReportUI monthReport; // کارنامه‌ی پایانِ ماهِ داستانی — موقع اجرا ساخته می‌شه
 
     // نشانگرهای بله/خیر — سمتِ راست و چپِ صفحه، موقع اجرا ساخته می‌شن
     private RTLTextMeshPro rightIndicator;
@@ -78,6 +80,7 @@ public class CardSwipe : MonoBehaviour
     void Start()
     {
         startPosition = transform.position;
+        startScale = transform.localScale;
         mainCamera = Camera.main;
 
         // یه AudioSource برای پخشِ افکت‌های صوتی — اگه رو کارت نبود، با کد اضافه می‌شه (نیازی به وایرینگ نیست)
@@ -179,9 +182,23 @@ public class CardSwipe : MonoBehaviour
     // با «بازی جدید» یا «ادامه‌ی بازی» از منوی اصلی صدا زده می‌شه
     public void BeginGame()
     {
+        gameObject.SetActive(true); // اگه بعد از پایانِ ماهِ قبلی غیرفعال شده بود، دوباره فعالش کن
+
         if (rightIndicator == null && leftIndicator == null) CreateSwipeIndicators();
         ShowSwipeIndicators(true);
         ResetSwipeIndicators();
+
+        // کارنامه‌ی پایانِ ماه رو (یه‌بار) بساز و مخفی نگه‌دار
+        if (monthReport == null)
+        {
+            TMPro.TMP_FontAsset font = advisorText != null ? advisorText.font : null;
+            monthReport = MonthReportUI.Create(GetUICanvas(), font);
+        }
+        if (monthReport != null) monthReport.Hide();
+
+        // شروعِ ماهِ داستانی (کمپین فروردین) — کارت‌ها به‌ترتیب از Resources لود می‌شن
+        if (CardDatabase.Instance.storyMode) CardDatabase.Instance.StartStoryMonth();
+
         LoadNextCard();
     }
 
@@ -294,6 +311,12 @@ public class CardSwipe : MonoBehaviour
 
         if (currentCard == null)
         {
+            // اگه ماهِ داستانی تموم شده، به‌جای خاموش‌شدنِ ساده، کارنامه‌ی ماه رو نشون بده
+            if (CardDatabase.Instance.StoryMonthComplete)
+            {
+                EndStoryMonth();
+                return;
+            }
             Debug.Log("کارتی برای نمایش نمونده!");
             gameObject.SetActive(false);
             return;
@@ -305,6 +328,34 @@ public class CardSwipe : MonoBehaviour
         decided = false;
         transform.position = startPosition;
         transform.rotation = Quaternion.identity;
+
+        // یه انیمیشنِ ریزِ «ظاهرشدن» برای جونِ بیشترِ گیم‌پلی
+        if (isActiveAndEnabled) StartCoroutine(AppearAnimation());
+    }
+
+    // وقتی ۱۲ کارتِ ماهِ داستانی تموم شد: نشانگرها و کارت رو مخفی کن و کارنامه‌ی ماه رو نشون بده
+    void EndStoryMonth()
+    {
+        ShowSwipeIndicators(false);
+        if (monthReport != null)
+            monthReport.Show(GameStats.Instance.Budget, GameStats.Instance.Popularity,
+                             GameStats.Instance.Security, GameStats.Instance.Diplomacy);
+        gameObject.SetActive(false);
+    }
+
+    // ظاهرشدنِ کارت با یه پرشِ کوچیکِ اندازه (از ۸۵٪ به ۱۰۰٪)
+    IEnumerator AppearAnimation()
+    {
+        float dur = 0.18f, t = 0f;
+        Vector3 from = startScale * 0.85f;
+        transform.localScale = from;
+        while (t < dur)
+        {
+            t += Time.deltaTime;
+            transform.localScale = Vector3.Lerp(from, startScale, t / dur);
+            yield return null;
+        }
+        transform.localScale = startScale;
     }
 
     void OnMouseDown()
@@ -380,10 +431,12 @@ public class CardSwipe : MonoBehaviour
         }
     }
 
-    // صدای مناسبِ تصمیم رو پخش می‌کنه: تایید = approveClip (بله)، رد = rejectClip (خیر)
+    // صدای مناسبِ تصمیم رو پخش می‌کنه: اگه کارت صدای مخصوصِ خودش رو داشت اون، وگرنه صدای پیش‌فرضِ بله/خیر
     void PlayDecisionSound(bool approved)
     {
-        AudioClip clip = approved ? approveClip : rejectClip;
+        AudioClip clip = approved
+            ? (currentCard != null && currentCard.approveSfx != null ? currentCard.approveSfx : approveClip)
+            : (currentCard != null && currentCard.rejectSfx != null ? currentCard.rejectSfx : rejectClip);
         if (clip != null && audioSource != null) audioSource.PlayOneShot(clip, sfxVolume);
     }
 
@@ -406,7 +459,10 @@ public class CardSwipe : MonoBehaviour
         string flag = approved ? currentCard.setFlagOnApprove : currentCard.setFlagOnReject;
         CardDatabase.Instance.SetFlag(flag);
 
-        GameStats.Instance.AdvanceMonth();
+        // تو حالتِ داستانی، هر ۱۲ کارت داخلِ همون یه ماه (فروردین) هستن؛ پس ماه رو جلو نمی‌بریم.
+        // (تو ماه‌های تصادفیِ آینده، هر تصمیم یه ماه رو جلو می‌بره — مثل قبل.)
+        if (!CardDatabase.Instance.storyMode)
+            GameStats.Instance.AdvanceMonth();
 
         // بعد از هر تصمیم، وضعیت رو خودکار ذخیره می‌کنیم تا «ادامه‌ی بازی» درست کار کنه
         if (GameStats.Instance.IsGameOver)

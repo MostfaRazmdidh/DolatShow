@@ -35,4 +35,16 @@ public class CardData : ScriptableObject
     public string requiredFlag;      // این کارت فقط وقتی این پرچم ست شده باشه ظاهر می‌شه
     public string setFlagOnApprove;  // با تایید، این پرچم ست می‌شه
     public string setFlagOnReject;   // با رد، این پرچم ست می‌شه
+
+    [Header("حالت داستانی (کمپین فروردین و ماه‌های داستانی بعدی)")]
+    [Tooltip("ترتیبِ کارت داخل ماه — کارت‌های داستانی به همین ترتیب پشت‌سرِ هم میان (کوچیک‌تر، زودتر)")]
+    public int orderInMonth = 0;
+
+    [Header("تصویر و صدا (اختیاری — برای «آب‌وتاب» بصری/صوتیِ کارت)")]
+    [Tooltip("تصویرِ اختصاصیِ کارت (ریزکاتسین). اگه خالی باشه، همون طرحِ پیش‌فرضِ کارت می‌مونه.")]
+    public Sprite illustration;
+    [Tooltip("صدای مخصوصِ این کارت موقع تایید — اگه خالی باشه، صدای پیش‌فرضِ «بله» پخش می‌شه")]
+    public AudioClip approveSfx;
+    [Tooltip("صدای مخصوصِ این کارت موقع رد — اگه خالی باشه، صدای پیش‌فرضِ «خیر» پخش می‌شه")]
+    public AudioClip rejectSfx;
 }
