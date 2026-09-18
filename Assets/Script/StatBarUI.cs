@@ -104,11 +104,11 @@ public class StatBarUI : MonoBehaviour
 
         valueText = textGO.AddComponent<TextMeshProUGUI>();
         valueText.alignment = TextAlignmentOptions.Center;
-        valueText.fontSize = 22;
+        valueText.fontSize = 30;
         valueText.color = Color.white;
         valueText.fontStyle = FontStyles.Bold;
-        valueText.outlineWidth = 0.2f;
-        valueText.outlineColor = Color.black;
+        valueText.outlineWidth = 0.32f;              // ضخیم‌تر → عدد رو زمینه‌ی طلایی/تیره واضح‌تر دیده می‌شه
+        valueText.outlineColor = new Color(0f, 0f, 0f, 1f);
         valueText.raycastTarget = false;
     }
 
