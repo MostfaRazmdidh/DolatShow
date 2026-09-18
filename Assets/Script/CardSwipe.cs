@@ -202,8 +202,13 @@ public class CardSwipe : MonoBehaviour
         }
         if (monthReport != null) monthReport.Hide();
 
-        // شروعِ ماهِ داستانی (کمپین فروردین) — کارت‌ها به‌ترتیب از Resources لود می‌شن
-        if (CardDatabase.Instance.storyMode) CardDatabase.Instance.StartStoryMonth();
+        // شروعِ ماهِ داستانی (کمپین فروردین) — کارت‌ها به‌ترتیب از Resources لود می‌شن،
+        // و ماه رو روی شماره‌ی همین فصل (فروردین=۱) می‌ذاریم تا تاریخ درست نشون داده بشه
+        if (CardDatabase.Instance.storyMode)
+        {
+            CardDatabase.Instance.StartStoryMonth();
+            GameStats.Instance.SetMonth(CardDatabase.Instance.storyMonthNumber);
+        }
 
         LoadNextCard();
     }

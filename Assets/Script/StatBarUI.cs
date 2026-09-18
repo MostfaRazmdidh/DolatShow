@@ -23,13 +23,13 @@ public class StatBarUI : MonoBehaviour
     [SerializeField] private float topMargin = 30f;
 
     [Header("محدوده‌ی پُرشدنِ طلایی داخلِ پنلِ مستطیلیِ پایین (کسری از خودِ تصویرِ بج)")]
-    [Tooltip("لبه‌ی چپِ پنلِ پایینی (۰ تا ۱) — اندازه‌گیری‌شده از روی تصویرِ Sagsa")]
-    [SerializeField] private float fillLeftFrac = 0.16f;
-    [SerializeField] private float fillRightFrac = 0.84f;
+    [Tooltip("لبه‌ی چپِ پنلِ پایینی (۰ تا ۱) — اندازه‌گیری‌شده از روی تصویرِ Sagsa تا کلِ باکس پر بشه")]
+    [SerializeField] private float fillLeftFrac = 0.125f;
+    [SerializeField] private float fillRightFrac = 0.85f;
     [Tooltip("کفِ پنلِ پایینی از پایینِ تصویر (۰ تا ۱)")]
     [SerializeField] private float fillBottomFrac = 0.03f;
     [Tooltip("سقفِ پنلِ پایینی از پایینِ تصویر (۰ تا ۱)")]
-    [SerializeField] private float fillTopFrac = 0.43f;
+    [SerializeField] private float fillTopFrac = 0.44f;
 
     [Header("رنگ‌ها و اندازه")]
     [SerializeField] private Color fillColor = new Color(0.90f, 0.66f, 0.20f, 1f); // طلاییِ گرم
@@ -129,12 +129,12 @@ public class StatBarUI : MonoBehaviour
         fillImg.color = fillColor;
         fillImg.raycastTarget = false;
 
-        // عددِ شاخص — وسطِ پنل، روی طلایی
+        // عددِ شاخص — وسطِ پنل. مشکی با دورخطِ روشن تا هم رو طلایی هم رو تیره خوب دیده بشه
         valueText = CreatePlainText(area.transform, "Value", valueFontSize, FontStyles.Bold);
         valueText.alignment = TextAlignmentOptions.Center;
-        valueText.color = Color.white;
-        valueText.outlineWidth = 0.3f;
-        valueText.outlineColor = new Color(0f, 0f, 0f, 1f);
+        valueText.color = Color.black;
+        valueText.outlineWidth = 0.22f;
+        valueText.outlineColor = new Color(0.98f, 0.92f, 0.72f, 1f); // کرمِ روشن
 
         // متنِ +/- که بعد از تصمیم بالای پنل نشون داده می‌شه (اول مخفیه)
         hintRuntime = CreatePlainText(badgeGO.transform, "Hint", valueFontSize * 0.95f, FontStyles.Bold);
