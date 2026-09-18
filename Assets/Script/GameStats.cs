@@ -90,6 +90,13 @@ public class GameStats : MonoBehaviour
         }
     }
 
+    // ماه رو مستقیم ست می‌کنه (مثلاً شروعِ ماهِ داستانی → فروردین). event رو هم صدا می‌زنه تا UI آپدیت بشه.
+    public void SetMonth(int month)
+    {
+        CurrentMonth = Mathf.Max(1, month);
+        OnMonthChanged?.Invoke(CurrentMonth);
+    }
+
     // بعد از هر تصمیم (سوایپ) صدا زده می‌شه، ماه رو جلو می‌بره
     public void AdvanceMonth()
     {

@@ -20,6 +20,8 @@ public class CardDatabase : MonoBehaviour
     public bool storyMode = true;
     [Tooltip("مسیرِ کارت‌های داستانی داخلِ Assets/Resources — بدونِ پسوند")]
     public string storyResourcesPath = "Story/Farvardin";
+    [Tooltip("شماره‌ی ماهِ این فصلِ داستانی (فروردین=۱) — برای نمایشِ درستِ تاریخ")]
+    public int storyMonthNumber = 1;
 
     private HashSet<string> activeFlags = new HashSet<string>();
     private Queue<string> recentCardIds = new Queue<string>();
