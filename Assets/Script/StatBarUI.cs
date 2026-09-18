@@ -35,9 +35,20 @@ public class StatBarUI : MonoBehaviour
     [SerializeField] private Color fillColor = new Color(0.90f, 0.66f, 0.20f, 1f); // طلاییِ گرم
     [SerializeField] private float valueFontSize = 34f;
 
+    [Header("تنظیمِ دقیقِ Fill داخلِ باکس (پیکسل — همون اندازه‌هایی که تو Inspector فرستادی)")]
+    [Tooltip("فاصله‌ی طلایی از لبه‌ی چپِ باکس")]
+    [SerializeField] private float fillPadLeft = 10.77f;
+    [Tooltip("فاصله‌ی طلایی از لبه‌ی راستِ باکس")]
+    [SerializeField] private float fillPadRight = 7.18f;
+    [Tooltip("فاصله از بالای باکس (وقتی پُرِ کامل)")]
+    [SerializeField] private float fillPadTop = 0f;
+    [Tooltip("فاصله از کفِ باکس")]
+    [SerializeField] private float fillPadBottom = 0f;
+
     public GameStats.StatType StatType => statType;
 
     private RectTransform fillRT;   // بخشِ طلاییِ پرشونده — ارتفاعش با مقدارِ شاخص عوض می‌شه
+    private float fillAreaHeight;   // ارتفاعِ باکس (پیکسل) — برای محاسبه‌ی دقیقِ پرشدن
     private TMP_Text valueText;     // عددِ شاخص
     private TMP_Text hintRuntime;   // +/- که بعد از تصمیم نشون داده می‌شه
     private GameObject badgeGO;     // خودِ بج — تا شروعِ بازی مخفیه (تو منو دیده نشه)
@@ -117,14 +128,15 @@ public class StatBarUI : MonoBehaviour
         areaRT.anchorMin = new Vector2(fillLeftFrac, fillBottomFrac);
         areaRT.anchorMax = new Vector2(fillRightFrac, fillTopFrac);
         areaRT.offsetMin = areaRT.offsetMax = Vector2.zero;
+        // ارتفاعِ باکس (پیکسل) = کسرِ ارتفاعیِ باکس × ارتفاعِ بج — برای محاسبه‌ی دقیقِ پرشدن
+        fillAreaHeight = (fillTopFrac - fillBottomFrac) * barHeight;
 
-        // خودِ طلاییِ پرشونده — از پایین به بالا رشد می‌کنه (anchorMax.y با مقدار عوض می‌شه)
+        // خودِ طلاییِ پرشونده — کاملاً کشیده به باکس، و ارتفاعش با آفستِ بالا (در SetFill) با مقدارِ شاخص کم/زیاد می‌شه
         GameObject fill = new GameObject("Fill", typeof(RectTransform));
         fill.transform.SetParent(area.transform, false);
         fillRT = fill.GetComponent<RectTransform>();
         fillRT.anchorMin = new Vector2(0f, 0f);
-        fillRT.anchorMax = new Vector2(1f, 0.5f);
-        fillRT.offsetMin = fillRT.offsetMax = Vector2.zero;
+        fillRT.anchorMax = new Vector2(1f, 1f);
         Image fillImg = fill.AddComponent<Image>();
         fillImg.color = fillColor;
         fillImg.raycastTarget = false;
@@ -173,12 +185,14 @@ public class StatBarUI : MonoBehaviour
         return t;
     }
 
-    // ارتفاعِ طلایی رو بر اساسِ مقدارِ شاخص (۰ تا ۱۰۰) تنظیم می‌کنه
+    // ارتفاعِ طلایی رو بر اساسِ مقدارِ شاخص (۰ تا ۱۰۰) تنظیم می‌کنه.
+    // با آفستِ دقیق (Left/Right/Top/Bottom) که طبقِ اندازه‌های فرستاده‌شده ثابته؛ فقط آفستِ بالا با مقدار عوض می‌شه.
     void SetFill(int value)
     {
         if (fillRT == null) return;
         float f = Mathf.Clamp01(value / 100f);
-        fillRT.anchorMax = new Vector2(1f, f);
+        fillRT.offsetMin = new Vector2(fillPadLeft, fillPadBottom);
+        fillRT.offsetMax = new Vector2(-fillPadRight, -((1f - f) * fillAreaHeight + fillPadTop));
     }
 
     void UpdateValueText(int value)
