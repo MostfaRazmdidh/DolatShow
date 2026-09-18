@@ -53,6 +53,7 @@ public class GameOverUI : MonoBehaviour
 
         messageText.text = GetLossMessage(type, hitMax);
         adButton.SetActive(!GameStats.Instance.AdUsedThisRun);
+        panel.transform.SetAsLastSibling(); // روی نوارهای وضعیت
         panel.SetActive(true);
     }
 
@@ -61,6 +62,7 @@ public class GameOverUI : MonoBehaviour
         wasLoss = false;
         messageText.text = "چهار سال ریاست‌جمهوری‌ت با موفقیت به پایان رسید!";
         adButton.SetActive(false);
+        panel.transform.SetAsLastSibling();
         panel.SetActive(true);
     }
 

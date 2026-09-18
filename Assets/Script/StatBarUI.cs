@@ -1,174 +1,227 @@
 using UnityEngine;
 using UnityEngine.UI;
-using RTLTMPro;
 using TMPro;
 
-// این اسکریپت رو روی هر کدوم از ۴ آبجکت نوار وضعیت می‌ذاریم
-// و تو Inspector مشخص می‌کنیم این نوار مال کدوم شاخصه
+// نوارِ وضعیتِ هر شاخص. طرحِ جدید: به‌جای اسلایدرِ چرخیده‌ی قدیمی، یه «بج» (badge) کاملِ آماده
+// (تصویر توی Assets/Resources/Bars/) نشون داده می‌شه که آیکون و اسمِ شاخص داخلش پخته شده. این اسکریپت
+// فقط «پُرشدنِ طلایی» رو توی پنلِ پایینیِ بج (Fill Area) و عددِ شاخص رو مدیریت می‌کنه.
 public class StatBarUI : MonoBehaviour
 {
     [SerializeField] private GameStats.StatType statType;
-    [SerializeField] private Slider slider; // یه UI Slider معمولی، فقط برای نمایش (تعاملی نیست)
+    [SerializeField] private Slider slider; // اسلایدرِ قدیمی — دیگه دیده نمی‌شه (visualش مخفی می‌شه)
 
-    [Header("پیش‌نمایش اثر تصمیم (اختیاری — موقع کشیدن کارت نشون داده می‌شه)")]
-    [SerializeField] private TMP_Text hintText; // یه متن کوچیک کنار نوار، مثلاً +۱۵ یا -۲۰ (نیازی به RTL نداره چون فقط عدد و علامته)
+    [Header("پیش‌نمایش/نتیجه‌ی اثر (از CardSwipe کنترل می‌شه)")]
+    [SerializeField] private TMP_Text hintText; // قدیمی — دیگه استفاده نمی‌شه (به‌جاش hint رو کد می‌سازه)
 
-    [Header("اسم شاخص (زیرِ نوار نوشته می‌شه)")]
-    [Tooltip("فونت فارسی — همون NotoNaskhArabic که بقیه‌ی متن‌ها ازش استفاده می‌کنن")]
+    [Header("فونت فارسی (برای عدد و +/-)")]
     [SerializeField] private TMP_FontAsset persianFont;
-    [Tooltip("اندازه‌ی فونتِ اسم شاخص")]
-    [SerializeField] private float nameFontSize = 50f;
-    [Tooltip("رنگ اسم شاخص")]
-    [SerializeField] private Color nameColor = new Color(0.96f, 0.90f, 0.78f);
-    [Tooltip("فاصله‌ی اسم از بالای نوار (پیکسل). چون بالای همه‌ی نوارها هم‌تراز است، با این مقدارِ ثابت " +
-        "اسمِ همه‌ی نوارها هم‌ترازِ هم می‌شه — حتی اگه طولِ نوارها فرق داشته باشه.")]
-    [SerializeField] private float nameDropFromTop = 380f;
-    [Tooltip("اندازه‌ی جعبه‌ی متنِ اسم شاخص")]
-    [SerializeField] private Vector2 nameBoxSize = new Vector2(260f, 80f);
 
-    [Header("ظاهر نوار (رنگِ بخشِ پرشده)")]
-    [SerializeField] private Color fillColor = new Color(0.92f, 0.71f, 0.28f, 1f);      // طلایی گرم و روشن
+    [Header("چیدمانِ بجِ نوار")]
+    [Tooltip("ارتفاعِ بج (پیکسل). عرض خودکار از نسبتِ تصویر حساب می‌شه.")]
+    [SerializeField] private float barHeight = 430f;
+    [Tooltip("فاصله‌ی بج از بالای صفحه (پیکسل)")]
+    [SerializeField] private float topMargin = 30f;
+
+    [Header("محدوده‌ی پُرشدنِ طلایی داخلِ بج (کسری از خودِ تصویرِ بج)")]
+    [Tooltip("لبه‌ی چپِ پنلِ پایینی (۰ تا ۱)")]
+    [SerializeField] private float fillLeftFrac = 0.30f;
+    [SerializeField] private float fillRightFrac = 0.70f;
+    [Tooltip("کفِ پنلِ پایینی از پایینِ تصویر (۰ تا ۱)")]
+    [SerializeField] private float fillBottomFrac = 0.06f;
+    [Tooltip("سقفِ پنلِ پایینی از پایینِ تصویر (۰ تا ۱)")]
+    [SerializeField] private float fillTopFrac = 0.42f;
+
+    [Header("رنگ‌ها و اندازه")]
+    [SerializeField] private Color fillColor = new Color(0.92f, 0.71f, 0.28f, 1f); // طلایی
+    [SerializeField] private float valueFontSize = 34f;
 
     public GameStats.StatType StatType => statType;
 
-    private TMP_Text valueText; // عدد فعلی شاخص، روی خودِ اسلایدر — با کد ساخته می‌شه، نیازی به وایرینگ دستی نداره
-
-    // اسم فارسیِ هر شاخص برای نمایش زیرِ نوار
-    private static string GetStatName(GameStats.StatType type)
-    {
-        switch (type)
-        {
-            case GameStats.StatType.Budget:     return "بودجه";
-            case GameStats.StatType.Popularity: return "محبوبیت";
-            case GameStats.StatType.Security:   return "امنیت";
-            case GameStats.StatType.Diplomacy:  return "دیپلماسی";
-            default: return "";
-        }
-    }
+    private RectTransform fillRT;   // بخشِ طلاییِ پرشونده — ارتفاعش با مقدارِ شاخص عوض می‌شه
+    private TMP_Text valueText;     // عددِ شاخص
+    private TMP_Text hintRuntime;   // +/- که بعد از تصمیم نشون داده می‌شه
 
     void Start()
     {
-        StyleSlider();
-        CreateValueText();
-        CreateNameLabel();
+        HideOldSliderVisual();
+        BuildBadge();
 
-        // مقدار اولیه رو بگیر و نمایش بده
-        slider.value = GameStats.Instance.GetStat(statType);
-        UpdateValueText(slider.value);
+        int val = GameStats.Instance.GetStat(statType);
+        SetFill(val);
+        UpdateValueText(val);
 
-        // از این به بعد هر تغییری رخ بده خودکار آپدیت می‌شه
         GameStats.Instance.OnStatChanged += HandleStatChanged;
-    }
-
-    // فقط رنگِ بخشِ پرشده (Fill) رو طلایی می‌کنیم و دستگیره رو مخفی می‌کنیم.
-    // نکته: پس‌زمینه‌ی نوار (Background) دیگه اینجا رنگ نمی‌شه — چون توسعه‌دهنده براش اسپرایتِ
-    // آماده (BG_slidr) گذاشته؛ اگه رنگش کنیم اون اسپرایت تیره و کم‌رنگ («سایه‌مانند») می‌شه.
-    void StyleSlider()
-    {
-        // fill (بخش پر شده)
-        if (slider.fillRect != null)
-        {
-            Image fillImg = slider.fillRect.GetComponent<Image>();
-            if (fillImg != null) fillImg.color = fillColor;
-        }
-
-        // دستگیره‌ی اسلایدر رو مخفی کن — این نوار فقط نمایشیه
-        if (slider.handleRect != null)
-            slider.handleRect.gameObject.SetActive(false);
     }
 
     void OnDestroy()
     {
-        // جلوگیری از خطای احتمالی وقتی صحنه عوض می‌شه
         if (GameStats.Instance != null)
             GameStats.Instance.OnStatChanged -= HandleStatChanged;
     }
 
     void HandleStatChanged(GameStats.StatType changedType, int newValue)
     {
-        if (changedType != statType) return; // این نوار فقط به شاخص خودش واکنش نشون می‌ده
-        slider.value = newValue;
+        if (changedType != statType) return;
+        SetFill(newValue);
         UpdateValueText(newValue);
     }
 
-    // عدد شاخص رو روی خودِ نوار (روی اسلایدر) نشون می‌ده — فقط عدده، نیازی به RTL نداره
-    void CreateValueText()
+    // ویژوالِ اسلایدرِ چرخیده‌ی قدیمی رو مخفی می‌کنه (نوارِ جدید یه بجِ صافِ روی Canvas‌ه)
+    void HideOldSliderVisual()
     {
-        GameObject textGO = new GameObject("ValueText", typeof(RectTransform));
-        textGO.transform.SetParent(slider.transform, false);
-        RectTransform rect = textGO.GetComponent<RectTransform>();
-        rect.anchorMin = Vector2.zero;
-        rect.anchorMax = Vector2.one;
-        rect.offsetMin = Vector2.zero;
-        rect.offsetMax = Vector2.zero;
-
-        valueText = textGO.AddComponent<TextMeshProUGUI>();
-        valueText.alignment = TextAlignmentOptions.Center;
-        valueText.fontSize = 30;
-        valueText.color = Color.white;
-        valueText.fontStyle = FontStyles.Bold;
-        valueText.outlineWidth = 0.32f;              // ضخیم‌تر → عدد رو زمینه‌ی طلایی/تیره واضح‌تر دیده می‌شه
-        valueText.outlineColor = new Color(0f, 0f, 0f, 1f);
-        valueText.raycastTarget = false;
+        if (slider == null) return;
+        DisableChild(slider.transform, "Background");
+        DisableChild(slider.transform, "Fill Area");
+        DisableChild(slider.transform, "Handle Slide Area");
     }
 
-    void UpdateValueText(float value)
+    void DisableChild(Transform parent, string childName)
     {
-        if (valueText != null) valueText.text = ((int)value).ToString();
+        Transform t = parent.Find(childName);
+        if (t != null) t.gameObject.SetActive(false);
     }
 
-    // اسم فارسیِ شاخص رو وسطِ زیرِ نوار می‌نویسه (به‌جای آیکونِ قبلی).
-    // نکته‌ی مهم: خودِ آبجکتِ نوار تو صحنه ۹۰ درجه چرخیده (m_LocalEulerAngles z=90) تا اسلایدرِ
-    // افقی به‌صورت عمودی وایسته. چون این متن فرزندِ همون آبجکته، اون چرخش ۹۰ درجه رو به ارث می‌بره
-    // و کج/زاویه‌دار دیده می‌شه. برای همین متن رو ۹۰- درجه برعکس می‌چرخونیم تا صاف و افقی بشه،
-    // و چون محورهای محلی هم چرخیدن، برای «پایینِ نوار» باید تو محورِ x محلیِ منفی جابه‌جاش کنیم.
-    void CreateNameLabel()
+    void BuildBadge()
     {
-        GameObject nameGO = new GameObject("NameLabel", typeof(RectTransform));
-        nameGO.transform.SetParent(transform, false);
-        RectTransform rect = nameGO.GetComponent<RectTransform>();
-        rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f); // وسطِ نوار
-        rect.pivot = new Vector2(0.5f, 0.5f);
+        Canvas canvas = GetComponentInParent<Canvas>();
+        if (canvas == null) return;
+        canvas = canvas.rootCanvas;
 
-        // چرخشِ متن رو صاف کن: چون والد ۹۰+ چرخیده، متن رو ۹۰- می‌چرخونیم تا در نهایت افقی بشه
-        rect.localRotation = Quaternion.Euler(0f, 0f, -90f);
-
-        // موقعیتِ عمودی: چون نوارها طولِ متفاوتی دارن، اگه اسم رو نسبت به «پایینِ» هر نوار بذاریم،
-        // اسمِ نوارهای بلندتر پایین‌تر می‌افته (باگی که «محبوبیت پایینه» رو می‌ساخت). ولی «بالای» همه‌ی
-        // نوارها هم‌تراز است؛ پس اسم رو یه فاصله‌ی ثابت (nameDropFromTop) پایین‌ترِ بالای نوار می‌ذاریم
-        // تا اسمِ همه‌ی نوارها هم‌ترازِ هم بشه. (والد ۹۰+ چرخیده: محورِ x محلیِ مثبت = بالای نوار.)
-        float halfLen = GetComponent<RectTransform>().rect.width * 0.5f;
-        rect.anchoredPosition = new Vector2(halfLen - nameDropFromTop, 0f);
-        rect.sizeDelta = nameBoxSize;
-
-        RTLTextMeshPro nameText = nameGO.AddComponent<RTLTextMeshPro>();
-        nameText.font = persianFont;
-        nameText.fontSize = nameFontSize;
-        nameText.alignment = TextAlignmentOptions.Center;
-        nameText.color = nameColor;
-        nameText.fontStyle = FontStyles.Bold;
-        nameText.raycastTarget = false;
-        nameText.text = GetStatName(statType);
-    }
-
-    // موقع کشیدن کارت صدا زده می‌شه تا نشون بده اگه همین الان رها کنی، این شاخص چقدر تغییر می‌کنه
-    public void ShowHint(int amount)
-    {
-        if (hintText == null) return;
-
-        if (amount == 0)
+        Sprite badge = Resources.Load<Sprite>("Bars/" + FileName(statType));
+        if (badge == null)
         {
-            HideHint();
+            Debug.LogWarning($"StatBarUI: تصویرِ بج برای {statType} تو Resources/Bars پیدا نشد.");
             return;
         }
 
-        hintText.gameObject.SetActive(true);
-        hintText.text = (amount > 0 ? "+" : "") + amount;
-        hintText.color = amount > 0 ? Color.green : Color.red;
+        // خودِ بج — بالای صفحه، وسطِ اسلاتِ افقیِ خودش
+        GameObject badgeGO = new GameObject("Badge_" + statType, typeof(RectTransform));
+        badgeGO.transform.SetParent(canvas.transform, false);
+        RectTransform badgeRT = badgeGO.GetComponent<RectTransform>();
+        float xFrac = SlotXFraction(statType);
+        badgeRT.anchorMin = badgeRT.anchorMax = new Vector2(xFrac, 1f);
+        badgeRT.pivot = new Vector2(0.5f, 1f);
+        float aspect = badge.rect.width / badge.rect.height;
+        badgeRT.sizeDelta = new Vector2(barHeight * aspect, barHeight);
+        badgeRT.anchoredPosition = new Vector2(0f, -topMargin);
+
+        Image badgeImg = badgeGO.AddComponent<Image>();
+        badgeImg.sprite = badge;
+        badgeImg.raycastTarget = false;
+
+        // پنلِ پایینی (Fill Area) — محدوده‌ای که طلایی توش پر می‌شه
+        GameObject area = new GameObject("FillArea", typeof(RectTransform));
+        area.transform.SetParent(badgeGO.transform, false);
+        RectTransform areaRT = area.GetComponent<RectTransform>();
+        areaRT.anchorMin = new Vector2(fillLeftFrac, fillBottomFrac);
+        areaRT.anchorMax = new Vector2(fillRightFrac, fillTopFrac);
+        areaRT.offsetMin = areaRT.offsetMax = Vector2.zero;
+
+        // خودِ طلاییِ پرشونده — از پایین به بالا رشد می‌کنه (anchorMax.y با مقدار عوض می‌شه)
+        GameObject fill = new GameObject("Fill", typeof(RectTransform));
+        fill.transform.SetParent(area.transform, false);
+        fillRT = fill.GetComponent<RectTransform>();
+        fillRT.anchorMin = new Vector2(0f, 0f);
+        fillRT.anchorMax = new Vector2(1f, 0.5f);
+        fillRT.offsetMin = fillRT.offsetMax = Vector2.zero;
+        Image fillImg = fill.AddComponent<Image>();
+        fillImg.color = fillColor;
+        fillImg.raycastTarget = false;
+
+        // عددِ شاخص — وسطِ پنل، روی طلایی
+        valueText = CreatePlainText(area.transform, "Value", valueFontSize, FontStyles.Bold);
+        valueText.alignment = TextAlignmentOptions.Center;
+        valueText.color = Color.white;
+        valueText.outlineWidth = 0.3f;
+        valueText.outlineColor = new Color(0f, 0f, 0f, 1f);
+
+        // متنِ +/- که بعد از تصمیم بالای پنل نشون داده می‌شه (اول مخفیه)
+        hintRuntime = CreatePlainText(badgeGO.transform, "Hint", valueFontSize * 0.95f, FontStyles.Bold);
+        RectTransform hintRT = hintRuntime.rectTransform;
+        hintRT.anchorMin = hintRT.anchorMax = new Vector2(0.5f, fillTopFrac);
+        hintRT.pivot = new Vector2(0.5f, 0f);
+        hintRT.sizeDelta = new Vector2(barHeight * aspect * 0.6f, 46f);
+        hintRT.anchoredPosition = new Vector2(0f, 4f);
+        hintRuntime.alignment = TextAlignmentOptions.Center;
+        hintRuntime.outlineWidth = 0.25f;
+        hintRuntime.outlineColor = new Color(0f, 0f, 0f, 1f);
+        hintRuntime.gameObject.SetActive(false);
+    }
+
+    TMP_Text CreatePlainText(Transform parent, string name, float size, FontStyles style)
+    {
+        GameObject go = new GameObject(name, typeof(RectTransform));
+        go.transform.SetParent(parent, false);
+        RectTransform rt = go.GetComponent<RectTransform>();
+        rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one;
+        rt.offsetMin = rt.offsetMax = Vector2.zero;
+        TextMeshProUGUI t = go.AddComponent<TextMeshProUGUI>();
+        if (persianFont != null) t.font = persianFont;
+        t.fontSize = size;
+        t.fontStyle = style;
+        t.raycastTarget = false;
+        return t;
+    }
+
+    // ارتفاعِ طلایی رو بر اساسِ مقدارِ شاخص (۰ تا ۱۰۰) تنظیم می‌کنه
+    void SetFill(int value)
+    {
+        if (fillRT == null) return;
+        float f = Mathf.Clamp01(value / 100f);
+        fillRT.anchorMax = new Vector2(1f, f);
+    }
+
+    void UpdateValueText(int value)
+    {
+        if (valueText != null) valueText.text = ToPersian(value);
+    }
+
+    // موقعِ نمایشِ نتیجه‌ی تصمیم (بعد از انتخاب) صدا زده می‌شه
+    public void ShowHint(int amount)
+    {
+        if (hintRuntime == null) return;
+        if (amount == 0) { HideHint(); return; }
+        hintRuntime.gameObject.SetActive(true);
+        hintRuntime.text = (amount > 0 ? "+" : "") + ToPersian(amount);
+        hintRuntime.color = amount > 0 ? new Color(0.4f, 0.9f, 0.45f) : new Color(0.95f, 0.4f, 0.35f);
     }
 
     public void HideHint()
     {
-        if (hintText != null) hintText.gameObject.SetActive(false);
+        if (hintRuntime != null) hintRuntime.gameObject.SetActive(false);
+    }
+
+    static float SlotXFraction(GameStats.StatType type)
+    {
+        // چیدمانِ افقی (چپ→راست): دیپلماسی، بودجه، محبوبیت، امنیت — مثلِ قبل، مساوی و بدونِ روی‌هم‌افتادگی
+        switch (type)
+        {
+            case GameStats.StatType.Diplomacy: return 0.125f;
+            case GameStats.StatType.Budget: return 0.375f;
+            case GameStats.StatType.Popularity: return 0.625f;
+            case GameStats.StatType.Security: return 0.875f;
+            default: return 0.5f;
+        }
+    }
+
+    static string FileName(GameStats.StatType type)
+    {
+        switch (type)
+        {
+            case GameStats.StatType.Budget: return "Bar_Budget";
+            case GameStats.StatType.Popularity: return "Bar_Popularity";
+            case GameStats.StatType.Security: return "Bar_Security";
+            case GameStats.StatType.Diplomacy: return "Bar_Diplomacy";
+            default: return "Bar_Budget";
+        }
+    }
+
+    static string ToPersian(int n)
+    {
+        string s = n.ToString();
+        string r = "";
+        foreach (char c in s)
+            r += (c >= '0' && c <= '9') ? "۰۱۲۳۴۵۶۷۸۹"[c - '0'] : c;
+        return r;
     }
 }

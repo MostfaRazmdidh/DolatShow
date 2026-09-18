@@ -122,6 +122,7 @@ public class MonthReportUI : MonoBehaviour
 
         TrySetEndingImage(endingIndex);
 
+        panel.transform.SetAsLastSibling(); // روی نوارهای وضعیت
         panel.SetActive(true);
     }
 
