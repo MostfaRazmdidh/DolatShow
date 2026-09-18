@@ -49,6 +49,9 @@ public class MainMenuUI : MonoBehaviour
         AddMenuButton("StartButton", startButtonSprite, startButtonCenter, "شروع بازی", StartGame);
         AddMenuButton("SettingsButton", settingsButtonSprite, settingsButtonCenter, "تنظیمات", OpenSettings);
         AddMenuButton("ExitButton", exitButtonSprite, exitButtonCenter, "خروج", QuitGame);
+
+        // منو باید روی همه‌چیز (از جمله نوارهای وضعیت که موقع اجرا روی Canvas ساخته می‌شن) باشه
+        panel.transform.SetAsLastSibling();
     }
 
     // یه دکمه رو وسط‌چینِ نقطه‌ی center می‌سازه؛ پهنا ثابته و ارتفاع از نسبتِ خودِ تصویر حساب می‌شه
