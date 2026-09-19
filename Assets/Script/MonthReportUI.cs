@@ -162,7 +162,8 @@ public class MonthReportUI : MonoBehaviour
 
     void BackToMenu()
     {
-        Debug.Log("MonthReportUI: دکمه‌ی خانه زده شد — بازگشت به منوی اصلی (ری‌لودِ صحنه).");
+        // با ری‌لودِ صحنه به منوی اصلی برمی‌گردیم. (حالا که DontDestroyOnLoad از GameStats حذف شده،
+        // GameManagerِ قدیمی با صحنه پاک می‌شه و نسخه‌ی تازه‌ش منوی نو رو درست نشون می‌ده.)
         Time.timeScale = 1f; // محضِ اطمینان اگه جایی pause شده بود
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
