@@ -355,6 +355,8 @@ public class CardSwipe : MonoBehaviour
     // وقتی ۱۲ کارتِ ماهِ داستانی تموم شد: نشانگرها و کارت رو مخفی کن و کارنامه‌ی ماه رو نشون بده
     void EndStoryMonth()
     {
+        // ماهِ داستانی کامل شد → سیو دیگه معنی نداره (چیزی برای ادامه نمونده)، پاکش کن
+        SaveSystem.DeleteSave();
         ShowSwipeIndicators(false);
         if (monthReport != null)
             monthReport.Show(GameStats.Instance.Budget, GameStats.Instance.Popularity,
@@ -478,11 +480,12 @@ public class CardSwipe : MonoBehaviour
         if (!CardDatabase.Instance.storyMode)
             GameStats.Instance.AdvanceMonth();
 
-        // فعلاً بازی سیو نمی‌شه (طبق خواسته‌ی توسعه‌دهنده) — سیوِ خودکار موقتاً غیرفعاله.
-        // if (GameStats.Instance.IsGameOver)
-        //     SaveSystem.DeleteSave();
-        // else
-        //     SaveSystem.Save(GameStats.Instance.CreateSaveData());
+        // سیوِ خودکار بعد از هر تصمیم: اگه بازی باخته → سیو پاک می‌شه، وگرنه وضعیتِ فعلی
+        // (شاخص‌ها + پرچم‌ها + جای فعلیِ کارتِ داستانی) ذخیره می‌شه تا بشه بعداً «ادامه» داد.
+        if (GameStats.Instance.IsGameOver)
+            SaveSystem.DeleteSave();
+        else
+            SaveSystem.Save(GameStats.Instance.CreateSaveData());
     }
 
     Vector3 GetMouseWorldPosition()
