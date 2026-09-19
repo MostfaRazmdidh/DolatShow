@@ -4,24 +4,21 @@ using UnityEngine.SceneManagement;
 using RTLTMPro;
 using TMPro;
 
-// کارنامه‌ی پایانِ ماهِ داستانی (مثلاً فروردین/کمپین). موقع اجرا با کد ساخته می‌شه (نیازی به وایرینگ
-// تو صحنه نداره — CardSwipe موقعِ BeginGame با MonthReportUI.Create می‌سازتش).
-// بر اساسِ وضعیتِ نهاییِ ۴ شاخص، یکی از ۴ «پایانِ» ماه رو انتخاب و نشون می‌ده، به‌همراه گزارشِ اعداد.
+// کارنامه‌ی پایانِ ماهِ داستانی، روی تصویرِ «روزنامه» (Assets/Resources/UI/Newspaper) نوشته می‌شه.
+// موقعِ اجرا با کد ساخته می‌شه (CardSwipe.BeginGame با MonthReportUI.Create می‌سازتش) — بدونِ وایرینگِ صحنه.
 public class MonthReportUI : MonoBehaviour
 {
     private TMP_FontAsset persianFont;
     private Canvas targetCanvas;
 
     private GameObject panel;
-    private GameObject endingImageGO;
-    private RTLTextMeshPro titleText;
-    private RTLTextMeshPro endingTitleText;
-    private RTLTextMeshPro endingBodyText;
-    private RTLTextMeshPro headlineText;
-    private RTLTextMeshPro statsText;
+    private RTLTextMeshPro mastheadText;   // «کارنامه‌ی فروردین» تو بنرِ مشکیِ بالای روزنامه
+    private RTLTextMeshPro endingTitleText; // اسمِ پایان (تیترِ درشت)
+    private RTLTextMeshPro endingBodyText;  // متنِ طنز
+    private RTLTextMeshPro headlineText;     // تیترِ روزنامه
+    private RTLTextMeshPro statsText;        // اعدادِ نهایی
 
-    // مسیرِ عکسِ اختیاریِ هر پایان تو Resources — اگه بذاری، بالای کارنامه نشون داده می‌شه
-    private const string endingImageResourcePath = "Story/Farvardin/Endings/ending_";
+    private static readonly Color parchmentInk = new Color(0.24f, 0.14f, 0.05f); // قهوه‌ای تیره روی کاغذِ کاهی
 
     public static MonthReportUI Create(Canvas canvas, TMP_FontAsset font)
     {
@@ -41,33 +38,72 @@ public class MonthReportUI : MonoBehaviour
 
     void BuildUI()
     {
-        panel = RuntimeUIHelper.CreateFullScreenPanel(targetCanvas.transform, "MonthReportPanel", new Color(0.03f, 0.03f, 0.05f, 0.92f));
+        // پس‌زمینه‌ی تیره‌ی محو پشتِ روزنامه
+        panel = RuntimeUIHelper.CreateFullScreenPanel(targetCanvas.transform, "MonthReportPanel", new Color(0f, 0f, 0f, 0.8f));
 
-        titleText = RuntimeUIHelper.CreateRTLText(panel.transform, "ReportTitle", new Vector2(0.1f, 0.88f), new Vector2(0.9f, 0.96f), 40, persianFont);
-        titleText.text = "کارنامه‌ی فروردین";
-        titleText.color = new Color(0.96f, 0.83f, 0.45f);
-        titleText.fontStyle = FontStyles.Bold;
+        // تصویرِ روزنامه، وسطِ صفحه، هم‌اندازه‌ی نسبتِ خودش (بدون کش‌آمدن) تا متن‌ها سرِ جاشون بشینن
+        Sprite paper = Resources.Load<Sprite>("UI/Newspaper");
+        GameObject paperGO = new GameObject("Newspaper", typeof(RectTransform));
+        paperGO.transform.SetParent(panel.transform, false);
+        RectTransform paperRT = paperGO.GetComponent<RectTransform>();
+        paperRT.anchorMin = paperRT.anchorMax = new Vector2(0.5f, 0.5f);
+        paperRT.pivot = new Vector2(0.5f, 0.5f);
+        Vector2 canvasSize = ((RectTransform)targetCanvas.transform).rect.size;
+        float aspect = paper != null ? (paper.rect.width / paper.rect.height) : (1024f / 1536f);
+        float ph = canvasSize.y * 0.96f;
+        float pw = ph * aspect;
+        if (pw > canvasSize.x * 0.98f) { pw = canvasSize.x * 0.98f; ph = pw / aspect; }
+        paperRT.sizeDelta = new Vector2(pw, ph);
+        paperRT.anchoredPosition = Vector2.zero;
+        if (paper != null)
+        {
+            Image img = paperGO.AddComponent<Image>();
+            img.sprite = paper;
+            img.preserveAspect = true;
+            img.raycastTarget = false;
+        }
 
-        // جای عکسِ پایان (اگه تو Resources باشه پر می‌شه)
-        endingImageGO = null;
+        // همه‌ی متن‌ها فرزندِ روزنامه‌ان تا با کسرها دقیق سرِ جاشون بشینن
+        mastheadText = MakeText(paperRT, "Masthead", 0.13f, 0.795f, 0.87f, 0.865f, 40, new Color(0.96f, 0.86f, 0.55f));
+        mastheadText.fontStyle = FontStyles.Bold;
+        mastheadText.text = "کارنامه‌ی فروردین";
 
-        endingTitleText = RuntimeUIHelper.CreateRTLText(panel.transform, "EndingTitle", new Vector2(0.08f, 0.62f), new Vector2(0.92f, 0.72f), 44, persianFont);
+        endingTitleText = MakeText(paperRT, "EndingTitle", 0.12f, 0.66f, 0.88f, 0.76f, 46, parchmentInk);
         endingTitleText.fontStyle = FontStyles.Bold;
 
-        endingBodyText = RuntimeUIHelper.CreateRTLText(panel.transform, "EndingBody", new Vector2(0.1f, 0.42f), new Vector2(0.9f, 0.62f), 28, persianFont);
-        endingBodyText.color = new Color(0.92f, 0.90f, 0.84f);
+        endingBodyText = MakeText(paperRT, "EndingBody", 0.13f, 0.45f, 0.87f, 0.64f, 26, parchmentInk);
 
-        headlineText = RuntimeUIHelper.CreateRTLText(panel.transform, "Headline", new Vector2(0.1f, 0.33f), new Vector2(0.9f, 0.41f), 24, persianFont);
-        headlineText.color = new Color(0.75f, 0.78f, 0.85f);
+        headlineText = MakeText(paperRT, "Headline", 0.13f, 0.35f, 0.87f, 0.43f, 24, new Color(0.45f, 0.28f, 0.12f));
         headlineText.fontStyle = FontStyles.Italic;
 
-        statsText = RuntimeUIHelper.CreateRTLText(panel.transform, "Stats", new Vector2(0.05f, 0.24f), new Vector2(0.95f, 0.31f), 26, persianFont);
-        statsText.color = new Color(0.96f, 0.83f, 0.45f);
+        statsText = MakeText(paperRT, "Stats", 0.06f, 0.26f, 0.94f, 0.34f, 26, new Color(0.35f, 0.2f, 0.06f));
+        statsText.fontStyle = FontStyles.Bold;
 
-        RuntimeUIHelper.CreateButton(panel.transform, "BackToMenuButton", new Vector2(0.3f, 0.1f), new Vector2(0.7f, 0.19f),
-            "بازگشت به منو", persianFont, new Color(0.2f, 0.55f, 0.25f, 1f), BackToMenu);
+        // دکمه‌ی خانه (بازگشت به منوی اصلی) — پایینِ روزنامه
+        Sprite home = Resources.Load<Sprite>("UI/Btn_Home");
+        if (home != null)
+        {
+            float bw = 0.42f, bAspect = home.rect.width / home.rect.height;
+            // ارتفاعِ دکمه نسبت به پهناش (که کسری از پهنای روزنامه‌ست)
+            float bhFrac = (bw * pw / bAspect) / ph;
+            float cx = 0.5f, cy = 0.16f;
+            var go = RuntimeUIHelper.CreateImageButton(paperRT, "HomeButton",
+                new Vector2(cx - bw / 2f, cy - bhFrac / 2f), new Vector2(cx + bw / 2f, cy + bhFrac / 2f), home, BackToMenu);
+        }
+        else
+        {
+            RuntimeUIHelper.CreateButton(paperRT, "HomeButton", new Vector2(0.3f, 0.11f), new Vector2(0.7f, 0.2f),
+                "بازگشت به منو", persianFont, new Color(0.2f, 0.55f, 0.25f, 1f), BackToMenu);
+        }
 
         panel.SetActive(false);
+    }
+
+    RTLTextMeshPro MakeText(Transform parent, string name, float xMin, float yMin, float xMax, float yMax, float size, Color color)
+    {
+        RTLTextMeshPro t = RuntimeUIHelper.CreateRTLText(parent, name, new Vector2(xMin, yMin), new Vector2(xMax, yMax), size, persianFont);
+        t.color = color;
+        return t;
     }
 
     public void Hide()
@@ -75,87 +111,52 @@ public class MonthReportUI : MonoBehaviour
         if (panel != null) panel.SetActive(false);
     }
 
-    // اعداد نهایی رو می‌گیره، پایان رو انتخاب می‌کنه و کارنامه رو نشون می‌ده
     public void Show(int budget, int popularity, int security, int diplomacy)
     {
         int competence = Mathf.RoundToInt((budget + security + diplomacy) / 3f);
         bool popHigh = popularity >= 50;
         bool compHigh = competence >= 50;
 
-        int endingIndex;
         string eTitle, eBody, eHeadline;
+        Color titleColor;
 
         if (popHigh && compHigh)
         {
-            endingIndex = 0;
             eTitle = "قهرمانِ ملی!";
             eBody = "مردم رو دوش‌شون گذاشتنت، اقتصاددان‌ها برات دست زدن، و حتی رقیب‌هات مجبور شدن تبریک بگن. یه شروعِ رؤیایی برای کسی که هنوز عملاً هیچ کاری نکرده.";
             eHeadline = "تیتر روزنامه‌ها: «مسیحِ اقتصاد از راه رسید!»";
+            titleColor = new Color(0.15f, 0.45f, 0.2f);
         }
         else if (popHigh && !compHigh)
         {
-            endingIndex = 1;
             eTitle = "پوپولیستِ محبوب";
             eBody = "مردم عاشقتن، چون به همه، همه‌چیز رو قول دادی. فقط یه مشکلِ کوچیک هست: خزانه خالیه و هیچ‌کس نمی‌دونه این وعده‌ها قراره از کجا بیان. ولی فعلاً کی به فکرِ فرداست؟";
             eHeadline = "تیتر روزنامه‌ها: «رئیس‌جمهورِ وعده‌ها سوگند خورد؛ صف‌ها هم قول دادن بمونن.»";
+            titleColor = new Color(0.6f, 0.42f, 0.1f);
         }
         else if (!popHigh && compHigh)
         {
-            endingIndex = 2;
             eTitle = "تکنوکراتِ بی‌رأی";
             eBody = "نمودارهات بی‌نقص بودن، بودجه‌ت متوازن بود، و دقیقاً به همین خاطر کسی رأیت نداد. مردم آدمِ حسابگر نمی‌خوان، معجزه می‌خوان.";
             eHeadline = "تیتر روزنامه‌ها: «کاندیدایی که اکسل بلد بود، دلِ ملت رو بلد نبود.»";
+            titleColor = new Color(0.15f, 0.3f, 0.55f);
         }
         else
         {
-            endingIndex = 3;
             eTitle = "کاندیدای فراموش‌شده";
             eBody = "نه مردم دوستت داشتن، نه اوضاع رو بهتر کردی. تا آخرِ هفته اسمت هم یادِ کسی نمی‌مونه. شاید سیاست اصلاً کارِ تو نبود.";
             eHeadline = "تیتر روزنامه‌ها: «کدوم کاندیدا؟»";
+            titleColor = new Color(0.55f, 0.2f, 0.15f);
         }
 
         endingTitleText.text = eTitle;
-        endingTitleText.color = EndingColor(endingIndex);
+        endingTitleText.color = titleColor;
         endingBodyText.text = eBody;
         headlineText.text = eHeadline;
         statsText.text = $"بودجه {Fa(budget)}    محبوبیت {Fa(popularity)}    امنیت {Fa(security)}    دیپلماسی {Fa(diplomacy)}";
 
-        TrySetEndingImage(endingIndex);
-
-        panel.transform.SetAsLastSibling(); // روی نوارهای وضعیت
+        panel.transform.SetAsLastSibling();
         panel.SetActive(true);
-    }
-
-    Color EndingColor(int index)
-    {
-        switch (index)
-        {
-            case 0: return new Color(0.45f, 0.85f, 0.5f);  // سبز — قهرمان
-            case 1: return new Color(0.96f, 0.75f, 0.35f);  // طلایی — پوپولیست
-            case 2: return new Color(0.55f, 0.75f, 0.95f);  // آبی — تکنوکرات
-            default: return new Color(0.85f, 0.45f, 0.4f);   // قرمز — فراموش‌شده
-        }
-    }
-
-    // اگه عکسِ پایان تو Resources/Story/Farvardin/Endings/ending_<index> باشه، بالای کارنامه نشونش می‌ده
-    void TrySetEndingImage(int index)
-    {
-        Sprite sprite = Resources.Load<Sprite>(endingImageResourcePath + index);
-
-        if (sprite == null)
-        {
-            if (endingImageGO != null) endingImageGO.SetActive(false);
-            return;
-        }
-
-        if (endingImageGO == null)
-            endingImageGO = RuntimeUIHelper.CreateImage(panel.transform, "EndingImage", new Vector2(0.25f, 0.72f), new Vector2(0.75f, 0.87f), sprite);
-        else
-        {
-            endingImageGO.SetActive(true);
-            Image img = endingImageGO.GetComponent<Image>();
-            if (img != null) img.sprite = sprite;
-        }
     }
 
     void BackToMenu()
@@ -163,7 +164,6 @@ public class MonthReportUI : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    // عددِ انگلیسی رو به رقمِ فارسی تبدیل می‌کنه (مثلاً 52 → ۵۲)
     static string Fa(int n)
     {
         string s = n.ToString();

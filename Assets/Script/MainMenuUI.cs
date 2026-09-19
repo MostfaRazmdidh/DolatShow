@@ -81,10 +81,8 @@ public class MainMenuUI : MonoBehaviour
     // (تو این چیدمان دکمه‌ی جداگانه‌ی «ادامه» نداریم؛ اگه بعداً خواستی اضافه می‌کنیم.)
     void StartGame()
     {
-        if (SaveSystem.HasSave())
-            ContinueGame();
-        else
-            StartNewGame();
+        // فعلاً سیو غیرفعاله، پس همیشه بازیِ جدید شروع می‌شه (سیوِ قدیمی هم پاک می‌شه)
+        StartNewGame();
     }
 
     void StartNewGame()
