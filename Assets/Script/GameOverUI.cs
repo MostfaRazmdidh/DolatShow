@@ -18,9 +18,13 @@ public class GameOverUI : MonoBehaviour
     [Header("آبجکت کارت (برای ادامه‌ی بازی بعد از دیدن تبلیغ)")]
     [SerializeField] private CardSwipe cardSwipe;
 
+    [Header("تصویر دکمه‌ی بازگشت (اختیاری — اگه خالی بمونه از رنگ ساده استفاده می‌شه)")]
+    [SerializeField] private Sprite backButtonSprite;
+
     private GameObject panel;
     private GameObject adButton;
     private RTLTextMeshPro messageText;
+    private RTLTextMeshPro scoreText;
 
     private GameStats.StatType lastLossType;
     private bool lastLossHitMax;
@@ -50,6 +54,8 @@ public class GameOverUI : MonoBehaviour
 
         messageText.text = GetLossMessage(type, hitMax);
         adButton.SetActive(!GameStats.Instance.AdUsedThisRun);
+        ShowScore();
+        panel.transform.SetAsLastSibling(); // روی نوارهای وضعیت
         panel.SetActive(true);
     }
 
@@ -58,7 +64,35 @@ public class GameOverUI : MonoBehaviour
         wasLoss = false;
         messageText.text = "چهار سال ریاست‌جمهوری‌ت با موفقیت به پایان رسید!";
         adButton.SetActive(false);
+        ShowScore();
+        panel.transform.SetAsLastSibling();
         panel.SetActive(true);
+    }
+
+    // «چند ماه دووم آوردی» + رکورد رو نشون می‌ده — متریکِ اصلیِ نگه‌داشتنِ کاربر
+    void ShowScore()
+    {
+        int months = Mathf.Clamp(GameStats.Instance.CurrentMonth, 1, GameStats.Instance.TotalMonths);
+        bool newRecord = ScoreSystem.SubmitMonths(months);
+        scoreText.text = newRecord
+            ? $"دووم آوردی: {ToPersian(months)} ماه  —  🏆 رکورد جدید!"
+            : $"دووم آوردی: {ToPersian(months)} ماه    رکورد: {ToPersian(ScoreSystem.BestMonths)} ماه";
+    }
+
+    static string ToPersian(int n)
+    {
+        string r = "";
+        foreach (char c in n.ToString())
+            r += (c >= '0' && c <= '9') ? "۰۱۲۳۴۵۶۷۸۹"[c - '0'] : c;
+        return r;
+    }
+
+    // «بازیِ دوباره» — فوری یه بازیِ جدید شروع می‌کنه (بدونِ برگشت به منو)
+    void RetryGame()
+    {
+        panel.SetActive(false);
+        if (cardSwipe != null) cardSwipe.RestartNewGame();
+        else BackToMenu();
     }
 
     // پیام‌های ساده‌ی هر ۸ نوع باخت — بعداً موقع نوشتن محتوای اصلی می‌شه با متن بهتر جایگزین‌شون کرد
@@ -108,11 +142,24 @@ public class GameOverUI : MonoBehaviour
     {
         panel = RuntimeUIHelper.CreateFullScreenPanel(targetCanvas.transform, "GameOverPanel", new Color(0f, 0f, 0f, 0.85f));
 
-        messageText = RuntimeUIHelper.CreateRTLText(panel.transform, "Message", new Vector2(0.1f, 0.5f), new Vector2(0.9f, 0.85f), 36, persianFont);
+        messageText = RuntimeUIHelper.CreateRTLText(panel.transform, "Message", new Vector2(0.1f, 0.55f), new Vector2(0.9f, 0.85f), 36, persianFont);
 
-        adButton = RuntimeUIHelper.CreateButton(panel.transform, "WatchAdButton", new Vector2(0.3f, 0.3f), new Vector2(0.7f, 0.4f), "دیدن تبلیغ و ادامه", persianFont, new Color(0.6f, 0.5f, 0.15f, 1f), WatchAdAndContinue);
+        // خطِ امتیاز + رکورد
+        scoreText = RuntimeUIHelper.CreateRTLText(panel.transform, "Score", new Vector2(0.1f, 0.46f), new Vector2(0.9f, 0.54f), 30, persianFont);
+        scoreText.color = new Color(0.98f, 0.86f, 0.5f);
+        scoreText.fontStyle = TMPro.FontStyles.Bold;
 
-        RuntimeUIHelper.CreateButton(panel.transform, "BackToMenuButton", new Vector2(0.3f, 0.15f), new Vector2(0.7f, 0.25f), "بازگشت به منو", persianFont, new Color(0.2f, 0.55f, 0.25f, 1f), BackToMenu);
+        adButton = RuntimeUIHelper.CreateButton(panel.transform, "WatchAdButton", new Vector2(0.28f, 0.33f), new Vector2(0.72f, 0.42f), "دیدن تبلیغ و ادامه", persianFont, new Color(0.6f, 0.5f, 0.15f, 1f), WatchAdAndContinue);
+
+        // «بازیِ دوباره» — فوری یه بازیِ جدید (حلقه‌ی «یه بار دیگه»)
+        RuntimeUIHelper.CreateButton(panel.transform, "RetryButton", new Vector2(0.28f, 0.22f), new Vector2(0.72f, 0.31f), "بازیِ دوباره", persianFont, new Color(0.18f, 0.5f, 0.24f, 1f), RetryGame);
+
+        // دکمه‌ی «بازگشت» — از پکِ ButtonAssets (اگه تو صحنه وصل نشده، از Resources لود می‌شه)
+        Sprite back = backButtonSprite != null ? backButtonSprite : Resources.Load<Sprite>("UI/Btn_Return");
+        if (back != null)
+            RuntimeUIHelper.CreateImageButton(panel.transform, "BackToMenuButton", new Vector2(0.34f, 0.10f), new Vector2(0.66f, 0.19f), back, BackToMenu);
+        else
+            RuntimeUIHelper.CreateButton(panel.transform, "BackToMenuButton", new Vector2(0.3f, 0.10f), new Vector2(0.7f, 0.19f), "بازگشت به منو", persianFont, new Color(0.2f, 0.45f, 0.55f, 1f), BackToMenu);
 
         panel.SetActive(false);
     }

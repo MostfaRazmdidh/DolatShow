@@ -41,7 +41,13 @@ public class GameStats : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+
+        // نکته‌ی مهم (رفعِ باگِ «دکمه‌ی خانه به منو نمی‌ره»):
+        // کلِ بازی تو یه صحنه‌ست (SampleScene) و GameStats/CardDatabase/MainMenuUI/GameOverUI
+        // همه رو یه آبجکت (GameManager) هستن. اگه اینجا DontDestroyOnLoad صدا بزنیم، موقعِ
+        // ری‌لودِ صحنه (بازگشت به منو) این آبجکت باقی می‌مونه و نسخه‌ی تازه‌ی GameManager (با منوی نو)
+        // به‌عنوان «تکراری» پاک می‌شه — برای همین بعد از ری‌لود منو دیده نمی‌شد.
+        // چون بازی تک‌صحنه‌ایه، DontDestroyOnLoad اصلاً لازم نیست؛ حذفش می‌کنیم تا ری‌لود درست کار کنه.
 
         Budget = startValue;
         Popularity = startValue;
@@ -88,6 +94,13 @@ public class GameStats : MonoBehaviour
             Debug.Log($"💀 باخت! شاخص {type} به {(hitMax ? "۱۰۰" : "۰")} رسید.");
             OnGameLost?.Invoke(type, hitMax);
         }
+    }
+
+    // ماه رو مستقیم ست می‌کنه (مثلاً شروعِ ماهِ داستانی → فروردین). event رو هم صدا می‌زنه تا UI آپدیت بشه.
+    public void SetMonth(int month)
+    {
+        CurrentMonth = Mathf.Max(1, month);
+        OnMonthChanged?.Invoke(CurrentMonth);
     }
 
     // بعد از هر تصمیم (سوایپ) صدا زده می‌شه، ماه رو جلو می‌بره
@@ -165,7 +178,8 @@ public class GameStats : MonoBehaviour
             security = Security,
             diplomacy = Diplomacy,
             currentMonth = CurrentMonth,
-            activeFlags = CardDatabase.Instance.GetActiveFlags()
+            activeFlags = CardDatabase.Instance.GetActiveFlags(),
+            storyIndex = CardDatabase.Instance.GetStoryIndex()
         };
     }
 

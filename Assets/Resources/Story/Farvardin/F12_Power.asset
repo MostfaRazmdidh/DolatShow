@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0885a2500c18ea546ad854f4a80bd1ef, type: 3}
+  m_Name: F12_Power
+  m_EditorClassIdentifier: Assembly-CSharp::CardData
+  cardId: F12_Power
+  advisorName: "اقتصاددانِ ستاد"
+  cardText: "تابستون نیومده خاموشی شروع شده. قول بدیم تا شهریور همه‌چی حل می‌شه؟ (هیچ‌کس نمی‌دونه چطوری، ولی قول که خرج نداره.)"
+  category: 2
+  approveEffects:
+  - type: 1
+    amount: 10
+  - type: 0
+    amount: -7
+  - type: 2
+    amount: -2
+  rejectEffects:
+  - type: 1
+    amount: -7
+  - type: 0
+    amount: 5
+  - type: 2
+    amount: 3
+  requiredFlag: 
+  setFlagOnApprove: 
+  setFlagOnReject: 
+  orderInMonth: 12
+  illustration: {fileID: 0}
+  approveSfx: {fileID: 0}
+  rejectSfx: {fileID: 0}

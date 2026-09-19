@@ -27,11 +27,17 @@ MonoBehaviour:
     amount: 23
   - type: 0
     amount: -10
+  - type: 3
+    amount: -12
   rejectEffects:
   - type: 1
     amount: 10
   - type: 2
     amount: -25
+  - type: 0
+    amount: 8
+  - type: 3
+    amount: 15
   requiredFlag: 
   setFlagOnApprove: 
   setFlagOnReject: 
