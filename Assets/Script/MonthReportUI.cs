@@ -162,6 +162,8 @@ public class MonthReportUI : MonoBehaviour
 
     void BackToMenu()
     {
+        Debug.Log("MonthReportUI: دکمه‌ی خانه زده شد — بازگشت به منوی اصلی (ری‌لودِ صحنه).");
+        Time.timeScale = 1f; // محضِ اطمینان اگه جایی pause شده بود
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
