@@ -70,6 +70,16 @@ public class CardSwipe : MonoBehaviour
     [Tooltip("موقعیتِ عمودیِ کارت تو دنیا. با کد مجبور می‌شه، پس هرچی اینجا بذاری همون می‌شه (مستقلِ از صحنه).")]
     [SerializeField] private float cardCenterY = -0.9f;
 
+    [Header("لرزشِ صفحه (Juice) موقعِ تصمیم")]
+    [Tooltip("لرزشِ کمینه برای تصمیم‌های کم‌اثر")]
+    [SerializeField] private float shakeMin = 0.04f;
+    [Tooltip("لرزشِ بیشینه برای تصمیم‌های پراثر")]
+    [SerializeField] private float shakeMax = 0.18f;
+    [Tooltip("لرزشِ باخت (وقتی شاخصی به ۰/۱۰۰ می‌رسه)")]
+    [SerializeField] private float shakeGameOver = 0.32f;
+    [Tooltip("مدتِ لرزش (ثانیه)")]
+    [SerializeField] private float shakeDuration = 0.22f;
+
     private Vector3 startPosition;
     private Vector3 startScale;
     private Vector3 dragOffset;
@@ -204,7 +214,7 @@ public class CardSwipe : MonoBehaviour
         if (monthReport == null)
         {
             TMPro.TMP_FontAsset font = advisorText != null ? advisorText.font : null;
-            monthReport = MonthReportUI.Create(GetUICanvas(), font);
+            monthReport = MonthReportUI.Create(GetUICanvas(), font, this);
         }
         if (monthReport != null) monthReport.Hide();
 
@@ -217,6 +227,16 @@ public class CardSwipe : MonoBehaviour
         }
 
         LoadNextCard();
+    }
+
+    // شروعِ فوریِ یه بازیِ کاملاً جدید (برای دکمه‌ی «دوباره» تو کارنامه/صفحه‌ی باخت) —
+    // بدونِ برگشت به منو، تا حلقه‌ی «یه بار دیگه» سریع باشه.
+    public void RestartNewGame()
+    {
+        SaveSystem.DeleteSave();
+        GameStats.Instance.ResetState();
+        CardDatabase.Instance.ClearFlags();
+        BeginGame();
     }
 
     // دو تا نشانگرِ «بله» و «خیر» رو سمتِ راست و چپِ صفحه می‌سازه تا کاربر بفهمه هر جهتِ سوایپ یعنی چی.
@@ -436,15 +456,52 @@ public class CardSwipe : MonoBehaviour
             bool draggedRight = xOffset > 0;      // کارت به کدوم سمت کشیده شد
             bool approved = IsApprove(xOffset);   // اون سمت یعنی تایید یا رد
             decided = true;
+            float maxEff = MaxAbsEffect(approved);  // بزرگ‌ترین اثرِ این تصمیم (برای شدتِ لرزش)
             PlayDecisionSound(approved);          // صدای بله/خیر
             ApplyCardEffects(approved);
             ShowAppliedHints(approved);           // اثرها «بعد از انتخاب» نشون داده می‌شن
+            TriggerShake(maxEff);                 // لرزشِ صفحه — هرچی اثر بزرگ‌تر، لرزشِ بیشتر
             StartCoroutine(FlyOffScreen(draggedRight)); // کارت به سمتی که کشیده شد پرت می‌شه
         }
         else
         {
             StartCoroutine(ReturnToCenter());
         }
+    }
+
+    // بزرگ‌ترین قدرِمطلقِ اثرِ این تصمیم رو برمی‌گردونه (برای تعیینِ شدتِ لرزش)
+    int MaxAbsEffect(bool approved)
+    {
+        if (currentCard == null) return 0;
+        var effects = approved ? currentCard.approveEffects : currentCard.rejectEffects;
+        int m = 0;
+        foreach (var e in effects) m = Mathf.Max(m, Mathf.Abs(e.amount));
+        return m;
+    }
+
+    // لرزشِ صفحه رو با شدتِ مناسب شروع می‌کنه (باخت = لرزشِ قوی‌تر)
+    void TriggerShake(int maxEffect)
+    {
+        float mag = Mathf.Lerp(shakeMin, shakeMax, Mathf.Clamp01(maxEffect / 20f));
+        if (GameStats.Instance.IsGameOver) mag = shakeGameOver;
+        if (mainCamera != null && isActiveAndEnabled) StartCoroutine(ShakeCamera(mag));
+    }
+
+    // دوربین رو کوتاه با میراییِ نمایی می‌لرزونه، بعد به جای اصلیش برمی‌گردونه
+    IEnumerator ShakeCamera(float magnitude)
+    {
+        Vector3 origin = mainCamera.transform.position;
+        float t = 0f;
+        while (t < shakeDuration)
+        {
+            t += Time.deltaTime;
+            float damp = 1f - (t / shakeDuration);      // میرایی خطی
+            float ox = (Random.value * 2f - 1f) * magnitude * damp;
+            float oy = (Random.value * 2f - 1f) * magnitude * damp;
+            mainCamera.transform.position = origin + new Vector3(ox, oy, 0f);
+            yield return null;
+        }
+        mainCamera.transform.position = origin;
     }
 
     // صدای مناسبِ تصمیم رو پخش می‌کنه: اگه کارت صدای مخصوصِ خودش رو داشت اون، وگرنه صدای پیش‌فرضِ بله/خیر

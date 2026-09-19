@@ -10,6 +10,7 @@ public class MonthReportUI : MonoBehaviour
 {
     private TMP_FontAsset persianFont;
     private Canvas targetCanvas;
+    private CardSwipe cardSwipe; // برای دکمه‌ی «دوباره» (شروعِ فوریِ بازیِ جدید)
 
     private GameObject panel;
     private RTLTextMeshPro mastheadText;   // «کارنامه‌ی فروردین» تو بنرِ مشکیِ بالای روزنامه
@@ -17,10 +18,11 @@ public class MonthReportUI : MonoBehaviour
     private RTLTextMeshPro endingBodyText;  // متنِ طنز
     private RTLTextMeshPro headlineText;     // تیترِ روزنامه
     private RTLTextMeshPro statsText;        // اعدادِ نهایی
+    private RTLTextMeshPro scoreText;        // امتیاز + رکورد
 
     private static readonly Color parchmentInk = new Color(0.24f, 0.14f, 0.05f); // قهوه‌ای تیره روی کاغذِ کاهی
 
-    public static MonthReportUI Create(Canvas canvas, TMP_FontAsset font)
+    public static MonthReportUI Create(Canvas canvas, TMP_FontAsset font, CardSwipe cardSwipe = null)
     {
         if (canvas == null)
         {
@@ -32,6 +34,7 @@ public class MonthReportUI : MonoBehaviour
         MonthReportUI ui = go.AddComponent<MonthReportUI>();
         ui.persianFont = font;
         ui.targetCanvas = canvas;
+        ui.cardSwipe = cardSwipe;
         ui.BuildUI();
         return ui;
     }
@@ -76,24 +79,35 @@ public class MonthReportUI : MonoBehaviour
         headlineText = MakeText(paperRT, "Headline", 0.13f, 0.35f, 0.87f, 0.43f, 24, new Color(0.45f, 0.28f, 0.12f));
         headlineText.fontStyle = FontStyles.Italic;
 
-        statsText = MakeText(paperRT, "Stats", 0.06f, 0.26f, 0.94f, 0.34f, 26, new Color(0.35f, 0.2f, 0.06f));
+        statsText = MakeText(paperRT, "Stats", 0.06f, 0.28f, 0.94f, 0.35f, 25, new Color(0.35f, 0.2f, 0.06f));
         statsText.fontStyle = FontStyles.Bold;
 
-        // دکمه‌ی خانه (بازگشت به منوی اصلی) — فرزندِ خودِ پنل و پایینِ صفحه، بیرونِ روزنامه، کامل و قابلِ کلیک
+        // خطِ امتیاز + رکورد (زیرِ اعداد) — انگیزه‌ی «رکوردت رو بشکن»
+        scoreText = MakeText(paperRT, "Score", 0.06f, 0.18f, 0.94f, 0.27f, 27, new Color(0.5f, 0.28f, 0.05f));
+        scoreText.fontStyle = FontStyles.Bold;
+
+        // دو دکمه پایینِ صفحه (بیرونِ روزنامه): «بازیِ دوباره» و «بازگشت به منو»
+        // «بازیِ دوباره» — چپ (سبز): فوری یه بازیِ جدید شروع می‌کنه (حلقه‌ی «یه بار دیگه»)
+        RuntimeUIHelper.CreateButton(panel.transform, "RetryButton",
+            new Vector2(0.08f, 0.04f), new Vector2(0.48f, 0.115f),
+            "بازیِ دوباره", persianFont, new Color(0.18f, 0.5f, 0.24f, 1f), RetryGame);
+
+        // «بازگشت به منو» — راست: با تصویرِ خانه اگه بود، وگرنه دکمه‌ی متنی
         Sprite home = Resources.Load<Sprite>("UI/Btn_Home");
         if (home != null)
         {
-            float bhFrac = 0.085f;                       // ارتفاعِ دکمه نسبت به صفحه
+            float bhFrac = 0.075f;
             float bAspect = home.rect.width / home.rect.height;
             float bwFrac = (bhFrac * canvasSize.y * bAspect) / canvasSize.x;
-            float cx = 0.5f, bottom = 0.04f;
+            float cx = 0.74f, bottom = 0.04f;
             RuntimeUIHelper.CreateImageButton(panel.transform, "HomeButton",
                 new Vector2(cx - bwFrac / 2f, bottom), new Vector2(cx + bwFrac / 2f, bottom + bhFrac), home, BackToMenu);
         }
         else
         {
-            RuntimeUIHelper.CreateButton(panel.transform, "HomeButton", new Vector2(0.35f, 0.04f), new Vector2(0.65f, 0.12f),
-                "بازگشت به منو", persianFont, new Color(0.2f, 0.55f, 0.25f, 1f), BackToMenu);
+            RuntimeUIHelper.CreateButton(panel.transform, "HomeButton",
+                new Vector2(0.52f, 0.04f), new Vector2(0.92f, 0.115f),
+                "بازگشت به منو", persianFont, new Color(0.2f, 0.45f, 0.55f, 1f), BackToMenu);
         }
 
         panel.SetActive(false);
@@ -156,8 +170,25 @@ public class MonthReportUI : MonoBehaviour
         headlineText.text = eHeadline;
         statsText.text = $"بودجه {Fa(budget)}    محبوبیت {Fa(popularity)}    امنیت {Fa(security)}    دیپلماسی {Fa(diplomacy)}";
 
+        // امتیاز و رکورد — انگیزه‌ی تکرار
+        int score = ScoreSystem.Compute(budget, popularity, security, diplomacy);
+        bool newRecord = ScoreSystem.Submit(score);
+        if (newRecord)
+            scoreText.text = $"امتیاز: {Fa(score)}  —  🏆 رکورد جدید!";
+        else
+            scoreText.text = $"امتیاز: {Fa(score)}    بهترین: {Fa(ScoreSystem.Best)}";
+
         panel.transform.SetAsLastSibling();
         panel.SetActive(true);
+    }
+
+    // «بازیِ دوباره» — بدونِ برگشت به منو، فوری یه بازیِ جدید شروع می‌کنه
+    void RetryGame()
+    {
+        Time.timeScale = 1f;
+        Hide();
+        if (cardSwipe != null) cardSwipe.RestartNewGame();
+        else BackToMenu(); // اگه رفرنس نبود، حداقل به منو برگرد
     }
 
     void BackToMenu()
