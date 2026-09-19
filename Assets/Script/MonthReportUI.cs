@@ -41,20 +41,20 @@ public class MonthReportUI : MonoBehaviour
         // پس‌زمینه‌ی تیره‌ی محو پشتِ روزنامه
         panel = RuntimeUIHelper.CreateFullScreenPanel(targetCanvas.transform, "MonthReportPanel", new Color(0f, 0f, 0f, 0.8f));
 
-        // تصویرِ روزنامه، وسطِ صفحه، هم‌اندازه‌ی نسبتِ خودش (بدون کش‌آمدن) تا متن‌ها سرِ جاشون بشینن
+        // تصویرِ روزنامه، بالای صفحه (کوچیک‌تر از قبل تا زیرش برای دکمه جا باشه)، با نسبتِ درست
         Sprite paper = Resources.Load<Sprite>("UI/Newspaper");
         GameObject paperGO = new GameObject("Newspaper", typeof(RectTransform));
         paperGO.transform.SetParent(panel.transform, false);
         RectTransform paperRT = paperGO.GetComponent<RectTransform>();
-        paperRT.anchorMin = paperRT.anchorMax = new Vector2(0.5f, 0.5f);
-        paperRT.pivot = new Vector2(0.5f, 0.5f);
+        paperRT.anchorMin = paperRT.anchorMax = new Vector2(0.5f, 1f); // بالا-وسط
+        paperRT.pivot = new Vector2(0.5f, 1f);
         Vector2 canvasSize = ((RectTransform)targetCanvas.transform).rect.size;
         float aspect = paper != null ? (paper.rect.width / paper.rect.height) : (1024f / 1536f);
-        float ph = canvasSize.y * 0.96f;
+        float ph = canvasSize.y * 0.78f; // کوچیک‌تر از صفحه تا پایینش برای دکمه‌ی خانه جا بمونه
         float pw = ph * aspect;
-        if (pw > canvasSize.x * 0.98f) { pw = canvasSize.x * 0.98f; ph = pw / aspect; }
+        if (pw > canvasSize.x * 0.96f) { pw = canvasSize.x * 0.96f; ph = pw / aspect; }
         paperRT.sizeDelta = new Vector2(pw, ph);
-        paperRT.anchoredPosition = Vector2.zero;
+        paperRT.anchoredPosition = new Vector2(0f, -canvasSize.y * 0.02f);
         if (paper != null)
         {
             Image img = paperGO.AddComponent<Image>();
@@ -79,20 +79,20 @@ public class MonthReportUI : MonoBehaviour
         statsText = MakeText(paperRT, "Stats", 0.06f, 0.26f, 0.94f, 0.34f, 26, new Color(0.35f, 0.2f, 0.06f));
         statsText.fontStyle = FontStyles.Bold;
 
-        // دکمه‌ی خانه (بازگشت به منوی اصلی) — پایینِ روزنامه
+        // دکمه‌ی خانه (بازگشت به منوی اصلی) — فرزندِ خودِ پنل و پایینِ صفحه، بیرونِ روزنامه، کامل و قابلِ کلیک
         Sprite home = Resources.Load<Sprite>("UI/Btn_Home");
         if (home != null)
         {
-            float bw = 0.42f, bAspect = home.rect.width / home.rect.height;
-            // ارتفاعِ دکمه نسبت به پهناش (که کسری از پهنای روزنامه‌ست)
-            float bhFrac = (bw * pw / bAspect) / ph;
-            float cx = 0.5f, cy = 0.16f;
-            var go = RuntimeUIHelper.CreateImageButton(paperRT, "HomeButton",
-                new Vector2(cx - bw / 2f, cy - bhFrac / 2f), new Vector2(cx + bw / 2f, cy + bhFrac / 2f), home, BackToMenu);
+            float bhFrac = 0.085f;                       // ارتفاعِ دکمه نسبت به صفحه
+            float bAspect = home.rect.width / home.rect.height;
+            float bwFrac = (bhFrac * canvasSize.y * bAspect) / canvasSize.x;
+            float cx = 0.5f, bottom = 0.04f;
+            RuntimeUIHelper.CreateImageButton(panel.transform, "HomeButton",
+                new Vector2(cx - bwFrac / 2f, bottom), new Vector2(cx + bwFrac / 2f, bottom + bhFrac), home, BackToMenu);
         }
         else
         {
-            RuntimeUIHelper.CreateButton(paperRT, "HomeButton", new Vector2(0.3f, 0.11f), new Vector2(0.7f, 0.2f),
+            RuntimeUIHelper.CreateButton(panel.transform, "HomeButton", new Vector2(0.35f, 0.04f), new Vector2(0.65f, 0.12f),
                 "بازگشت به منو", persianFont, new Color(0.2f, 0.55f, 0.25f, 1f), BackToMenu);
         }
 
@@ -103,6 +103,7 @@ public class MonthReportUI : MonoBehaviour
     {
         RTLTextMeshPro t = RuntimeUIHelper.CreateRTLText(parent, name, new Vector2(xMin, yMin), new Vector2(xMax, yMax), size, persianFont);
         t.color = color;
+        t.raycastTarget = false; // متن نباید جلوی کلیکِ دکمه رو بگیره
         return t;
     }
 
