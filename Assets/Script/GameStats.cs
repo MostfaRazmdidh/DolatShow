@@ -41,7 +41,13 @@ public class GameStats : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+
+        // نکته‌ی مهم (رفعِ باگِ «دکمه‌ی خانه به منو نمی‌ره»):
+        // کلِ بازی تو یه صحنه‌ست (SampleScene) و GameStats/CardDatabase/MainMenuUI/GameOverUI
+        // همه رو یه آبجکت (GameManager) هستن. اگه اینجا DontDestroyOnLoad صدا بزنیم، موقعِ
+        // ری‌لودِ صحنه (بازگشت به منو) این آبجکت باقی می‌مونه و نسخه‌ی تازه‌ی GameManager (با منوی نو)
+        // به‌عنوان «تکراری» پاک می‌شه — برای همین بعد از ری‌لود منو دیده نمی‌شد.
+        // چون بازی تک‌صحنه‌ایه، DontDestroyOnLoad اصلاً لازم نیست؛ حذفش می‌کنیم تا ری‌لود درست کار کنه.
 
         Budget = startValue;
         Popularity = startValue;
