@@ -263,9 +263,9 @@ TextureImporter:
       name: ButtonReturn
       rect:
         serializedVersion: 2
-        x: 939
+        x: 946
         y: 579
-        width: 286
+        width: 270
         height: 161
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -282,12 +282,12 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ButtonAssets_7
+      name: Home button
       rect:
         serializedVersion: 2
-        x: 659
+        x: 665
         y: 580
-        width: 276
+        width: 270
         height: 165
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -376,7 +376,7 @@ TextureImporter:
         x: 19
         y: 274
         width: 182
-        height: 138
+        height: 128
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -554,7 +554,7 @@ TextureImporter:
         width: 293
         height: 169
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -596,11 +596,11 @@ TextureImporter:
       ButtonAssets_4: -2683235536969594576
       ButtonAssets_5: 5373632614395416914
       ButtonAssets_6: 601128256
-      ButtonAssets_7: 191512579
       ButtonAssets_8: 1542210183
       ButtonAssets_9: 2059946146
       ButtonProfile: -539577455
       ButtonReturn: -1121216386
+      Home button: 191512579
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
