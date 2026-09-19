@@ -456,7 +456,7 @@ public class CardSwipe : MonoBehaviour
             bool draggedRight = xOffset > 0;      // کارت به کدوم سمت کشیده شد
             bool approved = IsApprove(xOffset);   // اون سمت یعنی تایید یا رد
             decided = true;
-            float maxEff = MaxAbsEffect(approved);  // بزرگ‌ترین اثرِ این تصمیم (برای شدتِ لرزش)
+            int maxEff = MaxAbsEffect(approved);  // بزرگ‌ترین اثرِ این تصمیم (برای شدتِ لرزش)
             PlayDecisionSound(approved);          // صدای بله/خیر
             ApplyCardEffects(approved);
             ShowAppliedHints(approved);           // اثرها «بعد از انتخاب» نشون داده می‌شن
