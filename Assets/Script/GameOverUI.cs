@@ -117,8 +117,10 @@ public class GameOverUI : MonoBehaviour
 
         adButton = RuntimeUIHelper.CreateButton(panel.transform, "WatchAdButton", new Vector2(0.3f, 0.3f), new Vector2(0.7f, 0.4f), "دیدن تبلیغ و ادامه", persianFont, new Color(0.6f, 0.5f, 0.15f, 1f), WatchAdAndContinue);
 
-        if (backButtonSprite != null)
-            RuntimeUIHelper.CreateImageButton(panel.transform, "BackToMenuButton", new Vector2(0.3f, 0.15f), new Vector2(0.7f, 0.25f), backButtonSprite, BackToMenu);
+        // دکمه‌ی «بازگشت» — از پکِ ButtonAssets (اگه تو صحنه وصل نشده، از Resources لود می‌شه)
+        Sprite back = backButtonSprite != null ? backButtonSprite : Resources.Load<Sprite>("UI/Btn_Return");
+        if (back != null)
+            RuntimeUIHelper.CreateImageButton(panel.transform, "BackToMenuButton", new Vector2(0.32f, 0.15f), new Vector2(0.68f, 0.24f), back, BackToMenu);
         else
             RuntimeUIHelper.CreateButton(panel.transform, "BackToMenuButton", new Vector2(0.3f, 0.15f), new Vector2(0.7f, 0.25f), "بازگشت به منو", persianFont, new Color(0.2f, 0.55f, 0.25f, 1f), BackToMenu);
 

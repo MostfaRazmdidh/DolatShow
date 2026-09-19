@@ -478,11 +478,11 @@ public class CardSwipe : MonoBehaviour
         if (!CardDatabase.Instance.storyMode)
             GameStats.Instance.AdvanceMonth();
 
-        // بعد از هر تصمیم، وضعیت رو خودکار ذخیره می‌کنیم تا «ادامه‌ی بازی» درست کار کنه
-        if (GameStats.Instance.IsGameOver)
-            SaveSystem.DeleteSave();
-        else
-            SaveSystem.Save(GameStats.Instance.CreateSaveData());
+        // فعلاً بازی سیو نمی‌شه (طبق خواسته‌ی توسعه‌دهنده) — سیوِ خودکار موقتاً غیرفعاله.
+        // if (GameStats.Instance.IsGameOver)
+        //     SaveSystem.DeleteSave();
+        // else
+        //     SaveSystem.Save(GameStats.Instance.CreateSaveData());
     }
 
     Vector3 GetMouseWorldPosition()
