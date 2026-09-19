@@ -30,6 +30,8 @@ public class CardDatabase : MonoBehaviour
     // وضعیتِ ماهِ داستانی
     private List<CardData> storyCards;
     private int storyIndex;
+    // اگه ≥۰ باشه، StartStoryMonth به‌جای شروع از کارتِ اول، از این کارت ادامه می‌ده (برای «ادامه بازی»)
+    private int resumeStoryIndex = -1;
 
     // وقتی همه‌ی کارت‌های ماهِ داستانی تموم شدن true می‌شه (CardSwipe ازش برای نمایشِ کارنامه استفاده می‌کنه)
     public bool StoryMonthComplete => storyMode && storyCards != null && storyIndex >= storyCards.Count;
@@ -63,15 +65,24 @@ public class CardDatabase : MonoBehaviour
         recentCardIds.Clear();
         storyCards = null;
         storyIndex = 0;
+        resumeStoryIndex = -1;
     }
 
-    // شروعِ (یا شروعِ دوباره‌ی) ماهِ داستانی — کارت‌ها رو از پوشه‌ی Resources به‌ترتیب لود می‌کنه
+    // جای فعلیِ بازیکن داخلِ کارت‌های ماهِ داستانی (برای ذخیره‌سازی)
+    public int GetStoryIndex() => storyIndex;
+
+    // برای «ادامه بازی» — می‌گه StartStoryMonth از این کارت ادامه بده (نه از اول). یه‌بار مصرفه.
+    public void SetResumeStoryIndex(int index) => resumeStoryIndex = index;
+
+    // شروعِ (یا ادامه‌ی) ماهِ داستانی — کارت‌ها رو از پوشه‌ی Resources به‌ترتیب لود می‌کنه.
+    // اگه resumeStoryIndex ست شده باشه (ادامه بازی)، از همون کارت شروع می‌کنه، وگرنه از اول.
     public void StartStoryMonth()
     {
         storyCards = Resources.LoadAll<CardData>(storyResourcesPath)
             .OrderBy(c => c.orderInMonth)
             .ToList();
-        storyIndex = 0;
+        storyIndex = (resumeStoryIndex >= 0) ? Mathf.Clamp(resumeStoryIndex, 0, storyCards.Count) : 0;
+        resumeStoryIndex = -1; // مصرف شد
         if (storyCards.Count == 0)
             Debug.LogWarning($"هیچ کارتِ داستانی‌ای تو مسیرِ Resources/{storyResourcesPath} پیدا نشد.");
     }

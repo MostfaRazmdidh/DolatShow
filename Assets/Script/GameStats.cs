@@ -178,7 +178,8 @@ public class GameStats : MonoBehaviour
             security = Security,
             diplomacy = Diplomacy,
             currentMonth = CurrentMonth,
-            activeFlags = CardDatabase.Instance.GetActiveFlags()
+            activeFlags = CardDatabase.Instance.GetActiveFlags(),
+            storyIndex = CardDatabase.Instance.GetStoryIndex()
         };
     }
 

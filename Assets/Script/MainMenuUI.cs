@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
@@ -34,6 +35,10 @@ public class MainMenuUI : MonoBehaviour
 
     private GameObject panel;
 
+    // پنلِ انتخابِ «شروع بازی جدید / ادامه بازی قبلی» که با زدنِ «شروع بازی» باز می‌شه
+    private GameObject startPanel;
+    private GameObject continueButtonGO;
+
     void Start()
     {
         BuildUI();
@@ -50,8 +55,77 @@ public class MainMenuUI : MonoBehaviour
         AddMenuButton("SettingsButton", settingsButtonSprite, settingsButtonCenter, "تنظیمات", OpenSettings);
         AddMenuButton("ExitButton", exitButtonSprite, exitButtonCenter, "خروج", QuitGame);
 
+        // پنلِ انتخابِ شروع/ادامه رو (یه‌بار) بساز و مخفی نگه‌دار
+        BuildStartPanel();
+
         // منو باید روی همه‌چیز (از جمله نوارهای وضعیت که موقع اجرا روی Canvas ساخته می‌شن) باشه
         panel.transform.SetAsLastSibling();
+    }
+
+    // پنلِ «شروع بازی جدید / ادامه بازی قبلی» رو با کد می‌سازه (تصاویرش از Resources/UI لود می‌شن،
+    // پس نیازی به وایرینگِ دستی تو صحنه نیست). با زدنِ دکمه‌ی «شروع بازی» نشون داده می‌شه.
+    void BuildStartPanel()
+    {
+        // پس‌زمینه‌ی تیره‌ی محو؛ کلیک روی فضای خالیش پنل رو می‌بنده (برگشت به منو)
+        startPanel = RuntimeUIHelper.CreateFullScreenPanel(targetCanvas.transform, "StartPanel", new Color(0f, 0f, 0f, 0.75f));
+        Button overlayBtn = startPanel.AddComponent<Button>();
+        overlayBtn.transition = Selectable.Transition.None;
+        overlayBtn.onClick.AddListener(HideStartPanel);
+
+        Sprite boxSpr = Resources.Load<Sprite>("UI/StartBox");
+        Sprite newSpr = Resources.Load<Sprite>("UI/Btn_NewGame");
+        Sprite contSpr = Resources.Load<Sprite>("UI/Btn_Continue");
+
+        // باکسِ تزئینیِ وسطِ صفحه — ارتفاعش از نسبتِ خودِ تصویر حساب می‌شه تا کش نیاد
+        GameObject boxGO;
+        if (boxSpr != null)
+        {
+            Vector2 canvasSize = ((RectTransform)targetCanvas.transform).rect.size;
+            float boxWFrac = 0.94f;
+            float boxAspect = boxSpr.rect.width / boxSpr.rect.height;
+            float boxHFrac = (boxWFrac * canvasSize.x / boxAspect) / canvasSize.y;
+            boxGO = RuntimeUIHelper.CreateImage(startPanel.transform, "Box",
+                new Vector2(0.5f - boxWFrac / 2f, 0.5f - boxHFrac / 2f),
+                new Vector2(0.5f + boxWFrac / 2f, 0.5f + boxHFrac / 2f), boxSpr);
+        }
+        else
+        {
+            boxGO = startPanel; // اگه تصویرِ باکس نبود، دکمه‌ها مستقیم روی پنل می‌شینن
+        }
+        Transform boxParent = boxGO.transform;
+
+        // «شروع بازی جدید» — نیمه‌ی بالاییِ باکس (نسبتِ ناحیه نزدیکِ نسبتِ خودِ دکمه تا کم‌فضای مرده باشه)
+        if (newSpr != null)
+            RuntimeUIHelper.CreateImageButton(boxParent, "NewGameButton",
+                new Vector2(0.27f, 0.52f), new Vector2(0.73f, 0.93f), newSpr, StartNewGame);
+        else
+            RuntimeUIHelper.CreateButton(boxParent, "NewGameButton",
+                new Vector2(0.20f, 0.56f), new Vector2(0.80f, 0.90f), "شروع بازی جدید", persianFont, new Color(0.2f, 0.45f, 0.6f, 1f), StartNewGame);
+
+        // «ادامه بازی قبلی» — نیمه‌ی پایینیِ باکس
+        if (contSpr != null)
+            continueButtonGO = RuntimeUIHelper.CreateImageButton(boxParent, "ContinueButton",
+                new Vector2(0.27f, 0.07f), new Vector2(0.73f, 0.48f), contSpr, ContinueGame);
+        else
+            continueButtonGO = RuntimeUIHelper.CreateButton(boxParent, "ContinueButton",
+                new Vector2(0.20f, 0.10f), new Vector2(0.80f, 0.44f), "ادامه بازی قبلی", persianFont, new Color(0.2f, 0.55f, 0.25f, 1f), ContinueGame);
+
+        startPanel.SetActive(false);
+    }
+
+    // «ادامه» فقط وقتی سیوِ قبلی باشه فعاله؛ در غیر این صورت کم‌رنگ و غیرقابل‌کلیک می‌شه
+    void SetContinueEnabled(bool enabled)
+    {
+        if (continueButtonGO == null) return;
+        Button btn = continueButtonGO.GetComponent<Button>();
+        if (btn != null) btn.interactable = enabled;
+        Image img = continueButtonGO.GetComponent<Image>();
+        if (img != null) img.color = enabled ? Color.white : new Color(1f, 1f, 1f, 0.4f);
+    }
+
+    void HideStartPanel()
+    {
+        if (startPanel != null) startPanel.SetActive(false);
     }
 
     // یه دکمه رو وسط‌چینِ نقطه‌ی center می‌سازه؛ پهنا ثابته و ارتفاع از نسبتِ خودِ تصویر حساب می‌شه
@@ -77,12 +151,13 @@ public class MainMenuUI : MonoBehaviour
         RuntimeUIHelper.CreateImageButton(panel.transform, name, min, max, sprite, onClick);
     }
 
-    // «شروع بازی»: اگه سیوِ قبلی هست، بازی رو ادامه می‌ده؛ وگرنه بازیِ جدید شروع می‌کنه.
-    // (تو این چیدمان دکمه‌ی جداگانه‌ی «ادامه» نداریم؛ اگه بعداً خواستی اضافه می‌کنیم.)
+    // «شروع بازی»: پنلِ انتخاب رو باز می‌کنه («شروع بازی جدید» یا «ادامه بازی قبلی»).
+    // اگه سیوِ قبلی نباشه، دکمه‌ی «ادامه» کم‌رنگ و غیرفعال نشون داده می‌شه.
     void StartGame()
     {
-        // فعلاً سیو غیرفعاله، پس همیشه بازیِ جدید شروع می‌شه (سیوِ قدیمی هم پاک می‌شه)
-        StartNewGame();
+        SetContinueEnabled(SaveSystem.HasSave());
+        startPanel.transform.SetAsLastSibling();
+        startPanel.SetActive(true);
     }
 
     void StartNewGame()
@@ -90,6 +165,7 @@ public class MainMenuUI : MonoBehaviour
         SaveSystem.DeleteSave();
         GameStats.Instance.ResetState();
         CardDatabase.Instance.ClearFlags();
+        HideStartPanel();
         panel.SetActive(false);
         cardSwipe.BeginGame();
     }
@@ -101,6 +177,8 @@ public class MainMenuUI : MonoBehaviour
 
         GameStats.Instance.LoadFromSaveData(data);
         CardDatabase.Instance.SetActiveFlags(data.activeFlags ?? new List<string>());
+        CardDatabase.Instance.SetResumeStoryIndex(data.storyIndex); // از همون کارتی که بود ادامه بده
+        HideStartPanel();
         panel.SetActive(false);
         cardSwipe.BeginGame();
     }
