@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 // نوارِ وضعیتِ هر شاخص. طرحِ جدید: به‌جای اسلایدرِ چرخیده‌ی قدیمی، یه «بج» (badge) کاملِ آماده
 // (تصویر توی Assets/Resources/Bars/) نشون داده می‌شه که آیکون و اسمِ شاخص داخلش پخته شده. این اسکریپت
@@ -35,6 +36,16 @@ public class StatBarUI : MonoBehaviour
     [SerializeField] private Color fillColor = new Color(0.90f, 0.66f, 0.20f, 1f); // طلاییِ گرم
     [SerializeField] private float valueFontSize = 34f;
 
+    [Header("Juice — انیمیشن و حسِ تغییرِ شاخص")]
+    [Tooltip("چند ثانیه طول بکشه تا عدد و نوار به مقدارِ جدید برسن (پرشِ نرم)")]
+    [SerializeField] private float animDuration = 0.45f;
+    [Tooltip("چقدر بج موقعِ تغییر «پرش» کنه (۰.۱۲ = ۱۲٪ بزرگ‌تر و برگشت)")]
+    [SerializeField] private float popScale = 0.12f;
+    [Tooltip("زیرِ این مقدار یا بالای (۱۰۰ منهای این)، بج نبضِ قرمزِ هشدار می‌زنه")]
+    [SerializeField] private int dangerThreshold = 15;
+    [SerializeField] private Color flashUpColor = new Color(0.35f, 0.95f, 0.45f);
+    [SerializeField] private Color flashDownColor = new Color(0.98f, 0.4f, 0.35f);
+
     [Header("تنظیمِ دقیقِ Fill داخلِ باکس (پیکسل — همون اندازه‌هایی که تو Inspector فرستادی)")]
     [Tooltip("فاصله‌ی طلایی از لبه‌ی چپِ باکس")]
     [SerializeField] private float fillPadLeft = 10.77f;
@@ -52,6 +63,12 @@ public class StatBarUI : MonoBehaviour
     private TMP_Text valueText;     // عددِ شاخص
     private TMP_Text hintRuntime;   // +/- که بعد از تصمیم نشون داده می‌شه
     private GameObject badgeGO;     // خودِ بج — تا شروعِ بازی مخفیه (تو منو دیده نشه)
+    private RectTransform badgeRT;  // برای انیمیشنِ پرش
+    private Image dangerOverlay;    // لایه‌ی قرمزِ هشدار که نبض می‌زنه
+    private Color valueBaseColor = Color.black; // رنگِ پایه‌ی عدد (برای برگردوندن بعد از فلش)
+
+    private float displayValue;     // مقدارِ فعلیِ نشون‌داده‌شده (برای انیمیشنِ نرم)
+    private Coroutine animCo;       // کوروتینِ انیمیشنِ تغییر
 
     void Start()
     {
@@ -59,10 +76,22 @@ public class StatBarUI : MonoBehaviour
         BuildBadge();
 
         int val = GameStats.Instance.GetStat(statType);
-        SetFill(val);
+        displayValue = val;
+        SetFillF(val);
         UpdateValueText(val);
 
         GameStats.Instance.OnStatChanged += HandleStatChanged;
+    }
+
+    // نبضِ قرمزِ هشدار وقتی شاخص به لبه‌ی باخت (۰ یا ۱۰۰) نزدیکه — حسِ خطر/تنش می‌سازه
+    void Update()
+    {
+        if (dangerOverlay == null || badgeGO == null || !badgeGO.activeInHierarchy) return;
+        int v = Mathf.RoundToInt(displayValue);
+        bool danger = v <= dangerThreshold || v >= 100 - dangerThreshold;
+        float a = danger ? (0.15f + 0.25f * Mathf.Abs(Mathf.Sin(Time.time * 4f))) : 0f;
+        Color c = dangerOverlay.color;
+        dangerOverlay.color = new Color(c.r, c.g, c.b, a);
     }
 
     void OnDestroy()
@@ -74,8 +103,54 @@ public class StatBarUI : MonoBehaviour
     void HandleStatChanged(GameStats.StatType changedType, int newValue)
     {
         if (changedType != statType) return;
-        SetFill(newValue);
-        UpdateValueText(newValue);
+
+        // اگه بج هنوز فعال نشده (مثلاً موقعِ لودِ سیو قبل از شروع)، بدونِ انیمیشن ست کن
+        if (badgeGO == null || !badgeGO.activeInHierarchy)
+        {
+            displayValue = newValue;
+            SetFillF(newValue);
+            UpdateValueText(newValue);
+            return;
+        }
+
+        bool increased = newValue > displayValue;
+        if (animCo != null) StopCoroutine(animCo);
+        animCo = StartCoroutine(AnimateChange(newValue, increased));
+    }
+
+    // انیمیشنِ نرمِ تغییرِ شاخص: پرشِ عدد + پرشدنِ نوار + پرشِ اندازه‌ی بج + فلشِ رنگِ عدد
+    IEnumerator AnimateChange(int target, bool increased)
+    {
+        float from = displayValue;
+        float t = 0f;
+        Color flash = increased ? flashUpColor : flashDownColor;
+        if (valueText != null) valueText.color = flash;
+
+        while (t < animDuration)
+        {
+            t += Time.deltaTime;
+            float k = Mathf.Clamp01(t / animDuration);
+            displayValue = Mathf.Lerp(from, target, k);
+            SetFillF(displayValue);
+            UpdateValueText(Mathf.RoundToInt(displayValue));
+
+            // پرشِ اندازه: اول بزرگ، بعد برگشت (نیم‌سینوس)
+            if (badgeRT != null)
+                badgeRT.localScale = Vector3.one * (1f + popScale * Mathf.Sin(k * Mathf.PI));
+
+            // رنگِ عدد از فلش به رنگِ پایه برمی‌گرده
+            if (valueText != null)
+                valueText.color = Color.Lerp(flash, valueBaseColor, k);
+
+            yield return null;
+        }
+
+        displayValue = target;
+        SetFillF(target);
+        UpdateValueText(target);
+        if (badgeRT != null) badgeRT.localScale = Vector3.one;
+        if (valueText != null) valueText.color = valueBaseColor;
+        animCo = null;
     }
 
     // ویژوالِ اسلایدرِ چرخیده‌ی قدیمی رو مخفی می‌کنه (نوارِ جدید یه بجِ صافِ روی Canvas‌ه)
@@ -109,7 +184,7 @@ public class StatBarUI : MonoBehaviour
         // خودِ بج — بالای صفحه، وسطِ اسلاتِ افقیِ خودش
         badgeGO = new GameObject("Badge_" + statType, typeof(RectTransform));
         badgeGO.transform.SetParent(canvas.transform, false);
-        RectTransform badgeRT = badgeGO.GetComponent<RectTransform>();
+        badgeRT = badgeGO.GetComponent<RectTransform>();
         float xFrac = SlotXFraction(statType);
         badgeRT.anchorMin = badgeRT.anchorMax = new Vector2(xFrac, 1f);
         badgeRT.pivot = new Vector2(0.5f, 1f);
@@ -120,6 +195,17 @@ public class StatBarUI : MonoBehaviour
         Image badgeImg = badgeGO.AddComponent<Image>();
         badgeImg.sprite = badge;
         badgeImg.raycastTarget = false;
+
+        // لایه‌ی قرمزِ هشدار — رو کلِ بج، اولش نامرئی؛ تو Update وقتی شاخص بحرانی شد نبض می‌زنه
+        GameObject dangerGO = new GameObject("DangerOverlay", typeof(RectTransform));
+        dangerGO.transform.SetParent(badgeGO.transform, false);
+        RectTransform dangerRT = dangerGO.GetComponent<RectTransform>();
+        dangerRT.anchorMin = Vector2.zero; dangerRT.anchorMax = Vector2.one;
+        dangerRT.offsetMin = dangerRT.offsetMax = Vector2.zero;
+        dangerOverlay = dangerGO.AddComponent<Image>();
+        if (badge != null) dangerOverlay.sprite = badge; // فرمِ بج رو بگیره تا فقط خودِ نوار قرمز شه، نه یه مستطیل
+        dangerOverlay.color = new Color(1f, 0.15f, 0.1f, 0f);
+        dangerOverlay.raycastTarget = false;
 
         // پنلِ پایینی (Fill Area) — محدوده‌ای که طلایی توش پر می‌شه
         GameObject area = new GameObject("FillArea", typeof(RectTransform));
@@ -145,6 +231,7 @@ public class StatBarUI : MonoBehaviour
         valueText = CreatePlainText(area.transform, "Value", valueFontSize, FontStyles.Bold);
         valueText.alignment = TextAlignmentOptions.Center;
         valueText.color = Color.black;
+        valueBaseColor = valueText.color; // رنگِ پایه برای برگردوندن بعد از فلش
         valueText.outlineWidth = 0.22f;
         valueText.outlineColor = new Color(0.98f, 0.92f, 0.72f, 1f); // کرمِ روشن
 
@@ -185,9 +272,9 @@ public class StatBarUI : MonoBehaviour
         return t;
     }
 
-    // ارتفاعِ طلایی رو بر اساسِ مقدارِ شاخص (۰ تا ۱۰۰) تنظیم می‌کنه.
+    // ارتفاعِ طلایی رو بر اساسِ مقدارِ شاخص (۰ تا ۱۰۰) تنظیم می‌کنه (مقدارِ اعشاری برای انیمیشنِ نرم).
     // با آفستِ دقیق (Left/Right/Top/Bottom) که طبقِ اندازه‌های فرستاده‌شده ثابته؛ فقط آفستِ بالا با مقدار عوض می‌شه.
-    void SetFill(int value)
+    void SetFillF(float value)
     {
         if (fillRT == null) return;
         float f = Mathf.Clamp01(value / 100f);
