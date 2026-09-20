@@ -167,7 +167,8 @@ public class MainMenuUI : MonoBehaviour
         CardDatabase.Instance.ClearFlags();
         HideStartPanel();
         panel.SetActive(false);
-        cardSwipe.BeginGame();
+        // اولِ بازیِ جدید، بخشِ آموزشی (دیالوگِ مشاور) نشون داده می‌شه؛ بعدش بازی شروع می‌شه.
+        TutorialUI.Show(targetCanvas, persianFont, () => cardSwipe.BeginGame());
     }
 
     void ContinueGame()
