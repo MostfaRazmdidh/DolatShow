@@ -7,21 +7,6 @@ using UnityEngine;
 public static class ScoreSystem
 {
     private const string BestKey = "DolatShow_BestScore";
-    private const string BestMonthsKey = "DolatShow_BestMonths";
-
-    // --- رکوردِ اصلیِ حالتِ بقا: بیشترین ماهی که دووم آوردی ---
-    public static int BestMonths => PlayerPrefs.GetInt(BestMonthsKey, 0);
-
-    public static bool SubmitMonths(int months)
-    {
-        if (months > BestMonths)
-        {
-            PlayerPrefs.SetInt(BestMonthsKey, months);
-            PlayerPrefs.Save();
-            return true;
-        }
-        return false;
-    }
 
     // محاسبه‌ی امتیاز از روی ۴ شاخصِ نهایی (۰ تا ~۴۵۰)
     public static int Compute(int budget, int popularity, int security, int diplomacy)

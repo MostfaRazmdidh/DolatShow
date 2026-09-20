@@ -80,8 +80,6 @@ public class CardSwipe : MonoBehaviour
     [Tooltip("مدتِ لرزش (ثانیه)")]
     [SerializeField] private float shakeDuration = 0.22f;
 
-    private float currentDifficultyMult = 1f; // ضریبِ سختیِ تصمیمِ جاری (تو حالتِ بقا بالا می‌ره)
-
     private Vector3 startPosition;
     private Vector3 startScale;
     private Vector3 dragOffset;
@@ -220,12 +218,13 @@ public class CardSwipe : MonoBehaviour
         }
         if (monthReport != null) monthReport.Hide();
 
-        // شروعِ مرحله‌ی مقدماتی (کمپین فروردین) فقط وقتی لازمه:
-        // بازیِ جدید (چیزی لود نشده) یا «ادامه» (resume در انتظار). تو «تبلیغ و ادامه» یا وسطِ بقا
-        // دوباره از اول شروع نمی‌شه. ماه هم دیگه اینجا زورکی ست نمی‌شه — بازیِ جدید (ResetState) یا
-        // ادامه (LoadFromSaveData) خودشون ماه رو درست تنظیم کردن.
-        if (CardDatabase.Instance.storyMode && CardDatabase.Instance.NeedsStoryStart)
+        // شروعِ ماهِ داستانی (کمپین فروردین) — کارت‌ها به‌ترتیب از Resources لود می‌شن،
+        // و ماه رو روی شماره‌ی همین فصل (فروردین=۱) می‌ذاریم تا تاریخ درست نشون داده بشه
+        if (CardDatabase.Instance.storyMode)
+        {
             CardDatabase.Instance.StartStoryMonth();
+            GameStats.Instance.SetMonth(CardDatabase.Instance.storyMonthNumber);
+        }
 
         LoadNextCard();
     }
@@ -432,28 +431,10 @@ public class CardSwipe : MonoBehaviour
         {
             var effect = effects.Find(e => e.type == bar.StatType);
             if (effect != null)
-                bar.ShowHint(ScaleEffect(effect.amount)); // اثرِ واقعیِ اعمال‌شده (با سختیِ فزاینده)
+                bar.ShowHint(effect.amount);
             else
                 bar.HideHint();
         }
-    }
-
-    // سختیِ فزاینده‌ی حالتِ بقا: هرچی از فروردین دورتر می‌شیم، اثرِ تصمیم‌ها بزرگ‌تر (تنشِ بالارونده).
-    // تو مرحله‌ی مقدماتی (۱۲ کارتِ فروردین) ضریب ۱ می‌مونه تا همون‌طور که نوشته شده بازی شه.
-    float ComputeDifficultyMult()
-    {
-        if (CardDatabase.Instance.LastCardWasIntro) return 1f;
-        float m = 1f + Mathf.Max(0, GameStats.Instance.CurrentMonth - 12) * 0.03f;
-        return Mathf.Min(m, 2.2f); // حداکثر حدودِ ۲.۲ برابر
-    }
-
-    // مقدارِ اثر رو با ضریبِ سختیِ فعلی مقیاس می‌کنه (علامت حفظ می‌شه، حداقل ±۱)
-    int ScaleEffect(int raw)
-    {
-        if (raw == 0) return 0;
-        int v = Mathf.RoundToInt(raw * currentDifficultyMult);
-        if (v == 0) v = raw > 0 ? 1 : -1;
-        return v;
     }
 
     void HideAllHints()
@@ -475,8 +456,7 @@ public class CardSwipe : MonoBehaviour
             bool draggedRight = xOffset > 0;      // کارت به کدوم سمت کشیده شد
             bool approved = IsApprove(xOffset);   // اون سمت یعنی تایید یا رد
             decided = true;
-            currentDifficultyMult = ComputeDifficultyMult(); // سختیِ فزاینده‌ی این تصمیم (تو بقا)
-            int maxEff = ScaleEffect(MaxAbsEffect(approved)); // بزرگ‌ترین اثر (برای شدتِ لرزش)
+            int maxEff = MaxAbsEffect(approved);  // بزرگ‌ترین اثرِ این تصمیم (برای شدتِ لرزش)
             PlayDecisionSound(approved);          // صدای بله/خیر
             ApplyCardEffects(approved);
             ShowAppliedHints(approved);           // اثرها «بعد از انتخاب» نشون داده می‌شن
@@ -546,15 +526,15 @@ public class CardSwipe : MonoBehaviour
         var effects = approved ? currentCard.approveEffects : currentCard.rejectEffects;
         foreach (var effect in effects)
         {
-            GameStats.Instance.ApplyEffect(effect.type, ScaleEffect(effect.amount));
+            GameStats.Instance.ApplyEffect(effect.type, effect.amount);
         }
 
         string flag = approved ? currentCard.setFlagOnApprove : currentCard.setFlagOnReject;
         CardDatabase.Instance.SetFlag(flag);
 
-        // مرحله‌ی مقدماتی (۱۲ کارتِ فروردین) همه داخلِ یه ماه‌ان → ماه جلو نمی‌ره.
-        // حالتِ بقا: هر تصمیم یه ماه جلو می‌بره (تا ۴۸ ماه = برد، یا شاخصِ ۰/۱۰۰ = باخت).
-        if (!CardDatabase.Instance.LastCardWasIntro)
+        // تو حالتِ داستانی، هر ۱۲ کارت داخلِ همون یه ماه (فروردین) هستن؛ پس ماه رو جلو نمی‌بریم.
+        // (تو ماه‌های تصادفیِ آینده، هر تصمیم یه ماه رو جلو می‌بره — مثل قبل.)
+        if (!CardDatabase.Instance.storyMode)
             GameStats.Instance.AdvanceMonth();
 
         // سیوِ خودکار بعد از هر تصمیم: اگه بازی باخته → سیو پاک می‌شه، وگرنه وضعیتِ فعلی
