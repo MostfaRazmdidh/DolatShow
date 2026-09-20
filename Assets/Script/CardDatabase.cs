@@ -23,22 +23,6 @@ public class CardDatabase : MonoBehaviour
     [Tooltip("شماره‌ی ماهِ این فصلِ داستانی (فروردین=۱) — برای نمایشِ درستِ تاریخ")]
     public int storyMonthNumber = 1;
 
-    [Header("حالتِ بقا (بعد از فروردین) — کارت‌های عمومیِ تصادفی")]
-    [Tooltip("مسیرِ حوضچه‌ی کارت‌های عمومیِ حالتِ بقا داخلِ Assets/Resources")]
-    public string generalResourcesPath = "Story/General";
-    private List<CardData> generalPool;
-
-    // آیا آخرین کارتی که داده شد از مرحله‌ی مقدماتی (۱۲ کارتِ فروردین) بود؟
-    // (تو مقدماتی ماه جلو نمی‌ره و سختی ثابته؛ تو بقا برعکس.)
-    public bool LastCardWasIntro { get; private set; }
-
-    // آیا هنوز داخلِ مرحله‌ی مقدماتی (فروردین) هستیم؟
-    public bool IntroActive => storyMode && storyCards != null && storyIndex < storyCards.Count;
-
-    // آیا باید ماهِ داستانی (از نو یا با ادامه) شروع بشه؟ — برای اینکه «ادامه بازی» و «تبلیغ و ادامه»
-    // به‌اشتباه بازی رو از اولِ فروردین شروع نکنن. true فقط وقتی هنوز چیزی لود نشده یا ادامه‌ای در انتظاره.
-    public bool NeedsStoryStart => storyCards == null || resumeStoryIndex >= 0;
-
     private HashSet<string> activeFlags = new HashSet<string>();
     private Queue<string> recentCardIds = new Queue<string>();
     private const int recentHistorySize = 5;
@@ -103,41 +87,24 @@ public class CardDatabase : MonoBehaviour
             Debug.LogWarning($"هیچ کارتِ داستانی‌ای تو مسیرِ Resources/{storyResourcesPath} پیدا نشد.");
     }
 
-    // متد اصلی — یه کارت مناسب برای نمایش بعدی برمی‌گردونه.
-    // مرحله‌ی مقدماتی (فروردین): ۱۲ کارت به‌ترتیب. بعدش «حالتِ بقا»: کارت‌های تصادفیِ عمومی
-    // که ماه‌به‌ماه ادامه پیدا می‌کنن تا وقتی یه شاخص به ۰/۱۰۰ برسه یا ۴۸ ماه کامل شه.
+    // متد اصلی — یه کارت مناسب برای نمایش بعدی برمی‌گردونه، یا null اگه چیزی نمونده
+    // (تو حالتِ داستانی، کارتِ بعدیِ ماه رو به‌ترتیب می‌ده؛ وقتی تموم شد null برمی‌گردونه)
     public CardData GetNextCard()
     {
-        if (storyMode && storyCards == null) StartStoryMonth();
-
-        // مرحله‌ی مقدماتی: کارت‌های فروردین به‌ترتیب
-        if (storyMode && storyCards != null && storyIndex < storyCards.Count)
+        if (storyMode)
         {
-            LastCardWasIntro = true;
-            return storyCards[storyIndex++];
+            if (storyCards == null) StartStoryMonth();
+            if (storyIndex < storyCards.Count) return storyCards[storyIndex++];
+            return null; // ماهِ داستانی تموم شد → StoryMonthComplete = true
         }
 
-        // حالتِ بقا: کارتِ تصادفیِ عمومی
-        LastCardWasIntro = false;
         return GetNextRandomCard();
     }
 
-    // حوضچه‌ی کارت‌های عمومیِ حالتِ بقا رو (یه‌بار) از Resources لود می‌کنه
-    void EnsureGeneralPool()
-    {
-        if (generalPool != null) return;
-        generalPool = Resources.LoadAll<CardData>(generalResourcesPath).ToList();
-        if (generalPool.Count == 0)
-            Debug.LogWarning($"CardDatabase: حوضچه‌ی عمومیِ بقا تو Resources/{generalResourcesPath} خالیه.");
-    }
-
-    // انتخابِ تصادفیِ وزن‌دار برای حالتِ بقا (از حوضچه‌ی عمومی؛ اگه خالی بود از allCards)
+    // انتخابِ تصادفیِ وزن‌دار (حالتِ غیرداستانی/ماه‌های آینده)
     CardData GetNextRandomCard()
     {
-        EnsureGeneralPool();
-        List<CardData> source = (generalPool != null && generalPool.Count > 0) ? generalPool : allCards;
-
-        List<CardData> eligible = source.Where(c =>
+        List<CardData> eligible = allCards.Where(c =>
             (string.IsNullOrEmpty(c.requiredFlag) || HasFlag(c.requiredFlag)) &&
             !recentCardIds.Contains(c.cardId)
         ).ToList();
@@ -145,7 +112,7 @@ public class CardDatabase : MonoBehaviour
         // اگه با محدودیت تکرار چیزی نموند، محدودیت رو موقتاً بردار
         if (eligible.Count == 0)
         {
-            eligible = source.Where(c =>
+            eligible = allCards.Where(c =>
                 string.IsNullOrEmpty(c.requiredFlag) || HasFlag(c.requiredFlag)
             ).ToList();
         }

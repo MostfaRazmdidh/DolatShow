@@ -69,14 +69,15 @@ public class GameOverUI : MonoBehaviour
         panel.SetActive(true);
     }
 
-    // «چند ماه دووم آوردی» + رکورد رو نشون می‌ده — متریکِ اصلیِ نگه‌داشتنِ کاربر
+    // امتیاز و رکورد رو حساب و نشون می‌ده (انگیزه‌ی «یه بار دیگه»)
     void ShowScore()
     {
-        int months = Mathf.Clamp(GameStats.Instance.CurrentMonth, 1, GameStats.Instance.TotalMonths);
-        bool newRecord = ScoreSystem.SubmitMonths(months);
+        var g = GameStats.Instance;
+        int score = ScoreSystem.Compute(g.Budget, g.Popularity, g.Security, g.Diplomacy);
+        bool newRecord = ScoreSystem.Submit(score);
         scoreText.text = newRecord
-            ? $"دووم آوردی: {ToPersian(months)} ماه  —  🏆 رکورد جدید!"
-            : $"دووم آوردی: {ToPersian(months)} ماه    رکورد: {ToPersian(ScoreSystem.BestMonths)} ماه";
+            ? $"امتیاز: {ToPersian(score)}  —  🏆 رکورد جدید!"
+            : $"امتیاز: {ToPersian(score)}    بهترین: {ToPersian(ScoreSystem.Best)}";
     }
 
     static string ToPersian(int n)
