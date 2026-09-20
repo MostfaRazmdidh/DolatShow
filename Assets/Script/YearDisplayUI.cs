@@ -32,11 +32,13 @@ public class YearDisplayUI : MonoBehaviour
     };
 
     private RTLTextMeshPro yearText;
+    private GameObject boxGO; // خودِ باکس — تا شروعِ بازی مخفیه (تو منوی اصلی دیده نشه)
 
     void Start()
     {
         // باکس، پایین-وسطِ صفحه
         GameObject box = new GameObject("DateBox", typeof(RectTransform));
+        boxGO = box;
         box.transform.SetParent(targetCanvas.transform, false);
         RectTransform boxRT = box.GetComponent<RectTransform>();
         boxRT.anchorMin = boxRT.anchorMax = new Vector2(0.5f, 0f); // پایین-وسط
@@ -58,12 +60,22 @@ public class YearDisplayUI : MonoBehaviour
 
         UpdateDisplay(GameStats.Instance.CurrentMonth);
         GameStats.Instance.OnMonthChanged += UpdateDisplay;
+
+        // باکسِ تاریخ فقط تو گیم‌پلی دیده بشه، نه تو منوی اصلی → تا شروعِ بازی مخفیش کن
+        boxGO.SetActive(false);
+        CardSwipe.GameStarted += ShowBox;
+    }
+
+    void ShowBox()
+    {
+        if (boxGO != null) boxGO.SetActive(true);
     }
 
     void OnDestroy()
     {
         if (GameStats.Instance != null)
             GameStats.Instance.OnMonthChanged -= UpdateDisplay;
+        CardSwipe.GameStarted -= ShowBox;
     }
 
     void UpdateDisplay(int month)

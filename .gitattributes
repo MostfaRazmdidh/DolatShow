@@ -173,3 +173,4 @@ LightingData.asset     binary
 # این ۴ عکسِ نوار به‌جای LFS به‌صورت بلاب معمولی ذخیره می‌شن (میزبانِ LFS تو این محیط بلاک بود)
 Assets/Resources/Bars/*.png -filter -diff -merge -text
 Assets/Resources/UI/*.png -filter -diff -merge -text
+Assets/Resources/Characters/*.png -filter -diff -merge -text

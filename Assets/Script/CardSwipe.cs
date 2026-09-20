@@ -89,6 +89,10 @@ public class CardSwipe : MonoBehaviour
     private CardData currentCard;
     private MonthReportUI monthReport; // کارنامه‌ی پایانِ ماهِ داستانی — موقع اجرا ساخته می‌شه
 
+    // وقتی بازی واقعاً شروع می‌شه صدا زده می‌شه (بعد از منو/آموزش). UIهایی مثل باکسِ تاریخ
+    // بهش گوش می‌دن تا فقط تو گیم‌پلی دیده بشن، نه تو منوی اصلی.
+    public static event System.Action GameStarted;
+
     // نشانگرهای بله/خیر — سمتِ راست و چپِ صفحه، موقع اجرا ساخته می‌شن
     private RTLTextMeshPro rightIndicator;
     private RTLTextMeshPro leftIndicator;
@@ -201,6 +205,7 @@ public class CardSwipe : MonoBehaviour
     public void BeginGame()
     {
         gameObject.SetActive(true); // اگه بعد از پایانِ ماهِ قبلی غیرفعال شده بود، دوباره فعالش کن
+        GameStarted?.Invoke(); // به UIهای گیم‌پلی (مثلِ باکسِ تاریخ) خبر بده که بازی شروع شد
 
         if (rightIndicator == null && leftIndicator == null) CreateSwipeIndicators();
         ShowSwipeIndicators(true);
