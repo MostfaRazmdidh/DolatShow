@@ -3,61 +3,77 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 
-// نوارِ وضعیتِ هر شاخص — طرحِ «نمودارِ ستونی»: هر شاخص یه ستونِ عمودیِ رنگیِ تمیزه که ارتفاعِ پُرشدنش
-// = مقدارِ شاخص (۰..۱۰۰)، با اسمِ شاخص زیرش و عدد روش. موقعِ اجرا با کد بالای صفحه ساخته می‌شه
-// (بدونِ وایرینگ/تصویر). Juice (پرشِ نرمِ عدد، فلشِ رنگ، نبضِ خطر) حفظ شده.
+// نوارِ وضعیتِ هر شاخص. طرحِ جدید: به‌جای اسلایدرِ چرخیده‌ی قدیمی، یه «بج» (badge) کاملِ آماده
+// (تصویر توی Assets/Resources/Bars/) نشون داده می‌شه که آیکون و اسمِ شاخص داخلش پخته شده. این اسکریپت
+// فقط «پُرشدنِ طلایی» رو توی پنلِ پایینیِ بج (Fill Area) و عددِ شاخص رو مدیریت می‌کنه.
 public class StatBarUI : MonoBehaviour
 {
     [SerializeField] private GameStats.StatType statType;
     [SerializeField] private Slider slider; // اسلایدرِ قدیمی — دیگه دیده نمی‌شه (visualش مخفی می‌شه)
 
-    [Header("پیش‌نمایش/نتیجه‌ی اثر (قدیمی — استفاده نمی‌شه)")]
-    [SerializeField] private TMP_Text hintText;
+    [Header("پیش‌نمایش/نتیجه‌ی اثر (از CardSwipe کنترل می‌شه)")]
+    [SerializeField] private TMP_Text hintText; // قدیمی — دیگه استفاده نمی‌شه (به‌جاش hint رو کد می‌سازه)
 
-    [Header("فونت فارسی")]
+    [Header("فونت فارسی (برای عدد و +/-)")]
     [SerializeField] private TMP_FontAsset persianFont;
 
-    [Header("چیدمانِ ستون")]
-    [Tooltip("پهنای ستون (پیکسل) — باریک تا شبیهِ نمودارِ ستونی باشه")]
-    [SerializeField] private float columnWidth = 95f;
-    [Tooltip("ارتفاعِ ستون (پیکسل) — بلند")]
-    [SerializeField] private float columnHeight = 330f;
-    [Tooltip("فاصله از بالای صفحه (پیکسل)")]
-    [SerializeField] private float topMargin = 40f;
-    [Tooltip("ضخامتِ قابِ طلاییِ دورِ ستون (پیکسل)")]
-    [SerializeField] private float frameThickness = 5f;
-    [Tooltip("رنگِ قابِ طلایی")]
-    [SerializeField] private Color frameColor = new Color(0.80f, 0.62f, 0.24f, 1f);
-    [Tooltip("رنگِ زمینه‌ی داخلِ ستون (track) — تیره و مات تا کلِ ستون دیده بشه")]
-    [SerializeField] private Color trackColor = new Color(0.09f, 0.07f, 0.05f, 0.92f);
-    [SerializeField] private float valueFontSize = 40f;
-    [SerializeField] private float nameFontSize = 28f;
+    [Header("چیدمانِ بجِ نوار")]
+    [Tooltip("ارتفاعِ بج (پیکسل). عرض خودکار از نسبتِ تصویر حساب می‌شه.")]
+    [SerializeField] private float barHeight = 430f;
+    [Tooltip("فاصله‌ی بج از بالای صفحه (پیکسل)")]
+    [SerializeField] private float topMargin = 30f;
+
+    [Header("محدوده‌ی پُرشدنِ طلایی داخلِ پنلِ مستطیلیِ پایین (کسری از خودِ تصویرِ بج)")]
+    [Tooltip("لبه‌ی چپِ پنلِ پایینی (۰ تا ۱) — اندازه‌گیری‌شده از روی تصویرِ Sagsa تا کلِ باکس پر بشه")]
+    [SerializeField] private float fillLeftFrac = 0.125f;
+    [SerializeField] private float fillRightFrac = 0.85f;
+    [Tooltip("کفِ پنلِ پایینی از پایینِ تصویر (۰ تا ۱)")]
+    [SerializeField] private float fillBottomFrac = 0.03f;
+    [Tooltip("سقفِ پنلِ پایینی از پایینِ تصویر (۰ تا ۱)")]
+    [SerializeField] private float fillTopFrac = 0.44f;
+
+    [Header("رنگ‌ها و اندازه")]
+    [SerializeField] private Color fillColor = new Color(0.90f, 0.66f, 0.20f, 1f); // طلاییِ گرم
+    [SerializeField] private float valueFontSize = 34f;
 
     [Header("Juice — انیمیشن و حسِ تغییرِ شاخص")]
+    [Tooltip("چند ثانیه طول بکشه تا عدد و نوار به مقدارِ جدید برسن (پرشِ نرم)")]
     [SerializeField] private float animDuration = 0.45f;
-    [SerializeField] private float popScale = 0.10f;
-    [Tooltip("زیرِ این مقدار یا بالای (۱۰۰ منهای این)، ستون نبضِ قرمزِ هشدار می‌زنه")]
+    [Tooltip("چقدر بج موقعِ تغییر «پرش» کنه (۰.۱۲ = ۱۲٪ بزرگ‌تر و برگشت)")]
+    [SerializeField] private float popScale = 0.12f;
+    [Tooltip("زیرِ این مقدار یا بالای (۱۰۰ منهای این)، بج نبضِ قرمزِ هشدار می‌زنه")]
     [SerializeField] private int dangerThreshold = 15;
     [SerializeField] private Color flashUpColor = new Color(0.35f, 0.95f, 0.45f);
     [SerializeField] private Color flashDownColor = new Color(0.98f, 0.4f, 0.35f);
 
+    [Header("تنظیمِ دقیقِ Fill داخلِ باکس (پیکسل — همون اندازه‌هایی که تو Inspector فرستادی)")]
+    [Tooltip("فاصله‌ی طلایی از لبه‌ی چپِ باکس")]
+    [SerializeField] private float fillPadLeft = 10.77f;
+    [Tooltip("فاصله‌ی طلایی از لبه‌ی راستِ باکس")]
+    [SerializeField] private float fillPadRight = 7.18f;
+    [Tooltip("فاصله از بالای باکس (وقتی پُرِ کامل)")]
+    [SerializeField] private float fillPadTop = 0f;
+    [Tooltip("فاصله از کفِ باکس")]
+    [SerializeField] private float fillPadBottom = 0f;
+
     public GameStats.StatType StatType => statType;
 
-    private RectTransform fillRT;   // بخشِ رنگیِ پرشونده — ارتفاعش با مقدارِ شاخص عوض می‌شه
+    private RectTransform fillRT;   // بخشِ طلاییِ پرشونده — ارتفاعش با مقدارِ شاخص عوض می‌شه
+    private float fillAreaHeight;   // ارتفاعِ باکس (پیکسل) — برای محاسبه‌ی دقیقِ پرشدن
     private TMP_Text valueText;     // عددِ شاخص
     private TMP_Text hintRuntime;   // +/- که بعد از تصمیم نشون داده می‌شه
-    private GameObject columnGO;    // خودِ ستون — تا شروعِ بازی مخفیه (تو منو دیده نشه)
-    private RectTransform columnRT; // برای انیمیشنِ پرش
+    private GameObject badgeGO;     // خودِ بج — تا شروعِ بازی مخفیه (تو منو دیده نشه)
+    private RectTransform badgeRT;  // برای انیمیشنِ پرش
     private Image dangerOverlay;    // لایه‌ی قرمزِ هشدار که نبض می‌زنه
-    private Color valueBaseColor = Color.white;
+    private Color valueBaseColor = Color.black; // رنگِ پایه‌ی عدد (برای برگردوندن بعد از فلش)
 
     private float displayValue;     // مقدارِ فعلیِ نشون‌داده‌شده (برای انیمیشنِ نرم)
-    private Coroutine animCo;
+    private Coroutine animCo;       // کوروتینِ انیمیشنِ تغییر
 
     void Start()
     {
         HideOldSliderVisual();
-        BuildColumn();
+        BuildBadge();
 
         int val = GameStats.Instance.GetStat(statType);
         displayValue = val;
@@ -67,13 +83,13 @@ public class StatBarUI : MonoBehaviour
         GameStats.Instance.OnStatChanged += HandleStatChanged;
     }
 
-    // نبضِ قرمزِ هشدار وقتی شاخص به لبه‌ی باخت (۰ یا ۱۰۰) نزدیکه
+    // نبضِ قرمزِ هشدار وقتی شاخص به لبه‌ی باخت (۰ یا ۱۰۰) نزدیکه — حسِ خطر/تنش می‌سازه
     void Update()
     {
-        if (dangerOverlay == null || columnGO == null || !columnGO.activeInHierarchy) return;
+        if (dangerOverlay == null || badgeGO == null || !badgeGO.activeInHierarchy) return;
         int v = Mathf.RoundToInt(displayValue);
         bool danger = v <= dangerThreshold || v >= 100 - dangerThreshold;
-        float a = danger ? (0.15f + 0.28f * Mathf.Abs(Mathf.Sin(Time.time * 4f))) : 0f;
+        float a = danger ? (0.15f + 0.25f * Mathf.Abs(Mathf.Sin(Time.time * 4f))) : 0f;
         Color c = dangerOverlay.color;
         dangerOverlay.color = new Color(c.r, c.g, c.b, a);
     }
@@ -88,7 +104,8 @@ public class StatBarUI : MonoBehaviour
     {
         if (changedType != statType) return;
 
-        if (columnGO == null || !columnGO.activeInHierarchy)
+        // اگه بج هنوز فعال نشده (مثلاً موقعِ لودِ سیو قبل از شروع)، بدونِ انیمیشن ست کن
+        if (badgeGO == null || !badgeGO.activeInHierarchy)
         {
             displayValue = newValue;
             SetFillF(newValue);
@@ -101,7 +118,7 @@ public class StatBarUI : MonoBehaviour
         animCo = StartCoroutine(AnimateChange(newValue, increased));
     }
 
-    // انیمیشنِ نرمِ تغییرِ شاخص: پرشِ عدد + بالا/پایین‌رفتنِ ستون + پرشِ اندازه + فلشِ رنگِ عدد
+    // انیمیشنِ نرمِ تغییرِ شاخص: پرشِ عدد + پرشدنِ نوار + پرشِ اندازه‌ی بج + فلشِ رنگِ عدد
     IEnumerator AnimateChange(int target, bool increased)
     {
         float from = displayValue;
@@ -117,8 +134,11 @@ public class StatBarUI : MonoBehaviour
             SetFillF(displayValue);
             UpdateValueText(Mathf.RoundToInt(displayValue));
 
-            if (columnRT != null)
-                columnRT.localScale = Vector3.one * (1f + popScale * Mathf.Sin(k * Mathf.PI));
+            // پرشِ اندازه: اول بزرگ، بعد برگشت (نیم‌سینوس)
+            if (badgeRT != null)
+                badgeRT.localScale = Vector3.one * (1f + popScale * Mathf.Sin(k * Mathf.PI));
+
+            // رنگِ عدد از فلش به رنگِ پایه برمی‌گرده
             if (valueText != null)
                 valueText.color = Color.Lerp(flash, valueBaseColor, k);
 
@@ -128,11 +148,12 @@ public class StatBarUI : MonoBehaviour
         displayValue = target;
         SetFillF(target);
         UpdateValueText(target);
-        if (columnRT != null) columnRT.localScale = Vector3.one;
+        if (badgeRT != null) badgeRT.localScale = Vector3.one;
         if (valueText != null) valueText.color = valueBaseColor;
         animCo = null;
     }
 
+    // ویژوالِ اسلایدرِ چرخیده‌ی قدیمی رو مخفی می‌کنه (نوارِ جدید یه بجِ صافِ روی Canvas‌ه)
     void HideOldSliderVisual()
     {
         if (slider == null) return;
@@ -147,102 +168,93 @@ public class StatBarUI : MonoBehaviour
         if (t != null) t.gameObject.SetActive(false);
     }
 
-    void BuildColumn()
+    void BuildBadge()
     {
         Canvas canvas = GetComponentInParent<Canvas>();
         if (canvas == null) return;
         canvas = canvas.rootCanvas;
 
-        Color statColor = StatColor(statType);
+        Sprite badge = Resources.Load<Sprite>("Bars/" + FileName(statType));
+        if (badge == null)
+        {
+            Debug.LogWarning($"StatBarUI: تصویرِ بج برای {statType} تو Resources/Bars پیدا نشد.");
+            return;
+        }
 
-        // قابِ بیرونیِ ستون (طلایی) — بالای صفحه، وسطِ اسلاتِ افقیِ خودش
-        columnGO = new GameObject("Column_" + statType, typeof(RectTransform));
-        columnGO.transform.SetParent(canvas.transform, false);
-        columnRT = columnGO.GetComponent<RectTransform>();
+        // خودِ بج — بالای صفحه، وسطِ اسلاتِ افقیِ خودش
+        badgeGO = new GameObject("Badge_" + statType, typeof(RectTransform));
+        badgeGO.transform.SetParent(canvas.transform, false);
+        badgeRT = badgeGO.GetComponent<RectTransform>();
         float xFrac = SlotXFraction(statType);
-        columnRT.anchorMin = columnRT.anchorMax = new Vector2(xFrac, 1f);
-        columnRT.pivot = new Vector2(0.5f, 1f);
-        columnRT.sizeDelta = new Vector2(columnWidth, columnHeight);
-        columnRT.anchoredPosition = new Vector2(0f, -topMargin);
-        Image frame = columnGO.AddComponent<Image>();
-        frame.color = frameColor;
-        frame.raycastTarget = false;
+        badgeRT.anchorMin = badgeRT.anchorMax = new Vector2(xFrac, 1f);
+        badgeRT.pivot = new Vector2(0.5f, 1f);
+        float aspect = badge.rect.width / badge.rect.height;
+        badgeRT.sizeDelta = new Vector2(barHeight * aspect, barHeight);
+        badgeRT.anchoredPosition = new Vector2(0f, -topMargin);
 
-        // زمینه‌ی داخلی (track) — تیره و مات، با قابِ طلایی دورش (به‌اندازه‌ی frameThickness داخل‌تر)
-        GameObject trackGO = new GameObject("Track", typeof(RectTransform));
-        trackGO.transform.SetParent(columnGO.transform, false);
-        RectTransform trackRT = trackGO.GetComponent<RectTransform>();
-        trackRT.anchorMin = Vector2.zero; trackRT.anchorMax = Vector2.one;
-        trackRT.offsetMin = new Vector2(frameThickness, frameThickness);
-        trackRT.offsetMax = new Vector2(-frameThickness, -frameThickness);
-        Image track = trackGO.AddComponent<Image>();
-        track.color = trackColor;
-        track.raycastTarget = false;
+        Image badgeImg = badgeGO.AddComponent<Image>();
+        badgeImg.sprite = badge;
+        badgeImg.raycastTarget = false;
 
-        // پُرشونده (رنگِ شاخص) — داخلِ track، از پایین بالا می‌آد (ارتفاع در SetFillF)
-        GameObject fill = new GameObject("Fill", typeof(RectTransform));
-        fill.transform.SetParent(trackGO.transform, false);
-        fillRT = fill.GetComponent<RectTransform>();
-        fillRT.anchorMin = new Vector2(0f, 0f);
-        fillRT.anchorMax = new Vector2(1f, 0f);
-        fillRT.offsetMin = fillRT.offsetMax = Vector2.zero;
-        fillRT.pivot = new Vector2(0.5f, 0f);
-        Image fillImg = fill.AddComponent<Image>();
-        fillImg.color = statColor;
-        fillImg.raycastTarget = false;
-
-        // لایه‌ی قرمزِ هشدار — رو کلِ track، اولش نامرئی؛ تو Update نبض می‌زنه
+        // لایه‌ی قرمزِ هشدار — رو کلِ بج، اولش نامرئی؛ تو Update وقتی شاخص بحرانی شد نبض می‌زنه
         GameObject dangerGO = new GameObject("DangerOverlay", typeof(RectTransform));
-        dangerGO.transform.SetParent(trackGO.transform, false);
+        dangerGO.transform.SetParent(badgeGO.transform, false);
         RectTransform dangerRT = dangerGO.GetComponent<RectTransform>();
         dangerRT.anchorMin = Vector2.zero; dangerRT.anchorMax = Vector2.one;
         dangerRT.offsetMin = dangerRT.offsetMax = Vector2.zero;
         dangerOverlay = dangerGO.AddComponent<Image>();
+        if (badge != null) dangerOverlay.sprite = badge; // فرمِ بج رو بگیره تا فقط خودِ نوار قرمز شه، نه یه مستطیل
         dangerOverlay.color = new Color(1f, 0.15f, 0.1f, 0f);
         dangerOverlay.raycastTarget = false;
 
-        // عددِ شاخص — وسطِ ستون، سفیدِ درشت با دورخطِ تیره (رو track و رو fill خوب دیده می‌شه)
-        valueText = CreatePlainText(trackGO.transform, "Value", valueFontSize, FontStyles.Bold);
-        RectTransform valRT = valueText.rectTransform;
-        valRT.anchorMin = Vector2.zero; valRT.anchorMax = Vector2.one;
-        valRT.offsetMin = valRT.offsetMax = Vector2.zero;
+        // پنلِ پایینی (Fill Area) — محدوده‌ای که طلایی توش پر می‌شه
+        GameObject area = new GameObject("FillArea", typeof(RectTransform));
+        area.transform.SetParent(badgeGO.transform, false);
+        RectTransform areaRT = area.GetComponent<RectTransform>();
+        areaRT.anchorMin = new Vector2(fillLeftFrac, fillBottomFrac);
+        areaRT.anchorMax = new Vector2(fillRightFrac, fillTopFrac);
+        areaRT.offsetMin = areaRT.offsetMax = Vector2.zero;
+        // ارتفاعِ باکس (پیکسل) = کسرِ ارتفاعیِ باکس × ارتفاعِ بج — برای محاسبه‌ی دقیقِ پرشدن
+        fillAreaHeight = (fillTopFrac - fillBottomFrac) * barHeight;
+
+        // خودِ طلاییِ پرشونده — کاملاً کشیده به باکس، و ارتفاعش با آفستِ بالا (در SetFill) با مقدارِ شاخص کم/زیاد می‌شه
+        GameObject fill = new GameObject("Fill", typeof(RectTransform));
+        fill.transform.SetParent(area.transform, false);
+        fillRT = fill.GetComponent<RectTransform>();
+        fillRT.anchorMin = new Vector2(0f, 0f);
+        fillRT.anchorMax = new Vector2(1f, 1f);
+        Image fillImg = fill.AddComponent<Image>();
+        fillImg.color = fillColor;
+        fillImg.raycastTarget = false;
+
+        // عددِ شاخص — وسطِ پنل. مشکی با دورخطِ روشن تا هم رو طلایی هم رو تیره خوب دیده بشه
+        valueText = CreatePlainText(area.transform, "Value", valueFontSize, FontStyles.Bold);
         valueText.alignment = TextAlignmentOptions.Center;
-        valueText.color = Color.white;
-        valueBaseColor = valueText.color;
-        valueText.outlineWidth = 0.25f;
-        valueText.outlineColor = new Color(0f, 0f, 0f, 1f);
+        valueText.color = Color.black;
+        valueBaseColor = valueText.color; // رنگِ پایه برای برگردوندن بعد از فلش
+        valueText.outlineWidth = 0.22f;
+        valueText.outlineColor = new Color(0.98f, 0.92f, 0.72f, 1f); // کرمِ روشن
 
-        // اسمِ شاخص — زیرِ ستون
-        TMP_Text nameLabel = CreatePlainText(columnGO.transform, "Name", nameFontSize, FontStyles.Bold);
-        RectTransform nameRT = nameLabel.rectTransform;
-        nameRT.anchorMin = nameRT.anchorMax = new Vector2(0.5f, 0f);
-        nameRT.pivot = new Vector2(0.5f, 1f);
-        nameRT.sizeDelta = new Vector2(columnWidth + 50f, 44f);
-        nameRT.anchoredPosition = new Vector2(0f, -8f);
-        nameLabel.alignment = TextAlignmentOptions.Center;
-        nameLabel.text = StatName(statType);
-        nameLabel.color = new Color(0.96f, 0.92f, 0.80f);
-        nameLabel.outlineWidth = 0.2f;
-        nameLabel.outlineColor = new Color(0f, 0f, 0f, 1f);
-
-        // متنِ +/- (بعد از تصمیم) — بالای ستون
-        hintRuntime = CreatePlainText(columnGO.transform, "Hint", valueFontSize * 0.95f, FontStyles.Bold);
+        // متنِ +/- که بعد از تصمیم بالای پنل نشون داده می‌شه (اول مخفیه)
+        hintRuntime = CreatePlainText(badgeGO.transform, "Hint", valueFontSize * 0.95f, FontStyles.Bold);
         RectTransform hintRT = hintRuntime.rectTransform;
-        hintRT.anchorMin = hintRT.anchorMax = new Vector2(0.5f, 1f);
+        hintRT.anchorMin = hintRT.anchorMax = new Vector2(0.5f, fillTopFrac);
         hintRT.pivot = new Vector2(0.5f, 0f);
-        hintRT.sizeDelta = new Vector2(columnWidth + 40f, 42f);
-        hintRT.anchoredPosition = new Vector2(0f, 6f);
+        hintRT.sizeDelta = new Vector2(barHeight * aspect * 0.6f, 46f);
+        hintRT.anchoredPosition = new Vector2(0f, 4f);
         hintRuntime.alignment = TextAlignmentOptions.Center;
         hintRuntime.outlineWidth = 0.25f;
         hintRuntime.outlineColor = new Color(0f, 0f, 0f, 1f);
         hintRuntime.gameObject.SetActive(false);
 
-        columnGO.SetActive(false); // تا شروعِ بازی مخفی
+        // تا شروعِ بازی بج مخفیه تا تو منوی اصلی دیده نشه (CardSwipe.BeginGame نشونش می‌ده)
+        badgeGO.SetActive(false);
     }
 
+    // با شروعِ بازی (CardSwipe.BeginGame) صدا زده می‌شه تا نوارها ظاهر بشن
     public void SetVisible(bool visible)
     {
-        if (columnGO != null) columnGO.SetActive(visible);
+        if (badgeGO != null) badgeGO.SetActive(visible);
     }
 
     TMP_Text CreatePlainText(Transform parent, string name, float size, FontStyles style)
@@ -260,12 +272,14 @@ public class StatBarUI : MonoBehaviour
         return t;
     }
 
-    // ارتفاعِ پُرشونده رو بر اساسِ مقدارِ شاخص (۰..۱۰۰) تنظیم می‌کنه (اعشاری برای انیمیشنِ نرم)
+    // ارتفاعِ طلایی رو بر اساسِ مقدارِ شاخص (۰ تا ۱۰۰) تنظیم می‌کنه (مقدارِ اعشاری برای انیمیشنِ نرم).
+    // با آفستِ دقیق (Left/Right/Top/Bottom) که طبقِ اندازه‌های فرستاده‌شده ثابته؛ فقط آفستِ بالا با مقدار عوض می‌شه.
     void SetFillF(float value)
     {
         if (fillRT == null) return;
         float f = Mathf.Clamp01(value / 100f);
-        fillRT.anchorMax = new Vector2(1f, f);
+        fillRT.offsetMin = new Vector2(fillPadLeft, fillPadBottom);
+        fillRT.offsetMax = new Vector2(-fillPadRight, -((1f - f) * fillAreaHeight + fillPadTop));
     }
 
     void UpdateValueText(int value)
@@ -273,6 +287,7 @@ public class StatBarUI : MonoBehaviour
         if (valueText != null) valueText.text = ToPersian(value);
     }
 
+    // موقعِ نمایشِ نتیجه‌ی تصمیم (بعد از انتخاب) صدا زده می‌شه
     public void ShowHint(int amount)
     {
         if (hintRuntime == null) return;
@@ -289,7 +304,7 @@ public class StatBarUI : MonoBehaviour
 
     static float SlotXFraction(GameStats.StatType type)
     {
-        // چیدمانِ افقی (چپ→راست): دیپلماسی، بودجه، محبوبیت، امنیت
+        // چیدمانِ افقی (چپ→راست): دیپلماسی، بودجه، محبوبیت، امنیت — مثلِ قبل، مساوی و بدونِ روی‌هم‌افتادگی
         switch (type)
         {
             case GameStats.StatType.Diplomacy: return 0.125f;
@@ -300,28 +315,15 @@ public class StatBarUI : MonoBehaviour
         }
     }
 
-    // رنگِ هر شاخص (برای نمودارِ ستونیِ رنگی)
-    static Color StatColor(GameStats.StatType type)
+    static string FileName(GameStats.StatType type)
     {
         switch (type)
         {
-            case GameStats.StatType.Budget: return new Color(0.95f, 0.72f, 0.20f);      // طلایی
-            case GameStats.StatType.Popularity: return new Color(0.36f, 0.80f, 0.45f);  // سبز
-            case GameStats.StatType.Security: return new Color(0.88f, 0.38f, 0.34f);     // قرمز
-            case GameStats.StatType.Diplomacy: return new Color(0.36f, 0.62f, 0.95f);    // آبی
-            default: return Color.gray;
-        }
-    }
-
-    static string StatName(GameStats.StatType type)
-    {
-        switch (type)
-        {
-            case GameStats.StatType.Budget: return "بودجه";
-            case GameStats.StatType.Popularity: return "محبوبیت";
-            case GameStats.StatType.Security: return "امنیت";
-            case GameStats.StatType.Diplomacy: return "دیپلماسی";
-            default: return "";
+            case GameStats.StatType.Budget: return "Bar_Budget";
+            case GameStats.StatType.Popularity: return "Bar_Popularity";
+            case GameStats.StatType.Security: return "Bar_Security";
+            case GameStats.StatType.Diplomacy: return "Bar_Diplomacy";
+            default: return "Bar_Budget";
         }
     }
 
