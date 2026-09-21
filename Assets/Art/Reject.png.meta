@@ -1,0 +1,754 @@
+fileFormatVersion: 2
+guid: 8e1cedb3880d7e2459e8949afaee3c34
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8774151521405605030
+    second: Reject_0
+  - first:
+      213: -317322611935191504
+    second: Reject_1
+  - first:
+      213: -6601086190738114551
+    second: Reject_2
+  - first:
+      213: 2360233730270763369
+    second: Reject_3
+  - first:
+      213: -504232476339831700
+    second: Reject_4
+  - first:
+      213: 5068821972872460521
+    second: Reject_5
+  - first:
+      213: -4267459157086714963
+    second: Reject_6
+  - first:
+      213: 2445764593671255498
+    second: Reject_7
+  - first:
+      213: 727821013415647488
+    second: Reject_8
+  - first:
+      213: -9027318266290988894
+    second: Reject_9
+  - first:
+      213: 8640151397285513645
+    second: Reject_10
+  - first:
+      213: 4254171830012868151
+    second: Reject_11
+  - first:
+      213: 8492795217206205019
+    second: Reject_12
+  - first:
+      213: -4664814962109589692
+    second: Reject_13
+  - first:
+      213: -6378590573794703906
+    second: Reject_14
+  - first:
+      213: -2247477328669978690
+    second: Reject_15
+  - first:
+      213: 2891405488560531048
+    second: Reject_16
+  - first:
+      213: 5403011601735320958
+    second: Reject_17
+  - first:
+      213: 9113952825891223059
+    second: Reject_18
+  - first:
+      213: -163190871759487824
+    second: Reject_19
+  - first:
+      213: 6679918000788505201
+    second: Reject_20
+  - first:
+      213: -1983564448257771672
+    second: Reject_21
+  - first:
+      213: -9141780135826319269
+    second: Reject_22
+  - first:
+      213: 7198130569838361140
+    second: Reject_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Reject_0
+      rect:
+        serializedVersion: 2
+        x: 248
+        y: 23
+        width: 1635
+        height: 750
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a5b6a21cda3fb3680800000000000000
+      internalID: -8774151521405605030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_1
+      rect:
+        serializedVersion: 2
+        x: 1249
+        y: 697
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03e576404c4a89bf0800000000000000
+      internalID: -317322611935191504
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_2
+      rect:
+        serializedVersion: 2
+        x: 1260
+        y: 683
+        width: 11
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9087155651b3464a0800000000000000
+      internalID: -6601086190738114551
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_3
+      rect:
+        serializedVersion: 2
+        x: 1241
+        y: 671
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9691fa7921c31c020800000000000000
+      internalID: 2360233730270763369
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_4
+      rect:
+        serializedVersion: 2
+        x: 701
+        y: 662
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c6c7c8bfb3b9009f0800000000000000
+      internalID: -504232476339831700
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_5
+      rect:
+        serializedVersion: 2
+        x: 1808
+        y: 476
+        width: 108
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e8f1c28ab2185640800000000000000
+      internalID: 5068821972872460521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 126
+        width: 164
+        height: 333
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da3cb50b180f6c4c0800000000000000
+      internalID: -4267459157086714963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_7
+      rect:
+        serializedVersion: 2
+        x: 183
+        y: 258
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac5b00290f911f120800000000000000
+      internalID: 2445764593671255498
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_8
+      rect:
+        serializedVersion: 2
+        x: 677
+        y: 153
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00954b40b5db91a00800000000000000
+      internalID: 727821013415647488
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_9
+      rect:
+        serializedVersion: 2
+        x: 693
+        y: 153
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a894579dd588b280800000000000000
+      internalID: -9027318266290988894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_10
+      rect:
+        serializedVersion: 2
+        x: 909
+        y: 177
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da94cc81bebf7e770800000000000000
+      internalID: 8640151397285513645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_11
+      rect:
+        serializedVersion: 2
+        x: 913
+        y: 173
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 736f3656dbad90b30800000000000000
+      internalID: 4254171830012868151
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_12
+      rect:
+        serializedVersion: 2
+        x: 979
+        y: 132
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5a56b7d0487cd570800000000000000
+      internalID: 8492795217206205019
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_13
+      rect:
+        serializedVersion: 2
+        x: 1376
+        y: 143
+        width: 12
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 447d788d18f334fb0800000000000000
+      internalID: -4664814962109589692
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_14
+      rect:
+        serializedVersion: 2
+        x: 421
+        y: 59
+        width: 21
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed5cf491ba1ba77a0800000000000000
+      internalID: -6378590573794703906
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_15
+      rect:
+        serializedVersion: 2
+        x: 439
+        y: 47
+        width: 36
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ebfc1e7f64b5fc0e0800000000000000
+      internalID: -2247477328669978690
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_16
+      rect:
+        serializedVersion: 2
+        x: 465
+        y: 72
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 866e347f8f5502820800000000000000
+      internalID: 2891405488560531048
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_17
+      rect:
+        serializedVersion: 2
+        x: 981
+        y: 52
+        width: 20
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e758fb6ec6a5bfa40800000000000000
+      internalID: 5403011601735320958
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_18
+      rect:
+        serializedVersion: 2
+        x: 580
+        y: 49
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 316f9eeaec34b7e70800000000000000
+      internalID: 9113952825891223059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_19
+      rect:
+        serializedVersion: 2
+        x: 586
+        y: 47
+        width: 26
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0bc703a44ca3cbdf0800000000000000
+      internalID: -163190871759487824
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_20
+      rect:
+        serializedVersion: 2
+        x: 846
+        y: 43
+        width: 10
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1728cbda706d3bc50800000000000000
+      internalID: 6679918000788505201
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_21
+      rect:
+        serializedVersion: 2
+        x: 1118
+        y: 48
+        width: 16
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8677088c4a6f874e0800000000000000
+      internalID: -1983564448257771672
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_22
+      rect:
+        serializedVersion: 2
+        x: 1373
+        y: 52
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b589955d66fd12180800000000000000
+      internalID: -9141780135826319269
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reject_23
+      rect:
+        serializedVersion: 2
+        x: 1394
+        y: 42
+        width: 26
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43a781ead95e4e360800000000000000
+      internalID: 7198130569838361140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Reject_0: -8774151521405605030
+      Reject_1: -317322611935191504
+      Reject_10: 8640151397285513645
+      Reject_11: 4254171830012868151
+      Reject_12: 8492795217206205019
+      Reject_13: -4664814962109589692
+      Reject_14: -6378590573794703906
+      Reject_15: -2247477328669978690
+      Reject_16: 2891405488560531048
+      Reject_17: 5403011601735320958
+      Reject_18: 9113952825891223059
+      Reject_19: -163190871759487824
+      Reject_2: -6601086190738114551
+      Reject_20: 6679918000788505201
+      Reject_21: -1983564448257771672
+      Reject_22: -9141780135826319269
+      Reject_23: 7198130569838361140
+      Reject_3: 2360233730270763369
+      Reject_4: -504232476339831700
+      Reject_5: 5068821972872460521
+      Reject_6: -4267459157086714963
+      Reject_7: 2445764593671255498
+      Reject_8: 727821013415647488
+      Reject_9: -9027318266290988894
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
