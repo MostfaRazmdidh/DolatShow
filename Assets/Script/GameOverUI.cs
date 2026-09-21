@@ -69,15 +69,12 @@ public class GameOverUI : MonoBehaviour
         panel.SetActive(true);
     }
 
-    // امتیاز و رکورد رو حساب و نشون می‌ده (انگیزه‌ی «یه بار دیگه»)
+    // ریالِ به‌دست‌آمده از این دور (به‌جای امتیاز) — به موجودی اضافه می‌شه
     void ShowScore()
     {
         var g = GameStats.Instance;
-        int score = ScoreSystem.Compute(g.Budget, g.Popularity, g.Security, g.Diplomacy);
-        bool newRecord = ScoreSystem.Submit(score);
-        scoreText.text = newRecord
-            ? $"امتیاز: {ToPersian(score)}  —  🏆 رکورد جدید!"
-            : $"امتیاز: {ToPersian(score)}    بهترین: {ToPersian(ScoreSystem.Best)}";
+        int earned = RialSystem.RewardRun(g.Budget, g.Popularity, g.Security, g.Diplomacy);
+        scoreText.text = $"ریالِ به‌دست‌آمده: +{ToPersian(earned)}      موجودی: {ToPersian(RialSystem.Total)}";
     }
 
     static string ToPersian(int n)

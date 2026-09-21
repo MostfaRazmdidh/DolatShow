@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using RTLTMPro;
 using System.Collections.Generic;
 
 // منوی اصلی بازی رو موقع اجرا با کد می‌سازه (مثل GameOverUI، چون امکان ساختنش تو Editor نبود).
@@ -55,11 +56,40 @@ public class MainMenuUI : MonoBehaviour
         AddMenuButton("SettingsButton", settingsButtonSprite, settingsButtonCenter, "تنظیمات", OpenSettings);
         AddMenuButton("ExitButton", exitButtonSprite, exitButtonCenter, "خروج", QuitGame);
 
+        // باکسِ ریال (بالا-چپ) — موجودیِ ریال رو نشون می‌ده. کوچیک نگهش می‌داریم چون بعداً
+        // کنارش چیزهای دیگه هم قراره اضافه شن.
+        BuildRialBox();
+
         // پنلِ انتخابِ شروع/ادامه رو (یه‌بار) بساز و مخفی نگه‌دار
         BuildStartPanel();
 
         // منو باید روی همه‌چیز (از جمله نوارهای وضعیت که موقع اجرا روی Canvas ساخته می‌شن) باشه
         panel.transform.SetAsLastSibling();
+    }
+
+    // باکسِ ریال بالا-چپِ منو: تصویرِ RialBox (سکه + کادر) و عددِ موجودی داخلِ کادرش.
+    void BuildRialBox()
+    {
+        Sprite boxSpr = Resources.Load<Sprite>("UI/RialBox");
+        if (boxSpr == null) return;
+
+        Vector2 canvasSize = ((RectTransform)targetCanvas.transform).rect.size;
+        float h = 0.065f; // کوچیک، تا جا برای چیزهای بعدی بمونه
+        float aspect = boxSpr.rect.width / boxSpr.rect.height;
+        float w = (h * canvasSize.y * aspect) / canvasSize.x;
+        float left = 0.02f, top = 0.985f;
+
+        GameObject boxGO = RuntimeUIHelper.CreateImage(panel.transform, "RialBox",
+            new Vector2(left, top - h), new Vector2(left + w, top), boxSpr);
+
+        // عددِ موجودی — داخلِ کادرِ سمتِ راستِ تصویر (سکه سمتِ چپه)
+        RTLTextMeshPro num = RuntimeUIHelper.CreateRTLText(boxGO.transform, "RialAmount",
+            new Vector2(0.44f, 0.18f), new Vector2(0.95f, 0.82f), 30, persianFont);
+        num.text = RialSystem.TotalPersian();
+        num.color = new Color(0.98f, 0.88f, 0.55f); // کرمِ طلایی
+        num.fontStyle = FontStyles.Bold;
+        num.alignment = TextAlignmentOptions.Center;
+        num.raycastTarget = false;
     }
 
     // پنلِ «شروع بازی جدید / ادامه بازی قبلی» رو با کد می‌سازه (تصاویرش از Resources/UI لود می‌شن،
