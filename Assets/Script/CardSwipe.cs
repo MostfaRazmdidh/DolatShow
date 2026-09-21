@@ -93,9 +93,12 @@ public class CardSwipe : MonoBehaviour
     // بهش گوش می‌دن تا فقط تو گیم‌پلی دیده بشن، نه تو منوی اصلی.
     public static event System.Action GameStarted;
 
-    // نشانگرِ بله/خیر به سبکِ Reigns — یه برچسبِ واحد روی خودِ کارت که موقعِ کشیدن ظاهر می‌شه
-    // و با کارت می‌چرخه/جابه‌جا می‌شه (چون فرزندِ Canvasِ خودِ کارته).
+    // نشانگرِ بله/خیر به سبکِ Reigns — یه نوارِ رنگی + برچسب روی خودِ کارت که موقعِ کشیدن ظاهر می‌شه
+    // و با کارت می‌چرخه/جابه‌جا می‌شه (چون فرزندِ Canvasِ خودِ کارته). «بله» سمتِ راست، «خیر» سمتِ چپ.
     private RTLTextMeshPro cardChoiceLabel;
+    private RectTransform choiceBandRT;      // نوارِ رنگیِ پشتِ متن
+    private UnityEngine.UI.Image choiceBandImg;
+    private Vector2 cardLocalSize;           // اندازه‌ی محلیِ کارت (برای جای‌گذاری روی Canvasِ کارت)
 
     void Start()
     {
@@ -244,7 +247,7 @@ public class CardSwipe : MonoBehaviour
         BeginGame();
     }
 
-    // به سبکِ Reigns: یه برچسبِ «بله/خیر» روی خودِ کارت می‌سازیم که موقعِ کشیدن ظاهر می‌شه.
+    // به سبکِ Reigns: یه نوارِ رنگی + برچسبِ «بله/خیر» روی خودِ کارت می‌سازیم که موقعِ کشیدن ظاهر می‌شه.
     // چون فرزندِ Canvasِ خودِ کارته، همراهِ کارت می‌چرخه و جابه‌جا می‌شه.
     void CreateSwipeIndicators()
     {
@@ -252,15 +255,25 @@ public class CardSwipe : MonoBehaviour
         Canvas cardCanvas = advisorText.GetComponentInParent<Canvas>();
         if (cardCanvas == null) return;
 
-        Vector2 cardSize = GetCardSize();
+        cardLocalSize = GetCardSize();
 
+        // نوارِ رنگی (پشتِ متن) — رنگش موقعِ کشیدن سبز/قرمز می‌شه
+        GameObject bandGO = new GameObject("CardChoiceBand", typeof(RectTransform));
+        bandGO.transform.SetParent(cardCanvas.transform, false);
+        choiceBandRT = bandGO.GetComponent<RectTransform>();
+        choiceBandRT.anchorMin = choiceBandRT.anchorMax = new Vector2(0.5f, 0.5f);
+        choiceBandRT.pivot = new Vector2(0.5f, 0.5f);
+        choiceBandRT.sizeDelta = new Vector2(cardLocalSize.x * 0.55f, cardLocalSize.y * 0.16f);
+        choiceBandImg = bandGO.AddComponent<UnityEngine.UI.Image>();
+        choiceBandImg.raycastTarget = false;
+        choiceBandImg.color = new Color(0f, 0f, 0f, 0f);
+
+        // برچسبِ متن — فرزندِ نوار (تا با هم جابه‌جا شن)، سفید با دورخطِ تیره
         GameObject go = new GameObject("CardChoiceLabel", typeof(RectTransform));
-        go.transform.SetParent(cardCanvas.transform, false);
+        go.transform.SetParent(bandGO.transform, false);
         RectTransform rt = go.GetComponent<RectTransform>();
-        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-        rt.pivot = new Vector2(0.5f, 0.5f);
-        rt.anchoredPosition = new Vector2(0f, cardSize.y * 0.34f); // بالای کارت
-        rt.sizeDelta = new Vector2(cardSize.x * 0.8f, cardSize.y * 0.2f);
+        rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one;
+        rt.offsetMin = rt.offsetMax = Vector2.zero;
 
         cardChoiceLabel = go.AddComponent<RTLTextMeshPro>();
         cardChoiceLabel.font = advisorText.font;
@@ -268,10 +281,12 @@ public class CardSwipe : MonoBehaviour
         cardChoiceLabel.fontStyle = TMPro.FontStyles.Bold;
         cardChoiceLabel.enableAutoSizing = true;
         cardChoiceLabel.fontSizeMin = 0.05f;
-        cardChoiceLabel.fontSizeMax = cardSize.y * 0.16f;
-        cardChoiceLabel.outlineWidth = 0.25f;
-        cardChoiceLabel.outlineColor = new Color(0f, 0f, 0f, 1f); // دورخطِ تیره برای خوانایی روی کارت
+        cardChoiceLabel.fontSizeMax = cardLocalSize.y * 0.12f;
+        cardChoiceLabel.color = Color.white;
+        cardChoiceLabel.outlineWidth = 0.2f;
+        cardChoiceLabel.outlineColor = new Color(0f, 0f, 0f, 1f);
         cardChoiceLabel.raycastTarget = false;
+
         SetChoiceAlpha(0f);
     }
 
@@ -300,37 +315,50 @@ public class CardSwipe : MonoBehaviour
 
     void ShowSwipeIndicators(bool show)
     {
-        if (cardChoiceLabel != null) cardChoiceLabel.gameObject.SetActive(show);
+        if (choiceBandRT != null) choiceBandRT.gameObject.SetActive(show);
     }
 
-    // موقعِ کشیدنِ کارت: برچسب «بله» (سبز) یا «خیر» (قرمز) بسته به جهت، با شفافیتِ متناسب با فاصله ظاهر می‌شه
+    // موقعِ کشیدنِ کارت: نوار+برچسب «بله» (سبز، سمتِ راست) یا «خیر» (قرمز، سمتِ چپ) با شفافیتِ متناسب با فاصله
     void UpdateSwipeIndicators(float xOffset)
     {
-        if (cardChoiceLabel == null) return;
+        if (choiceBandRT == null || cardChoiceLabel == null) return;
 
         float t = Mathf.Clamp01(Mathf.Abs(xOffset) / swipeThreshold);
         if (t < 0.02f) { SetChoiceAlpha(0f); return; }
 
         bool approved = IsApprove(xOffset);
+        // «بله» سمتِ راستِ کارت، «خیر» سمتِ چپِ کارت
+        float side = approved ? 1f : -1f;
+        choiceBandRT.anchoredPosition = new Vector2(side * cardLocalSize.x * 0.20f, cardLocalSize.y * 0.30f);
+        choiceBandRT.localScale = Vector3.one * (0.9f + 0.2f * t);
+
         cardChoiceLabel.text = approved ? "بله" : "خیر";
-        Color c = approved ? approveColor : rejectColor;
-        c.a = t;
-        cardChoiceLabel.color = c;
-        cardChoiceLabel.rectTransform.localScale = Vector3.one * (0.9f + 0.25f * t);
+
+        Color band = approved ? approveColor : rejectColor;
+        band.a = 0.6f * t;
+        choiceBandImg.color = band;
+
+        Color txt = cardChoiceLabel.color;
+        txt.a = Mathf.Clamp01(t * 1.5f);
+        cardChoiceLabel.color = txt;
     }
 
     void ResetSwipeIndicators()
     {
         SetChoiceAlpha(0f);
-        if (cardChoiceLabel != null) cardChoiceLabel.rectTransform.localScale = Vector3.one;
+        if (choiceBandRT != null) choiceBandRT.localScale = Vector3.one;
     }
 
     void SetChoiceAlpha(float a)
     {
-        if (cardChoiceLabel == null) return;
-        Color c = cardChoiceLabel.color;
-        c.a = a;
-        cardChoiceLabel.color = c;
+        if (choiceBandImg != null)
+        {
+            Color c = choiceBandImg.color; c.a = 0.6f * a; choiceBandImg.color = c;
+        }
+        if (cardChoiceLabel != null)
+        {
+            Color c = cardChoiceLabel.color; c.a = a; cardChoiceLabel.color = c;
+        }
     }
 
     // کارت بعدی رو از دیتابیس می‌گیره و متنش رو نمایش می‌ده
