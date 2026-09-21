@@ -93,12 +93,11 @@ public class CardSwipe : MonoBehaviour
     // بهش گوش می‌دن تا فقط تو گیم‌پلی دیده بشن، نه تو منوی اصلی.
     public static event System.Action GameStarted;
 
-    // نشانگرِ بله/خیر به سبکِ Reigns — یه نوارِ رنگی + برچسب روی خودِ کارت که موقعِ کشیدن ظاهر می‌شه
-    // و با کارت می‌چرخه/جابه‌جا می‌شه (چون فرزندِ Canvasِ خودِ کارته). «بله» سمتِ راست، «خیر» سمتِ چپ.
+    // نشانگرِ بله/خیر به سبکِ Reigns — موقعِ کشیدن، کلِ کارت یه ته‌رنگِ سبز/قرمز می‌گیره (`cardTintImg`)
+    // و کلمه‌ی «بله» (راست) / «خیر» (چپ) روی کارت ظاهر می‌شه. چون فرزندِ Canvasِ کارتن، با کارت می‌چرخن.
     private RTLTextMeshPro cardChoiceLabel;
-    private RectTransform choiceBandRT;      // نوارِ رنگیِ پشتِ متن
-    private UnityEngine.UI.Image choiceBandImg;
-    private Vector2 cardLocalSize;           // اندازه‌ی محلیِ کارت (برای جای‌گذاری روی Canvasِ کارت)
+    private UnityEngine.UI.Image cardTintImg;  // ته‌رنگِ رنگیِ کلِ کارت (پشتِ متن، رو خودِ کارت)
+    private Vector2 cardLocalSize;             // اندازه‌ی محلیِ کارت (برای جای‌گذاری روی Canvasِ کارت)
 
     void Start()
     {
@@ -257,23 +256,26 @@ public class CardSwipe : MonoBehaviour
 
         cardLocalSize = GetCardSize();
 
-        // نوارِ رنگی (پشتِ متن) — رنگش موقعِ کشیدن سبز/قرمز می‌شه
-        GameObject bandGO = new GameObject("CardChoiceBand", typeof(RectTransform));
-        bandGO.transform.SetParent(cardCanvas.transform, false);
-        choiceBandRT = bandGO.GetComponent<RectTransform>();
-        choiceBandRT.anchorMin = choiceBandRT.anchorMax = new Vector2(0.5f, 0.5f);
-        choiceBandRT.pivot = new Vector2(0.5f, 0.5f);
-        choiceBandRT.sizeDelta = new Vector2(cardLocalSize.x * 0.55f, cardLocalSize.y * 0.16f);
-        choiceBandImg = bandGO.AddComponent<UnityEngine.UI.Image>();
-        choiceBandImg.raycastTarget = false;
-        choiceBandImg.color = new Color(0f, 0f, 0f, 0f);
+        // ته‌رنگِ کلِ کارت — یه Image که ناحیه‌ی داخلیِ کارت رو می‌پوشونه؛ موقعِ کشیدن سبز/قرمز می‌شه.
+        // به‌عنوانِ اولین فرزندِ Canvas گذاشته می‌شه تا پشتِ متنِ کارت (اسم/متن) بمونه، نه روش.
+        GameObject tintGO = new GameObject("CardTint", typeof(RectTransform));
+        tintGO.transform.SetParent(cardCanvas.transform, false);
+        RectTransform tintRT = tintGO.GetComponent<RectTransform>();
+        tintRT.anchorMin = new Vector2(0.06f, 0.06f); // کمی داخل‌تر از لبه‌ی کارت (رو کادرِ تزئینی نیفته)
+        tintRT.anchorMax = new Vector2(0.94f, 0.94f);
+        tintRT.offsetMin = tintRT.offsetMax = Vector2.zero;
+        cardTintImg = tintGO.AddComponent<UnityEngine.UI.Image>();
+        cardTintImg.raycastTarget = false;
+        cardTintImg.color = new Color(0f, 0f, 0f, 0f);
+        tintRT.SetAsFirstSibling(); // پشتِ متنِ کارت
 
-        // برچسبِ متن — فرزندِ نوار (تا با هم جابه‌جا شن)، سفید با دورخطِ تیره
+        // کلمه‌ی بله/خیر — روی کارت (بالاترین فرزند تا روی همه‌چیز باشه)، سفیدِ درشت با دورخطِ تیره
         GameObject go = new GameObject("CardChoiceLabel", typeof(RectTransform));
-        go.transform.SetParent(bandGO.transform, false);
+        go.transform.SetParent(cardCanvas.transform, false);
         RectTransform rt = go.GetComponent<RectTransform>();
-        rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one;
-        rt.offsetMin = rt.offsetMax = Vector2.zero;
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.sizeDelta = new Vector2(cardLocalSize.x * 0.5f, cardLocalSize.y * 0.18f);
 
         cardChoiceLabel = go.AddComponent<RTLTextMeshPro>();
         cardChoiceLabel.font = advisorText.font;
@@ -281,11 +283,12 @@ public class CardSwipe : MonoBehaviour
         cardChoiceLabel.fontStyle = TMPro.FontStyles.Bold;
         cardChoiceLabel.enableAutoSizing = true;
         cardChoiceLabel.fontSizeMin = 0.05f;
-        cardChoiceLabel.fontSizeMax = cardLocalSize.y * 0.12f;
-        cardChoiceLabel.color = Color.white;
-        cardChoiceLabel.outlineWidth = 0.2f;
+        cardChoiceLabel.fontSizeMax = cardLocalSize.y * 0.14f;
+        cardChoiceLabel.color = new Color(1f, 1f, 1f, 0f);
+        cardChoiceLabel.outlineWidth = 0.25f;
         cardChoiceLabel.outlineColor = new Color(0f, 0f, 0f, 1f);
         cardChoiceLabel.raycastTarget = false;
+        rt.SetAsLastSibling(); // روی همه‌چیز
 
         SetChoiceAlpha(0f);
     }
@@ -315,45 +318,44 @@ public class CardSwipe : MonoBehaviour
 
     void ShowSwipeIndicators(bool show)
     {
-        if (choiceBandRT != null) choiceBandRT.gameObject.SetActive(show);
+        if (cardChoiceLabel != null) cardChoiceLabel.gameObject.SetActive(show);
+        if (cardTintImg != null) cardTintImg.gameObject.SetActive(show);
     }
 
-    // موقعِ کشیدنِ کارت: نوار+برچسب «بله» (سبز، سمتِ راست) یا «خیر» (قرمز، سمتِ چپ) با شفافیتِ متناسب با فاصله
+    // موقعِ کشیدنِ کارت: کلِ کارت ته‌رنگِ سبز(بله)/قرمز(خیر) می‌گیره و کلمه سمتِ راست(بله)/چپ(خیر) ظاهر می‌شه
     void UpdateSwipeIndicators(float xOffset)
     {
-        if (choiceBandRT == null || cardChoiceLabel == null) return;
+        if (cardChoiceLabel == null || cardTintImg == null) return;
 
         float t = Mathf.Clamp01(Mathf.Abs(xOffset) / swipeThreshold);
         if (t < 0.02f) { SetChoiceAlpha(0f); return; }
 
         bool approved = IsApprove(xOffset);
-        // «بله» سمتِ راستِ کارت، «خیر» سمتِ چپِ کارت
+        Color col = approved ? approveColor : rejectColor;
+
+        // ته‌رنگِ کلِ کارت
+        Color wash = col; wash.a = 0.4f * t;
+        cardTintImg.color = wash;
+
+        // کلمه: «بله» سمتِ راستِ کارت، «خیر» سمتِ چپِ کارت
         float side = approved ? 1f : -1f;
-        choiceBandRT.anchoredPosition = new Vector2(side * cardLocalSize.x * 0.20f, cardLocalSize.y * 0.30f);
-        choiceBandRT.localScale = Vector3.one * (0.9f + 0.2f * t);
-
+        cardChoiceLabel.rectTransform.anchoredPosition = new Vector2(side * cardLocalSize.x * 0.18f, cardLocalSize.y * 0.36f);
+        cardChoiceLabel.rectTransform.localScale = Vector3.one * (0.9f + 0.25f * t);
         cardChoiceLabel.text = approved ? "بله" : "خیر";
-
-        Color band = approved ? approveColor : rejectColor;
-        band.a = 0.6f * t;
-        choiceBandImg.color = band;
-
-        Color txt = cardChoiceLabel.color;
-        txt.a = Mathf.Clamp01(t * 1.5f);
-        cardChoiceLabel.color = txt;
+        cardChoiceLabel.color = new Color(1f, 1f, 1f, Mathf.Clamp01(t * 1.5f));
     }
 
     void ResetSwipeIndicators()
     {
         SetChoiceAlpha(0f);
-        if (choiceBandRT != null) choiceBandRT.localScale = Vector3.one;
+        if (cardChoiceLabel != null) cardChoiceLabel.rectTransform.localScale = Vector3.one;
     }
 
     void SetChoiceAlpha(float a)
     {
-        if (choiceBandImg != null)
+        if (cardTintImg != null)
         {
-            Color c = choiceBandImg.color; c.a = 0.6f * a; choiceBandImg.color = c;
+            Color c = cardTintImg.color; c.a = 0.4f * a; cardTintImg.color = c;
         }
         if (cardChoiceLabel != null)
         {
