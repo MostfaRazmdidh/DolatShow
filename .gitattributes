@@ -174,3 +174,4 @@ LightingData.asset     binary
 Assets/Resources/Bars/*.png -filter -diff -merge -text
 Assets/Resources/UI/*.png -filter -diff -merge -text
 Assets/Resources/Characters/*.png -filter -diff -merge -text
+Assets/Resources/Voice/Dialogue/*.wav -filter -diff -merge -text
