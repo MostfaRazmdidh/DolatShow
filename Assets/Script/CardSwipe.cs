@@ -93,9 +93,9 @@ public class CardSwipe : MonoBehaviour
     // بهش گوش می‌دن تا فقط تو گیم‌پلی دیده بشن، نه تو منوی اصلی.
     public static event System.Action GameStarted;
 
-    // نشانگرهای بله/خیر — سمتِ راست و چپِ صفحه، موقع اجرا ساخته می‌شن
-    private RTLTextMeshPro rightIndicator;
-    private RTLTextMeshPro leftIndicator;
+    // نشانگرِ بله/خیر به سبکِ Reigns — یه برچسبِ واحد روی خودِ کارت که موقعِ کشیدن ظاهر می‌شه
+    // و با کارت می‌چرخه/جابه‌جا می‌شه (چون فرزندِ Canvasِ خودِ کارته).
+    private RTLTextMeshPro cardChoiceLabel;
 
     void Start()
     {
@@ -207,7 +207,7 @@ public class CardSwipe : MonoBehaviour
         gameObject.SetActive(true); // اگه بعد از پایانِ ماهِ قبلی غیرفعال شده بود، دوباره فعالش کن
         GameStarted?.Invoke(); // به UIهای گیم‌پلی (مثلِ باکسِ تاریخ) خبر بده که بازی شروع شد
 
-        if (rightIndicator == null && leftIndicator == null) CreateSwipeIndicators();
+        if (cardChoiceLabel == null) CreateSwipeIndicators();
         ShowSwipeIndicators(true);
         ResetSwipeIndicators();
 
@@ -244,27 +244,46 @@ public class CardSwipe : MonoBehaviour
         BeginGame();
     }
 
-    // دو تا نشانگرِ «بله» و «خیر» رو سمتِ راست و چپِ صفحه می‌سازه تا کاربر بفهمه هر جهتِ سوایپ یعنی چی.
-    // فونت رو از خودِ متنِ کارت (advisorText) قرض می‌گیریم و روی همون Canvasِ اصلیِ صحنه (که نوارها زیرشن)
-    // می‌ذاریمشون، تا نیازی به وایرینگِ دستیِ جدید تو Inspector نباشه.
+    // به سبکِ Reigns: یه برچسبِ «بله/خیر» روی خودِ کارت می‌سازیم که موقعِ کشیدن ظاهر می‌شه.
+    // چون فرزندِ Canvasِ خودِ کارته، همراهِ کارت می‌چرخه و جابه‌جا می‌شه.
     void CreateSwipeIndicators()
     {
-        Canvas canvas = GetUICanvas();
-        if (canvas == null) return;
-        TMPro.TMP_FontAsset font = advisorText != null ? advisorText.font : null;
+        if (advisorText == null) return;
+        Canvas cardCanvas = advisorText.GetComponentInParent<Canvas>();
+        if (cardCanvas == null) return;
 
-        // سمتِ راست: اگه راست=تایید باشه «بله» (سبز)، وگرنه «خیر» (قرمز)
-        rightIndicator = CreateSwipeLabel(canvas.transform, font, true,
-            swipeRightMeansApprove ? "بله" : "خیر",
-            swipeRightMeansApprove ? approveColor : rejectColor);
+        Vector2 cardSize = GetCardSize();
 
-        // سمتِ چپ: برعکسِ سمتِ راست
-        leftIndicator = CreateSwipeLabel(canvas.transform, font, false,
-            swipeRightMeansApprove ? "خیر" : "بله",
-            swipeRightMeansApprove ? rejectColor : approveColor);
+        GameObject go = new GameObject("CardChoiceLabel", typeof(RectTransform));
+        go.transform.SetParent(cardCanvas.transform, false);
+        RectTransform rt = go.GetComponent<RectTransform>();
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = new Vector2(0f, cardSize.y * 0.34f); // بالای کارت
+        rt.sizeDelta = new Vector2(cardSize.x * 0.8f, cardSize.y * 0.2f);
+
+        cardChoiceLabel = go.AddComponent<RTLTextMeshPro>();
+        cardChoiceLabel.font = advisorText.font;
+        cardChoiceLabel.alignment = TMPro.TextAlignmentOptions.Center;
+        cardChoiceLabel.fontStyle = TMPro.FontStyles.Bold;
+        cardChoiceLabel.enableAutoSizing = true;
+        cardChoiceLabel.fontSizeMin = 0.05f;
+        cardChoiceLabel.fontSizeMax = cardSize.y * 0.16f;
+        cardChoiceLabel.outlineWidth = 0.25f;
+        cardChoiceLabel.outlineColor = new Color(0f, 0f, 0f, 1f); // دورخطِ تیره برای خوانایی روی کارت
+        cardChoiceLabel.raycastTarget = false;
+        SetChoiceAlpha(0f);
     }
 
-    // Canvasِ اصلیِ صحنه رو از روی یکی از نوارهای وضعیت پیدا می‌کنه
+    // اندازه‌ی محلیِ کارت (برای جای‌گذاریِ برچسب روی Canvasِ کارت که هم‌اندازه‌ی کارته)
+    Vector2 GetCardSize()
+    {
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr != null && sr.sprite != null) return sr.sprite.bounds.size;
+        return new Vector2(10f, 14f);
+    }
+
+    // Canvasِ اصلیِ صحنه رو از روی یکی از نوارهای وضعیت پیدا می‌کنه (برای کارنامه‌ی ماه)
     Canvas GetUICanvas()
     {
         if (statBars != null)
@@ -279,64 +298,39 @@ public class CardSwipe : MonoBehaviour
         return null;
     }
 
-    RTLTextMeshPro CreateSwipeLabel(Transform parent, TMPro.TMP_FontAsset font, bool rightSide, string text, Color color)
-    {
-        GameObject go = new GameObject(rightSide ? "SwipeIndicatorRight" : "SwipeIndicatorLeft", typeof(RectTransform));
-        go.transform.SetParent(parent, false);
-        RectTransform rt = go.GetComponent<RectTransform>();
-        // به وسطِ لبه‌ی راست/چپ بچسبون
-        rt.anchorMin = rt.anchorMax = new Vector2(rightSide ? 1f : 0f, 0.5f);
-        rt.pivot = new Vector2(rightSide ? 1f : 0f, 0.5f);
-        rt.anchoredPosition = new Vector2(rightSide ? -indicatorMargin : indicatorMargin, indicatorYOffset);
-        rt.sizeDelta = new Vector2(320f, 150f);
-
-        RTLTextMeshPro t = go.AddComponent<RTLTextMeshPro>();
-        t.font = font;
-        t.fontSize = indicatorFontSize;
-        t.alignment = TMPro.TextAlignmentOptions.Center;
-        t.fontStyle = TMPro.FontStyles.Bold;
-        t.color = color;
-        t.text = text;
-        t.raycastTarget = false;
-        SetIndicatorAlpha(t, indicatorBaseAlpha);
-        return t;
-    }
-
     void ShowSwipeIndicators(bool show)
     {
-        if (rightIndicator != null) rightIndicator.gameObject.SetActive(show);
-        if (leftIndicator != null) leftIndicator.gameObject.SetActive(show);
+        if (cardChoiceLabel != null) cardChoiceLabel.gameObject.SetActive(show);
     }
 
-    // موقع کشیدنِ کارت: سمتی که کارت به سمتش می‌ره پررنگ‌تر و بزرگ‌تر می‌شه، سمتِ دیگه محو می‌شه
+    // موقعِ کشیدنِ کارت: برچسب «بله» (سبز) یا «خیر» (قرمز) بسته به جهت، با شفافیتِ متناسب با فاصله ظاهر می‌شه
     void UpdateSwipeIndicators(float xOffset)
     {
-        if (rightIndicator == null || leftIndicator == null) return;
+        if (cardChoiceLabel == null) return;
 
         float t = Mathf.Clamp01(Mathf.Abs(xOffset) / swipeThreshold);
-        bool draggedRight = xOffset > 0;
-        RTLTextMeshPro active = draggedRight ? rightIndicator : leftIndicator;
-        RTLTextMeshPro other = draggedRight ? leftIndicator : rightIndicator;
+        if (t < 0.02f) { SetChoiceAlpha(0f); return; }
 
-        SetIndicatorAlpha(active, Mathf.Lerp(indicatorBaseAlpha, 1f, t));
-        active.rectTransform.localScale = Vector3.one * (1f + 0.35f * t);
-
-        SetIndicatorAlpha(other, indicatorBaseAlpha * (1f - t));
-        other.rectTransform.localScale = Vector3.one;
+        bool approved = IsApprove(xOffset);
+        cardChoiceLabel.text = approved ? "بله" : "خیر";
+        Color c = approved ? approveColor : rejectColor;
+        c.a = t;
+        cardChoiceLabel.color = c;
+        cardChoiceLabel.rectTransform.localScale = Vector3.one * (0.9f + 0.25f * t);
     }
 
     void ResetSwipeIndicators()
     {
-        if (rightIndicator != null) { SetIndicatorAlpha(rightIndicator, indicatorBaseAlpha); rightIndicator.rectTransform.localScale = Vector3.one; }
-        if (leftIndicator != null) { SetIndicatorAlpha(leftIndicator, indicatorBaseAlpha); leftIndicator.rectTransform.localScale = Vector3.one; }
+        SetChoiceAlpha(0f);
+        if (cardChoiceLabel != null) cardChoiceLabel.rectTransform.localScale = Vector3.one;
     }
 
-    void SetIndicatorAlpha(RTLTextMeshPro t, float a)
+    void SetChoiceAlpha(float a)
     {
-        if (t == null) return;
-        Color c = t.color;
+        if (cardChoiceLabel == null) return;
+        Color c = cardChoiceLabel.color;
         c.a = a;
-        t.color = c;
+        cardChoiceLabel.color = c;
     }
 
     // کارت بعدی رو از دیتابیس می‌گیره و متنش رو نمایش می‌ده
