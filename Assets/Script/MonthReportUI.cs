@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using RTLTMPro;
 using TMPro;
+using System.Collections;
 
 // کارنامه‌ی پایانِ ماهِ داستانی، روی تصویرِ «روزنامه» (Assets/Resources/UI/Newspaper) نوشته می‌شه.
 // موقعِ اجرا با کد ساخته می‌شه (CardSwipe.BeginGame با MonthReportUI.Create می‌سازتش) — بدونِ وایرینگِ صحنه.
@@ -17,8 +18,22 @@ public class MonthReportUI : MonoBehaviour
     private RTLTextMeshPro endingTitleText; // اسمِ پایان (تیترِ درشت)
     private RTLTextMeshPro endingBodyText;  // متنِ طنز
     private RTLTextMeshPro headlineText;     // تیترِ روزنامه
-    private RTLTextMeshPro statsText;        // اعدادِ نهایی
-    private RTLTextMeshPro scoreText;        // امتیاز + رکورد
+    private RTLTextMeshPro scoreText;        // ریالِ به‌دست‌آمده
+
+    // ۴ سلولِ شاخص (اسم + عددِ درشت) — عددها با انیمیشن از صفر بالا می‌آن
+    private readonly RTLTextMeshPro[] statNums = new RTLTextMeshPro[4];
+    private readonly int[] statTargets = new int[4];
+    private AudioSource countAudio;   // صدای شمارش
+    private AudioClip countTick;      // کلیپِ تیکِ شمارش (Resources/Sound/Count)
+    private Coroutine countCo;
+
+    private static readonly string[] statLabels = { "بودجه", "محبوبیت", "امنیت", "دیپلماسی" };
+    private static readonly Color[] statColors = {
+        new Color(0.62f, 0.44f, 0.06f), // بودجه — طلاییِ تیره
+        new Color(0.15f, 0.45f, 0.20f), // محبوبیت — سبز
+        new Color(0.62f, 0.18f, 0.14f), // امنیت — قرمز
+        new Color(0.14f, 0.32f, 0.55f), // دیپلماسی — آبی
+    };
 
     private static readonly Color parchmentInk = new Color(0.24f, 0.14f, 0.05f); // قهوه‌ای تیره روی کاغذِ کاهی
 
@@ -74,17 +89,27 @@ public class MonthReportUI : MonoBehaviour
         endingTitleText = MakeText(paperRT, "EndingTitle", 0.12f, 0.65f, 0.88f, 0.77f, 56, parchmentInk);
         endingTitleText.fontStyle = FontStyles.Bold;
 
-        endingBodyText = MakeText(paperRT, "EndingBody", 0.12f, 0.45f, 0.88f, 0.64f, 32, parchmentInk);
+        endingBodyText = MakeText(paperRT, "EndingBody", 0.12f, 0.45f, 0.88f, 0.64f, 38, parchmentInk);
+        // autosize تا متنِ طنز درشت باشه ولی از کادرِ روزنامه نزنه بیرون
+        endingBodyText.enableAutoSizing = true;
+        endingBodyText.fontSizeMin = 26;
+        endingBodyText.fontSizeMax = 38;
 
-        headlineText = MakeText(paperRT, "Headline", 0.12f, 0.35f, 0.88f, 0.44f, 30, new Color(0.45f, 0.28f, 0.12f));
+        headlineText = MakeText(paperRT, "Headline", 0.12f, 0.36f, 0.88f, 0.44f, 32, new Color(0.45f, 0.28f, 0.12f));
         headlineText.fontStyle = FontStyles.Italic;
 
-        statsText = MakeText(paperRT, "Stats", 0.05f, 0.27f, 0.95f, 0.35f, 32, new Color(0.35f, 0.2f, 0.06f));
-        statsText.fontStyle = FontStyles.Bold;
+        // ۴ سلولِ شاخص (اسم + عددِ درشتِ رنگی داخلِ یه کارتِ کوچیک) — به‌جای یه خطِ ساده
+        BuildStatCells(paperRT);
 
         // خطِ ریالِ به‌دست‌آمده (به‌جای امتیاز)
-        scoreText = MakeText(paperRT, "Rial", 0.05f, 0.17f, 0.95f, 0.26f, 34, new Color(0.5f, 0.28f, 0.05f));
+        scoreText = MakeText(paperRT, "Rial", 0.05f, 0.15f, 0.95f, 0.23f, 36, new Color(0.5f, 0.28f, 0.05f));
         scoreText.fontStyle = FontStyles.Bold;
+
+        // آماده‌سازیِ صدای شمارش (اختیاری — اگه فایلِ Resources/Sound/Count نبود، بی‌صدا کار می‌کنه)
+        countTick = Resources.Load<AudioClip>("Sound/Count");
+        countAudio = gameObject.AddComponent<AudioSource>();
+        countAudio.playOnAwake = false;
+        countAudio.clip = countTick;
 
         // دو دکمه‌ی تصویریِ پایینِ صفحه (بیرونِ روزنامه): «بازیِ دوباره» (چپ) و «خانه» (راست)
         // هر کدوم با نسبتِ تصویرِ خودش ساخته می‌شه تا کامل و بدونِ بریدگی باشه.
@@ -92,6 +117,34 @@ public class MonthReportUI : MonoBehaviour
         AddImageButton("HomeButton", "UI/Btn_Home", 0.72f, 0.085f, 0.035f, BackToMenu);
 
         panel.SetActive(false);
+    }
+
+    // ۴ سلولِ شاخص رو کنارِ هم (چپ→راست) روی روزنامه می‌سازه؛ هر سلول یه اسمِ کوچیک بالا و
+    // یه عددِ درشتِ رنگی (رنگِ همون شاخص) پایین داره. عددها اول صفرن و با انیمیشن بالا می‌آن.
+    void BuildStatCells(RectTransform paperRT)
+    {
+        // چیدمانِ راست→چپ (فارسی): بودجه سمتِ راست، دیپلماسی سمتِ چپ
+        float yBot = 0.235f, yTop = 0.35f;   // ناحیه‌ی عمودیِ سلول‌ها روی روزنامه
+        float cellW = 0.205f;                 // پهنای هر سلول (کسری از روزنامه)
+        float[] centers = { 0.85f, 0.62f, 0.39f, 0.16f }; // مرکزِ x برای شاخص‌های ۰..۳ (راست→چپ)
+
+        for (int i = 0; i < 4; i++)
+        {
+            float cx = centers[i];
+            float xMin = cx - cellW / 2f;
+            float xMax = cx + cellW / 2f;
+
+            // اسمِ شاخص (کوچیک، بالای سلول)
+            RTLTextMeshPro nameT = MakeText(paperRT, "StatName" + i, xMin, yTop - 0.03f, xMax, yTop, 26, parchmentInk);
+            nameT.fontStyle = FontStyles.Bold;
+            nameT.text = statLabels[i];
+
+            // عددِ شاخص (درشت، رنگی، پایینِ سلول)
+            RTLTextMeshPro numT = MakeText(paperRT, "StatNum" + i, xMin, yBot, xMax, yTop - 0.035f, 52, statColors[i]);
+            numT.fontStyle = FontStyles.Bold;
+            numT.text = Fa(0);
+            statNums[i] = numT;
+        }
     }
 
     // یه دکمه‌ی تصویری وسطِ نقطه‌ی cx پایینِ صفحه می‌سازه؛ ارتفاع ثابت و عرض از نسبتِ خودِ تصویر (بدونِ بریدگی).
@@ -170,7 +223,12 @@ public class MonthReportUI : MonoBehaviour
         endingTitleText.color = titleColor;
         endingBodyText.text = eBody;
         headlineText.text = eHeadline;
-        statsText.text = $"بودجه {Fa(budget)}    محبوبیت {Fa(popularity)}    امنیت {Fa(security)}    دیپلماسی {Fa(diplomacy)}";
+
+        // مقادیرِ نهاییِ شاخص‌ها رو ذخیره می‌کنیم؛ انیمیشنِ شمارش از صفر بالاشون می‌بره
+        statTargets[0] = budget;
+        statTargets[1] = popularity;
+        statTargets[2] = security;
+        statTargets[3] = diplomacy;
 
         // ریالِ به‌دست‌آمده از این دور (به‌جای امتیاز) — به موجودی اضافه می‌شه
         int earned = RialSystem.RewardRun(budget, popularity, security, diplomacy);
@@ -178,6 +236,52 @@ public class MonthReportUI : MonoBehaviour
 
         panel.transform.SetAsLastSibling();
         panel.SetActive(true);
+
+        // شروعِ انیمیشنِ شمارش (عددها از صفر تا مقدارِ واقعی بالا می‌رن + صدای تیک)
+        if (countCo != null) StopCoroutine(countCo);
+        countCo = StartCoroutine(CountUpStats());
+    }
+
+    // عددِ هر شاخص رو با انیمیشن از صفر تا مقدارِ نهایی بالا می‌بره و همزمان صدای تیک پخش می‌کنه
+    IEnumerator CountUpStats()
+    {
+        const float duration = 1.2f;      // مدتِ کلِ انیمیشن
+        const float tickEvery = 0.09f;    // فاصله‌ی بینِ تیک‌های صدا
+
+        // اول همه رو صفر کن
+        for (int i = 0; i < 4; i++)
+            if (statNums[i] != null) statNums[i].text = Fa(0);
+
+        float elapsed = 0f;
+        float nextTick = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime; // اگه جایی timeScale=0 بود بازم کار کنه
+            float t = Mathf.Clamp01(elapsed / duration);
+            float eased = 1f - (1f - t) * (1f - t); // ease-out تا آخرش نرم برسه
+
+            for (int i = 0; i < 4; i++)
+            {
+                if (statNums[i] == null) continue;
+                int val = Mathf.RoundToInt(statTargets[i] * eased);
+                statNums[i].text = Fa(val);
+            }
+
+            // صدای تیکِ شمارش (اگه کلیپ وصل باشه)
+            if (countTick != null && countAudio != null && elapsed >= nextTick)
+            {
+                countAudio.pitch = 0.9f + 0.4f * t; // هرچی بالاتر می‌ره، تیزتر
+                countAudio.PlayOneShot(countTick, 0.6f);
+                nextTick = elapsed + tickEvery;
+            }
+            yield return null;
+        }
+
+        // مقدارِ دقیقِ نهایی
+        for (int i = 0; i < 4; i++)
+            if (statNums[i] != null) statNums[i].text = Fa(statTargets[i]);
+
+        countCo = null;
     }
 
     // «بازیِ دوباره» — بدونِ برگشت به منو، فوری یه بازیِ جدید شروع می‌کنه
