@@ -66,51 +66,53 @@ public class MonthReportUI : MonoBehaviour
             img.raycastTarget = false;
         }
 
-        // همه‌ی متن‌ها فرزندِ روزنامه‌ان تا با کسرها دقیق سرِ جاشون بشینن
-        mastheadText = MakeText(paperRT, "Masthead", 0.13f, 0.795f, 0.87f, 0.865f, 40, new Color(0.96f, 0.86f, 0.55f));
+        // همه‌ی متن‌ها فرزندِ روزنامه‌ان تا با کسرها دقیق سرِ جاشون بشینن (متن‌ها بزرگ‌تر شدن)
+        mastheadText = MakeText(paperRT, "Masthead", 0.13f, 0.795f, 0.87f, 0.87f, 46, new Color(0.96f, 0.86f, 0.55f));
         mastheadText.fontStyle = FontStyles.Bold;
         mastheadText.text = "کارنامه‌ی فروردین";
 
-        endingTitleText = MakeText(paperRT, "EndingTitle", 0.12f, 0.66f, 0.88f, 0.76f, 46, parchmentInk);
+        endingTitleText = MakeText(paperRT, "EndingTitle", 0.12f, 0.65f, 0.88f, 0.77f, 56, parchmentInk);
         endingTitleText.fontStyle = FontStyles.Bold;
 
-        endingBodyText = MakeText(paperRT, "EndingBody", 0.13f, 0.45f, 0.87f, 0.64f, 26, parchmentInk);
+        endingBodyText = MakeText(paperRT, "EndingBody", 0.12f, 0.45f, 0.88f, 0.64f, 32, parchmentInk);
 
-        headlineText = MakeText(paperRT, "Headline", 0.13f, 0.35f, 0.87f, 0.43f, 24, new Color(0.45f, 0.28f, 0.12f));
+        headlineText = MakeText(paperRT, "Headline", 0.12f, 0.35f, 0.88f, 0.44f, 30, new Color(0.45f, 0.28f, 0.12f));
         headlineText.fontStyle = FontStyles.Italic;
 
-        statsText = MakeText(paperRT, "Stats", 0.06f, 0.28f, 0.94f, 0.35f, 25, new Color(0.35f, 0.2f, 0.06f));
+        statsText = MakeText(paperRT, "Stats", 0.05f, 0.27f, 0.95f, 0.35f, 32, new Color(0.35f, 0.2f, 0.06f));
         statsText.fontStyle = FontStyles.Bold;
 
-        // خطِ امتیاز + رکورد (زیرِ اعداد) — انگیزه‌ی «رکوردت رو بشکن»
-        scoreText = MakeText(paperRT, "Score", 0.06f, 0.18f, 0.94f, 0.27f, 27, new Color(0.5f, 0.28f, 0.05f));
+        // خطِ ریالِ به‌دست‌آمده (به‌جای امتیاز)
+        scoreText = MakeText(paperRT, "Rial", 0.05f, 0.17f, 0.95f, 0.26f, 34, new Color(0.5f, 0.28f, 0.05f));
         scoreText.fontStyle = FontStyles.Bold;
 
-        // دو دکمه پایینِ صفحه (بیرونِ روزنامه): «بازیِ دوباره» و «بازگشت به منو»
-        // «بازیِ دوباره» — چپ (سبز): فوری یه بازیِ جدید شروع می‌کنه (حلقه‌ی «یه بار دیگه»)
-        RuntimeUIHelper.CreateButton(panel.transform, "RetryButton",
-            new Vector2(0.08f, 0.04f), new Vector2(0.48f, 0.115f),
-            "بازیِ دوباره", persianFont, new Color(0.18f, 0.5f, 0.24f, 1f), RetryGame);
+        // دو دکمه‌ی تصویریِ پایینِ صفحه (بیرونِ روزنامه): «بازیِ دوباره» (چپ) و «خانه» (راست)
+        // هر کدوم با نسبتِ تصویرِ خودش ساخته می‌شه تا کامل و بدونِ بریدگی باشه.
+        AddImageButton("ReplayButton", "UI/Btn_Replay", 0.30f, 0.085f, 0.035f, RetryGame);
+        AddImageButton("HomeButton", "UI/Btn_Home", 0.72f, 0.085f, 0.035f, BackToMenu);
 
-        // «بازگشت به منو» — راست: با تصویرِ خانه اگه بود، وگرنه دکمه‌ی متنی
-        Sprite home = Resources.Load<Sprite>("UI/Btn_Home");
-        if (home != null)
+        panel.SetActive(false);
+    }
+
+    // یه دکمه‌ی تصویری وسطِ نقطه‌ی cx پایینِ صفحه می‌سازه؛ ارتفاع ثابت و عرض از نسبتِ خودِ تصویر (بدونِ بریدگی).
+    void AddImageButton(string name, string resPath, float cx, float hFrac, float bottom, UnityEngine.Events.UnityAction onClick)
+    {
+        Vector2 canvasSize = ((RectTransform)targetCanvas.transform).rect.size;
+        Sprite sp = Resources.Load<Sprite>(resPath);
+        if (sp != null)
         {
-            float bhFrac = 0.075f;
-            float bAspect = home.rect.width / home.rect.height;
-            float bwFrac = (bhFrac * canvasSize.y * bAspect) / canvasSize.x;
-            float cx = 0.74f, bottom = 0.04f;
-            RuntimeUIHelper.CreateImageButton(panel.transform, "HomeButton",
-                new Vector2(cx - bwFrac / 2f, bottom), new Vector2(cx + bwFrac / 2f, bottom + bhFrac), home, BackToMenu);
+            float aspect = sp.rect.width / sp.rect.height;
+            float wFrac = (hFrac * canvasSize.y * aspect) / canvasSize.x;
+            RuntimeUIHelper.CreateImageButton(panel.transform, name,
+                new Vector2(cx - wFrac / 2f, bottom), new Vector2(cx + wFrac / 2f, bottom + hFrac), sp, onClick);
         }
         else
         {
-            RuntimeUIHelper.CreateButton(panel.transform, "HomeButton",
-                new Vector2(0.52f, 0.04f), new Vector2(0.92f, 0.115f),
-                "بازگشت به منو", persianFont, new Color(0.2f, 0.45f, 0.55f, 1f), BackToMenu);
+            RuntimeUIHelper.CreateButton(panel.transform, name,
+                new Vector2(cx - 0.18f, bottom), new Vector2(cx + 0.18f, bottom + hFrac),
+                name == "HomeButton" ? "بازگشت به منو" : "بازیِ دوباره", persianFont,
+                new Color(0.25f, 0.4f, 0.5f, 1f), onClick);
         }
-
-        panel.SetActive(false);
     }
 
     RTLTextMeshPro MakeText(Transform parent, string name, float xMin, float yMin, float xMax, float yMax, float size, Color color)
@@ -170,13 +172,9 @@ public class MonthReportUI : MonoBehaviour
         headlineText.text = eHeadline;
         statsText.text = $"بودجه {Fa(budget)}    محبوبیت {Fa(popularity)}    امنیت {Fa(security)}    دیپلماسی {Fa(diplomacy)}";
 
-        // امتیاز و رکورد — انگیزه‌ی تکرار
-        int score = ScoreSystem.Compute(budget, popularity, security, diplomacy);
-        bool newRecord = ScoreSystem.Submit(score);
-        if (newRecord)
-            scoreText.text = $"امتیاز: {Fa(score)}  —  🏆 رکورد جدید!";
-        else
-            scoreText.text = $"امتیاز: {Fa(score)}    بهترین: {Fa(ScoreSystem.Best)}";
+        // ریالِ به‌دست‌آمده از این دور (به‌جای امتیاز) — به موجودی اضافه می‌شه
+        int earned = RialSystem.RewardRun(budget, popularity, security, diplomacy);
+        scoreText.text = $"ریالِ به‌دست‌آمده: +{Fa(earned)}      موجودی: {Fa(RialSystem.Total)}";
 
         panel.transform.SetAsLastSibling();
         panel.SetActive(true);
