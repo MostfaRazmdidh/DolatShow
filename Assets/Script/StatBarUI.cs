@@ -18,16 +18,20 @@ public class StatBarUI : MonoBehaviour
     [SerializeField] private TMP_FontAsset persianFont;
 
     [Header("چیدمانِ ستون")]
-    [Tooltip("پهنای ستون (پیکسل)")]
-    [SerializeField] private float columnWidth = 140f;
-    [Tooltip("ارتفاعِ ستون (پیکسل)")]
-    [SerializeField] private float columnHeight = 230f;
+    [Tooltip("پهنای ستون (پیکسل) — باریک تا شبیهِ نمودارِ ستونی باشه")]
+    [SerializeField] private float columnWidth = 95f;
+    [Tooltip("ارتفاعِ ستون (پیکسل) — بلند")]
+    [SerializeField] private float columnHeight = 330f;
     [Tooltip("فاصله از بالای صفحه (پیکسل)")]
-    [SerializeField] private float topMargin = 45f;
-    [Tooltip("رنگِ زمینه‌ی ستون (track)")]
-    [SerializeField] private Color trackColor = new Color(0.10f, 0.08f, 0.06f, 0.82f);
-    [SerializeField] private float valueFontSize = 34f;
-    [SerializeField] private float nameFontSize = 26f;
+    [SerializeField] private float topMargin = 40f;
+    [Tooltip("ضخامتِ قابِ طلاییِ دورِ ستون (پیکسل)")]
+    [SerializeField] private float frameThickness = 5f;
+    [Tooltip("رنگِ قابِ طلایی")]
+    [SerializeField] private Color frameColor = new Color(0.80f, 0.62f, 0.24f, 1f);
+    [Tooltip("رنگِ زمینه‌ی داخلِ ستون (track) — تیره و مات تا کلِ ستون دیده بشه")]
+    [SerializeField] private Color trackColor = new Color(0.09f, 0.07f, 0.05f, 0.92f);
+    [SerializeField] private float valueFontSize = 40f;
+    [SerializeField] private float nameFontSize = 28f;
 
     [Header("Juice — انیمیشن و حسِ تغییرِ شاخص")]
     [SerializeField] private float animDuration = 0.45f;
@@ -151,7 +155,7 @@ public class StatBarUI : MonoBehaviour
 
         Color statColor = StatColor(statType);
 
-        // ظرفِ ستون — بالای صفحه، وسطِ اسلاتِ افقیِ خودش
+        // قابِ بیرونیِ ستون (طلایی) — بالای صفحه، وسطِ اسلاتِ افقیِ خودش
         columnGO = new GameObject("Column_" + statType, typeof(RectTransform));
         columnGO.transform.SetParent(canvas.transform, false);
         columnRT = columnGO.GetComponent<RectTransform>();
@@ -160,27 +164,36 @@ public class StatBarUI : MonoBehaviour
         columnRT.pivot = new Vector2(0.5f, 1f);
         columnRT.sizeDelta = new Vector2(columnWidth, columnHeight);
         columnRT.anchoredPosition = new Vector2(0f, -topMargin);
+        Image frame = columnGO.AddComponent<Image>();
+        frame.color = frameColor;
+        frame.raycastTarget = false;
 
-        // زمینه‌ی ستون (track)
-        Image track = columnGO.AddComponent<Image>();
+        // زمینه‌ی داخلی (track) — تیره و مات، با قابِ طلایی دورش (به‌اندازه‌ی frameThickness داخل‌تر)
+        GameObject trackGO = new GameObject("Track", typeof(RectTransform));
+        trackGO.transform.SetParent(columnGO.transform, false);
+        RectTransform trackRT = trackGO.GetComponent<RectTransform>();
+        trackRT.anchorMin = Vector2.zero; trackRT.anchorMax = Vector2.one;
+        trackRT.offsetMin = new Vector2(frameThickness, frameThickness);
+        trackRT.offsetMax = new Vector2(-frameThickness, -frameThickness);
+        Image track = trackGO.AddComponent<Image>();
         track.color = trackColor;
         track.raycastTarget = false;
 
-        // پُرشونده (رنگِ شاخص) — از پایین بالا می‌آد
+        // پُرشونده (رنگِ شاخص) — داخلِ track، از پایین بالا می‌آد (ارتفاع در SetFillF)
         GameObject fill = new GameObject("Fill", typeof(RectTransform));
-        fill.transform.SetParent(columnGO.transform, false);
+        fill.transform.SetParent(trackGO.transform, false);
         fillRT = fill.GetComponent<RectTransform>();
         fillRT.anchorMin = new Vector2(0f, 0f);
-        fillRT.anchorMax = new Vector2(1f, 0f); // ارتفاع در SetFillF ست می‌شه
+        fillRT.anchorMax = new Vector2(1f, 0f);
         fillRT.offsetMin = fillRT.offsetMax = Vector2.zero;
         fillRT.pivot = new Vector2(0.5f, 0f);
         Image fillImg = fill.AddComponent<Image>();
         fillImg.color = statColor;
         fillImg.raycastTarget = false;
 
-        // لایه‌ی قرمزِ هشدار — رو کلِ ستون، اولش نامرئی؛ تو Update نبض می‌زنه
+        // لایه‌ی قرمزِ هشدار — رو کلِ track، اولش نامرئی؛ تو Update نبض می‌زنه
         GameObject dangerGO = new GameObject("DangerOverlay", typeof(RectTransform));
-        dangerGO.transform.SetParent(columnGO.transform, false);
+        dangerGO.transform.SetParent(trackGO.transform, false);
         RectTransform dangerRT = dangerGO.GetComponent<RectTransform>();
         dangerRT.anchorMin = Vector2.zero; dangerRT.anchorMax = Vector2.one;
         dangerRT.offsetMin = dangerRT.offsetMax = Vector2.zero;
@@ -188,16 +201,15 @@ public class StatBarUI : MonoBehaviour
         dangerOverlay.color = new Color(1f, 0.15f, 0.1f, 0f);
         dangerOverlay.raycastTarget = false;
 
-        // عددِ شاخص — روی ستون، سفیدِ درشت با دورخطِ تیره
-        valueText = CreatePlainText(columnGO.transform, "Value", valueFontSize, FontStyles.Bold);
+        // عددِ شاخص — وسطِ ستون، سفیدِ درشت با دورخطِ تیره (رو track و رو fill خوب دیده می‌شه)
+        valueText = CreatePlainText(trackGO.transform, "Value", valueFontSize, FontStyles.Bold);
         RectTransform valRT = valueText.rectTransform;
         valRT.anchorMin = Vector2.zero; valRT.anchorMax = Vector2.one;
         valRT.offsetMin = valRT.offsetMax = Vector2.zero;
-        valueText.alignment = TextAlignmentOptions.Top;
-        valueText.margin = new Vector4(0, 8, 0, 0);
+        valueText.alignment = TextAlignmentOptions.Center;
         valueText.color = Color.white;
         valueBaseColor = valueText.color;
-        valueText.outlineWidth = 0.22f;
+        valueText.outlineWidth = 0.25f;
         valueText.outlineColor = new Color(0f, 0f, 0f, 1f);
 
         // اسمِ شاخص — زیرِ ستون
