@@ -29,9 +29,9 @@ public class TutorialUI : MonoBehaviour
 
     // بزرگ‌ترکردنِ باکس (چون متن‌ها جا نمی‌شدن) — ضریبِ ارتفاعِ باکس نسبت به نسبتِ اصلیِ تصویر
     private const float boxWidthFrac = 0.97f;
-    private const float boxHeightMultiplier = 1.55f;
+    private const float boxHeightMultiplier = 1.9f;
 
-    // دیالوگ‌های آموزش (هماهنگ با فایل‌های صوتی Dialog_1..Dialog_8). هر خط یه «صفحه»ست.
+    // دیالوگ‌های آموزش (هماهنگ با فایل‌های صوتی Dialog_1..Dialog_7). هر خط یه «صفحه»ست.
     private static readonly string[] lines =
     {
         "سلام، جنابِ رئیس‌جمهور. من رستمی‌ام، مشاورِ ارشدِ شما. از همین امروز کنارتونم.",
@@ -40,7 +40,6 @@ public class TutorialUI : MonoBehaviour
         "بالای صفحه چهار شاخص می‌بینید: بودجه، محبوبیت، امنیت، و دیپلماسی. این‌ها وضعیت شما رو نشون می‌دن.",
         "هر تصمیمی که بگیرید، این چهار شاخص کم یا زیاد می‌شن. بعد از هر انتخاب، تغییرش رو کنارِ همون شاخص می‌بینید.",
         "حواستون باشه: اگه هر کدوم از این شاخص‌ها به صفر یا به صد برسه، کار تمومه. باید هر چهارتا رو متعادل نگه دارید.",
-        "سعی کنید بینِ خواسته‌ی مردم و توانِ واقعیِ کشور تعادل برقرار کنید؛ نه همه رو ناامید کنید، نه بیش از حد قول بدید.",
         "خب، اولین موضوع آماده‌ست. تصمیم با شماست، قربان. من همین‌جا کنارتونم.",
     };
 
@@ -113,12 +112,12 @@ public class TutorialUI : MonoBehaviour
             boxRT = r;
         }
 
-        // متنِ دیالوگ داخلِ باکس — ناحیه‌ی بزرگ‌تر + اندازه‌ی خودکار تا هیچ‌وقت سرریز نشه
-        dialogText = RuntimeUIHelper.CreateRTLText(boxRT, "Line", new Vector2(0.08f, 0.30f), new Vector2(0.92f, 0.86f), 34, font);
+        // متنِ دیالوگ داخلِ باکس — ناحیه‌ی بزرگ + اندازه‌ی خودکار با کف پایین تا هیچ‌وقت سرریز نشه
+        dialogText = RuntimeUIHelper.CreateRTLText(boxRT, "Line", new Vector2(0.07f, 0.16f), new Vector2(0.93f, 0.90f), 34, font);
         dialogText.color = new Color(0.96f, 0.90f, 0.78f); // کرمِ روشن رو زمینه‌ی تیره
         dialogText.enableAutoSizing = true;
-        dialogText.fontSizeMin = 20;
-        dialogText.fontSizeMax = 46;
+        dialogText.fontSizeMin = 12;
+        dialogText.fontSizeMax = 40;
         dialogText.raycastTarget = false;
 
         // اسمِ مشاور — بالای باکس، سمتِ راست
