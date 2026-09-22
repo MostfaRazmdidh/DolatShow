@@ -47,6 +47,9 @@ public class MainMenuUI : MonoBehaviour
     private bool slideOpen;
     private Coroutine slideCo;
 
+    // صفحه‌ی «درباره‌ی ما» (یه‌بار ساخته و بعد نشون/مخفی می‌شه)
+    private GameObject aboutPanel;
+
     void Start()
     {
         BuildUI();
@@ -185,17 +188,17 @@ public class MainMenuUI : MonoBehaviour
         Sprite about = FindSprite(sheet, "About Us");
         Sprite cross = FindSprite(sheet, "Cross");
 
-        // دکمه‌ی همبرگری (باز/بست‌کن) — بالا-راست، روبه‌روی باکسِ ریال
+        // دکمه‌ی همبرگری (باز/بست‌کن) — بالا-راست، روبه‌روی باکسِ ریال (یه‌ذره کوچیک‌تر شد)
         if (ham != null)
             RuntimeUIHelper.CreateImageButton(panel.transform, "SlideToggle",
-                new Vector2(0.80f, 0.895f), new Vector2(0.96f, 0.985f), ham, ToggleSlideMenu);
+                new Vector2(0.825f, 0.907f), new Vector2(0.955f, 0.985f), ham, ToggleSlideMenu);
 
         // پنلِ کشویی (زیرِ دکمه‌ی همبرگری) — شاملِ سه دکمه‌ی ستونی
         GameObject sp = new GameObject("SlidePanel", typeof(RectTransform));
         sp.transform.SetParent(panel.transform, false);
         slidePanelRT = sp.GetComponent<RectTransform>();
-        slidePanelRT.anchorMin = new Vector2(0.80f, 0.585f);
-        slidePanelRT.anchorMax = new Vector2(0.96f, 0.88f);
+        slidePanelRT.anchorMin = new Vector2(0.825f, 0.63f);
+        slidePanelRT.anchorMax = new Vector2(0.955f, 0.895f);
         slidePanelRT.offsetMin = slidePanelRT.offsetMax = Vector2.zero;
         slidePanelRT.pivot = new Vector2(0.5f, 1f); // از بالا (از زیرِ دکمه) باز می‌شه
 
@@ -280,9 +283,70 @@ public class MainMenuUI : MonoBehaviour
         Debug.Log("فروشگاه — به‌زودی");
     }
 
+    // صفحه‌ی «درباره‌ی ما» — عکسِ Resources/UI/AboutUs رو تمام‌قد وسطِ صفحه نشون می‌ده،
+    // با کلیک روی هرجاش بسته می‌شه. با انیمیشنِ سبکِ محو+پرش باز می‌شه.
     void OpenAbout()
     {
-        Debug.Log("درباره‌ی ما — به‌زودی");
+        CloseSlideMenu();
+        if (aboutPanel == null) BuildAboutPanel();
+        if (aboutPanel == null) return;
+        aboutPanel.transform.SetAsLastSibling();
+        aboutPanel.SetActive(true);
+        StartCoroutine(FadeInPanel(aboutPanel));
+    }
+
+    void BuildAboutPanel()
+    {
+        aboutPanel = RuntimeUIHelper.CreateFullScreenPanel(targetCanvas.transform, "AboutPanel", new Color(0f, 0f, 0f, 0.88f));
+        Button overlay = aboutPanel.AddComponent<Button>();
+        overlay.transition = Selectable.Transition.None;
+        overlay.onClick.AddListener(HideAboutPanel);
+
+        Sprite img = Resources.Load<Sprite>("UI/AboutUs");
+        if (img != null)
+        {
+            GameObject go = RuntimeUIHelper.CreateImage(aboutPanel.transform, "AboutImage",
+                new Vector2(0.05f, 0.05f), new Vector2(0.95f, 0.95f), img); // preserveAspect: تمام‌قد و وسط
+            go.GetComponent<Image>().raycastTarget = false;
+        }
+        else
+        {
+            // اگه عکس هنوز اضافه نشده باشه، یه متنِ ساده به‌جاش (تا صفحه خالی نباشه)
+            RTLTextMeshPro t = RuntimeUIHelper.CreateRTLText(aboutPanel.transform, "AboutText",
+                new Vector2(0.1f, 0.4f), new Vector2(0.9f, 0.6f), 34, persianFont);
+            t.text = "درباره‌ی ما\n(عکس رو تو Resources/UI/AboutUs بذار)";
+            t.color = new Color(0.96f, 0.9f, 0.78f);
+            t.raycastTarget = false;
+        }
+
+        aboutPanel.SetActive(false);
+    }
+
+    void HideAboutPanel()
+    {
+        if (aboutPanel != null) aboutPanel.SetActive(false);
+    }
+
+    // انیمیشنِ سبکِ باز شدنِ پنل: محو (fade) + یه پرشِ ریزِ اندازه (۰.۹۶→۱). سبک و روان.
+    IEnumerator FadeInPanel(GameObject go)
+    {
+        CanvasGroup cg = go.GetComponent<CanvasGroup>();
+        if (cg == null) cg = go.AddComponent<CanvasGroup>();
+        const float d = 0.2f;
+        float t = 0f;
+        cg.alpha = 0f;
+        go.transform.localScale = Vector3.one * 0.96f;
+        while (t < d)
+        {
+            t += Time.unscaledDeltaTime;
+            float p = Mathf.Clamp01(t / d);
+            float e = 1f - (1f - p) * (1f - p); // ease-out
+            cg.alpha = e;
+            go.transform.localScale = Vector3.one * Mathf.Lerp(0.96f, 1f, e);
+            yield return null;
+        }
+        cg.alpha = 1f;
+        go.transform.localScale = Vector3.one;
     }
 
     // پنلِ «شروع بازی جدید / ادامه بازی قبلی» رو با کد می‌سازه (تصاویرش از Resources/UI لود می‌شن،
@@ -427,6 +491,7 @@ public class MainMenuUI : MonoBehaviour
         SetContinueEnabled(SaveSystem.HasSave());
         startPanel.transform.SetAsLastSibling();
         startPanel.SetActive(true);
+        StartCoroutine(FadeInPanel(startPanel)); // باز شدنِ نرم (محو + پرشِ ریز)
     }
 
     void StartNewGame()
