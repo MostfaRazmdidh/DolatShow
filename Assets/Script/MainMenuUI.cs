@@ -119,8 +119,9 @@ public class MainMenuUI : MonoBehaviour
     {
         Transform child = FindDeep(panel.transform, childName);
         if (child == null) return;
+        // اگه به هر دلیلی کامپوننتِ Button از Prefab لود نشده باشه، خودمون اضافه می‌کنیم (تورِ ایمنی)
         Button btn = child.GetComponent<Button>();
-        if (btn == null) return;
+        if (btn == null) btn = child.gameObject.AddComponent<Button>();
         btn.onClick.RemoveAllListeners();
         btn.onClick.AddListener(action);
     }
@@ -228,11 +229,10 @@ public class MainMenuUI : MonoBehaviour
 
         // کلیک روی پس‌زمینه‌ی تیره → بستنِ پنل
         Button overlay = startPanel.GetComponent<Button>();
-        if (overlay != null)
-        {
-            overlay.onClick.RemoveAllListeners();
-            overlay.onClick.AddListener(HideStartPanel);
-        }
+        if (overlay == null) overlay = startPanel.AddComponent<Button>();
+        overlay.transition = Selectable.Transition.None;
+        overlay.onClick.RemoveAllListeners();
+        overlay.onClick.AddListener(HideStartPanel);
 
         // دکمه‌ها
         WireStartPanelButton("NewGameButton", StartNewGame);
@@ -242,7 +242,8 @@ public class MainMenuUI : MonoBehaviour
         {
             continueButtonGO = cont.gameObject;
             Button b = cont.GetComponent<Button>();
-            if (b != null) { b.onClick.RemoveAllListeners(); b.onClick.AddListener(ContinueGame); }
+            if (b == null) b = cont.gameObject.AddComponent<Button>();
+            b.onClick.RemoveAllListeners(); b.onClick.AddListener(ContinueGame);
         }
 
         startPanel.SetActive(false);
@@ -254,7 +255,7 @@ public class MainMenuUI : MonoBehaviour
         Transform child = FindDeep(startPanel.transform, childName);
         if (child == null) return;
         Button btn = child.GetComponent<Button>();
-        if (btn == null) return;
+        if (btn == null) btn = child.gameObject.AddComponent<Button>();
         btn.onClick.RemoveAllListeners();
         btn.onClick.AddListener(action);
     }

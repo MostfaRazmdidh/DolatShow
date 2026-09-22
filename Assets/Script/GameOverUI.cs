@@ -212,7 +212,7 @@ public class GameOverUI : MonoBehaviour
         Transform t = FindDeep(panel.transform, name);
         if (t == null) return;
         var b = t.GetComponent<UnityEngine.UI.Button>();
-        if (b == null) return;
+        if (b == null) b = t.gameObject.AddComponent<UnityEngine.UI.Button>();
         b.onClick.RemoveAllListeners();
         b.onClick.AddListener(action);
     }
