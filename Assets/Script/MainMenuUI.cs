@@ -98,12 +98,17 @@ public class MainMenuUI : MonoBehaviour
         WirePrefabButton("SettingsButton", OpenSettings);
         WirePrefabButton("ExitButton", QuitGame);
 
-        // عددِ موجودیِ ریال رو ست می‌کنیم
+        // عددِ موجودیِ ریال رو ست می‌کنیم — و فونتِ فارسی رو با کد اعمال می‌کنیم
+        // (رفرنسِ فونت تو Prefab گاهی به فونتِ پیش‌فرضِ TMP برمی‌گرده که رقمِ فارسی نداره)
         Transform num = FindDeep(panel.transform, "RialNumber");
         if (num != null)
         {
             var t = num.GetComponent<RTLTextMeshPro>();
-            if (t != null) t.text = RialSystem.TotalPersian();
+            if (t != null)
+            {
+                if (persianFont != null) t.font = persianFont;
+                t.text = RialSystem.TotalPersian();
+            }
         }
 
         return true;
