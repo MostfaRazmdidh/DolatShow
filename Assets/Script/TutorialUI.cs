@@ -67,6 +67,15 @@ public class TutorialUI : MonoBehaviour
         for (int i = 0; i < lines.Length; i++)
             clips[i] = Resources.Load<AudioClip>($"Voice/Dialogue/Dialog_{i + 1}");
 
+        // اول از Prefab (قابلِ ویرایش تو ادیتور) امتحان می‌کنیم؛ اگه نبود به روشِ کدیِ قبلی برمی‌گردیم
+        if (BuildFromPrefab())
+        {
+            index = 0;
+            panel.transform.SetAsLastSibling();
+            ShowLine();
+            return;
+        }
+
         // پس‌زمینه‌ی تیره — با ضربه روی هرجاش، دیالوگ می‌ره صفحه‌ی بعد
         panel = RuntimeUIHelper.CreateFullScreenPanel(canvas.transform, "TutorialPanel", new Color(0f, 0f, 0f, 0.88f));
         Button advanceBtn = panel.AddComponent<Button>();
@@ -156,6 +165,52 @@ public class TutorialUI : MonoBehaviour
         index = 0;
         panel.transform.SetAsLastSibling();
         ShowLine();
+    }
+
+    // بخشِ آموزش رو از Resources/Prefabs/TutorialPanel می‌سازه (چیدمان تو خودِ Prefab).
+    // متن‌ها/فونت‌ها و کلیک‌ها (ادامه/رد کردن) رو با کد وصل می‌کنیم. اگه Prefab نبود false.
+    bool BuildFromPrefab()
+    {
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/TutorialPanel");
+        if (prefab == null) return false;
+
+        panel = Instantiate(prefab, canvas.transform);
+        panel.name = "TutorialPanel";
+
+        // فونتِ فارسی روی همه‌ی متن‌ها
+        if (font != null)
+            foreach (var t in panel.GetComponentsInChildren<RTLTextMeshPro>(true))
+                t.font = font;
+
+        Transform line = FindDeep(panel.transform, "Line");
+        if (line != null) dialogText = line.GetComponent<RTLTextMeshPro>();
+        Transform hint = FindDeep(panel.transform, "Hint");
+        if (hint != null) hintText = hint.GetComponent<RTLTextMeshPro>();
+
+        // ضربه روی پس‌زمینه → صفحه‌ی بعد
+        Button advance = panel.GetComponent<Button>();
+        if (advance != null) { advance.onClick.RemoveAllListeners(); advance.onClick.AddListener(Next); }
+
+        // دکمه‌ی «رد کردن» → پایان
+        Transform skip = FindDeep(panel.transform, "SkipButton");
+        if (skip != null)
+        {
+            Button b = skip.GetComponent<Button>();
+            if (b != null) { b.onClick.RemoveAllListeners(); b.onClick.AddListener(Finish); }
+        }
+
+        return dialogText != null;
+    }
+
+    static Transform FindDeep(Transform parent, string name)
+    {
+        if (parent.name == name) return parent;
+        foreach (Transform c in parent)
+        {
+            Transform r = FindDeep(c, name);
+            if (r != null) return r;
+        }
+        return null;
     }
 
     void ShowLine()
