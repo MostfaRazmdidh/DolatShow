@@ -166,6 +166,9 @@ public class MainMenuUI : MonoBehaviour
     // پس نیازی به وایرینگِ دستی تو صحنه نیست). با زدنِ دکمه‌ی «شروع بازی» نشون داده می‌شه.
     void BuildStartPanel()
     {
+        // اول از Prefab (قابلِ ویرایش تو ادیتور) امتحان می‌کنیم؛ اگه نبود به روشِ کدیِ قبلی برمی‌گردیم
+        if (BuildStartPanelFromPrefab()) return;
+
         // پس‌زمینه‌ی تیره‌ی محو؛ کلیک روی فضای خالیش پنل رو می‌بنده (برگشت به منو)
         startPanel = RuntimeUIHelper.CreateFullScreenPanel(targetCanvas.transform, "StartPanel", new Color(0f, 0f, 0f, 0.75f));
         Button overlayBtn = startPanel.AddComponent<Button>();
@@ -211,6 +214,49 @@ public class MainMenuUI : MonoBehaviour
                 new Vector2(0.20f, 0.10f), new Vector2(0.80f, 0.44f), "ادامه بازی قبلی", persianFont, new Color(0.2f, 0.55f, 0.25f, 1f), ContinueGame);
 
         startPanel.SetActive(false);
+    }
+
+    // پنلِ شروع/ادامه رو از Resources/Prefabs/StartPanel می‌سازه (چیدمان تو خودِ Prefab).
+    // فقط رفتارِ دکمه‌ها (شروع جدید/ادامه/بستن) رو با کد وصل می‌کنیم. اگه Prefab نبود false.
+    bool BuildStartPanelFromPrefab()
+    {
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/StartPanel");
+        if (prefab == null) return false;
+
+        startPanel = Instantiate(prefab, targetCanvas.transform);
+        startPanel.name = "StartPanel";
+
+        // کلیک روی پس‌زمینه‌ی تیره → بستنِ پنل
+        Button overlay = startPanel.GetComponent<Button>();
+        if (overlay != null)
+        {
+            overlay.onClick.RemoveAllListeners();
+            overlay.onClick.AddListener(HideStartPanel);
+        }
+
+        // دکمه‌ها
+        WireStartPanelButton("NewGameButton", StartNewGame);
+        continueButtonGO = null;
+        Transform cont = FindDeep(startPanel.transform, "ContinueButton");
+        if (cont != null)
+        {
+            continueButtonGO = cont.gameObject;
+            Button b = cont.GetComponent<Button>();
+            if (b != null) { b.onClick.RemoveAllListeners(); b.onClick.AddListener(ContinueGame); }
+        }
+
+        startPanel.SetActive(false);
+        return true;
+    }
+
+    void WireStartPanelButton(string childName, UnityEngine.Events.UnityAction action)
+    {
+        Transform child = FindDeep(startPanel.transform, childName);
+        if (child == null) return;
+        Button btn = child.GetComponent<Button>();
+        if (btn == null) return;
+        btn.onClick.RemoveAllListeners();
+        btn.onClick.AddListener(action);
     }
 
     // «ادامه» فقط وقتی سیوِ قبلی باشه فعاله؛ در غیر این صورت کم‌رنگ و غیرقابل‌کلیک می‌شه
