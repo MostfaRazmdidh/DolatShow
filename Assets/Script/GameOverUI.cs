@@ -138,6 +138,9 @@ public class GameOverUI : MonoBehaviour
     // کل ساختار صفحه‌ی پایان بازی (پس‌زمینه‌ی تیره + متن + دکمه‌ها) رو با کد می‌سازه
     void BuildUI()
     {
+        // اول از Prefab (قابلِ ویرایش تو ادیتور) امتحان می‌کنیم؛ اگه نبود به روشِ کدیِ قبلی برمی‌گردیم
+        if (BuildFromPrefab()) return;
+
         panel = RuntimeUIHelper.CreateFullScreenPanel(targetCanvas.transform, "GameOverPanel", new Color(0f, 0f, 0f, 0.85f));
 
         messageText = RuntimeUIHelper.CreateRTLText(panel.transform, "Message", new Vector2(0.1f, 0.55f), new Vector2(0.9f, 0.85f), 36, persianFont);
@@ -160,5 +163,68 @@ public class GameOverUI : MonoBehaviour
             RuntimeUIHelper.CreateButton(panel.transform, "BackToMenuButton", new Vector2(0.3f, 0.10f), new Vector2(0.7f, 0.19f), "بازگشت به منو", persianFont, new Color(0.2f, 0.45f, 0.55f, 1f), BackToMenu);
 
         panel.SetActive(false);
+    }
+
+    // صفحه‌ی پایان بازی رو از Resources/Prefabs/GameOverPanel می‌سازه (چیدمان تو خودِ Prefab).
+    // متن‌ها/فونت‌ها و کلیکِ دکمه‌ها رو با کد وصل می‌کنیم. اگه Prefab نبود false برمی‌گردونه.
+    bool BuildFromPrefab()
+    {
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/GameOverPanel");
+        if (prefab == null) return false;
+
+        panel = Instantiate(prefab, targetCanvas.transform);
+        panel.name = "GameOverPanel";
+
+        messageText = FindText("Message");
+        scoreText = FindText("Score");
+
+        // فونتِ فارسی رو روی همه‌ی متن‌ها (از جمله برچسبِ دکمه‌ها) ست می‌کنیم
+        if (persianFont != null)
+            foreach (var t in panel.GetComponentsInChildren<RTLTextMeshPro>(true))
+                t.font = persianFont;
+
+        adButton = FindChild("WatchAdButton");
+        WireButton("WatchAdButton", WatchAdAndContinue);
+        WireButton("RetryButton", RetryGame);
+        WireButton("BackToMenuButton", BackToMenu);
+
+        panel.SetActive(false);
+        return true;
+    }
+
+    RTLTextMeshPro FindText(string name)
+    {
+        Transform t = FindDeep(panel.transform, name);
+        if (t == null) return null;
+        var r = t.GetComponent<RTLTextMeshPro>();
+        if (r != null && persianFont != null) r.font = persianFont;
+        return r;
+    }
+
+    GameObject FindChild(string name)
+    {
+        Transform t = FindDeep(panel.transform, name);
+        return t != null ? t.gameObject : null;
+    }
+
+    void WireButton(string name, UnityEngine.Events.UnityAction action)
+    {
+        Transform t = FindDeep(panel.transform, name);
+        if (t == null) return;
+        var b = t.GetComponent<UnityEngine.UI.Button>();
+        if (b == null) return;
+        b.onClick.RemoveAllListeners();
+        b.onClick.AddListener(action);
+    }
+
+    static Transform FindDeep(Transform parent, string name)
+    {
+        if (parent.name == name) return parent;
+        foreach (Transform c in parent)
+        {
+            Transform r = FindDeep(c, name);
+            if (r != null) return r;
+        }
+        return null;
     }
 }
