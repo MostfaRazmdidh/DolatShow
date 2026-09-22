@@ -47,24 +47,89 @@ public class MainMenuUI : MonoBehaviour
 
     void BuildUI()
     {
-        panel = backgroundSprite != null
-            ? RuntimeUIHelper.CreateImage(targetCanvas.transform, "MainMenuPanel", Vector2.zero, Vector2.one, backgroundSprite, stretch: true)
-            : RuntimeUIHelper.CreateFullScreenPanel(targetCanvas.transform, "MainMenuPanel", new Color(0.05f, 0.05f, 0.08f, 1f));
+        // اول سعی می‌کنیم منو رو از Prefabِ آماده (که تو ادیتور قابلِ ویرایشه) بسازیم؛
+        // اگه Prefab نبود یا ایراد داشت، به روشِ کدیِ قبلی برمی‌گردیم (تا منو هیچ‌وقت خراب نشه).
+        if (BuildFromPrefab()) { /* Prefab لود شد */ }
+        else
+        {
+            panel = backgroundSprite != null
+                ? RuntimeUIHelper.CreateImage(targetCanvas.transform, "MainMenuPanel", Vector2.zero, Vector2.one, backgroundSprite, stretch: true)
+                : RuntimeUIHelper.CreateFullScreenPanel(targetCanvas.transform, "MainMenuPanel", new Color(0.05f, 0.05f, 0.08f, 1f));
 
-        // سه دکمه (اگه اسپرایتشون خالی بمونه، نسخه‌ی رنگ‌ساده‌ی متنی نشون داده می‌شه)
-        AddMenuButton("StartButton", startButtonSprite, startButtonCenter, "شروع بازی", StartGame);
-        AddMenuButton("SettingsButton", settingsButtonSprite, settingsButtonCenter, "تنظیمات", OpenSettings);
-        AddMenuButton("ExitButton", exitButtonSprite, exitButtonCenter, "خروج", QuitGame);
+            // سه دکمه (اگه اسپرایتشون خالی بمونه، نسخه‌ی رنگ‌ساده‌ی متنی نشون داده می‌شه)
+            AddMenuButton("StartButton", startButtonSprite, startButtonCenter, "شروع بازی", StartGame);
+            AddMenuButton("SettingsButton", settingsButtonSprite, settingsButtonCenter, "تنظیمات", OpenSettings);
+            AddMenuButton("ExitButton", exitButtonSprite, exitButtonCenter, "خروج", QuitGame);
 
-        // باکسِ ریال (بالا-چپ) — موجودیِ ریال رو نشون می‌ده. کوچیک نگهش می‌داریم چون بعداً
-        // کنارش چیزهای دیگه هم قراره اضافه شن.
-        BuildRialBox();
+            // باکسِ ریال (بالا-چپ) — موجودیِ ریال رو نشون می‌ده.
+            BuildRialBox();
+        }
 
-        // پنلِ انتخابِ شروع/ادامه رو (یه‌بار) بساز و مخفی نگه‌دار
+        // پنلِ انتخابِ شروع/ادامه رو (یه‌بار) بساز و مخفی نگه‌دار (فعلاً همچنان با کد)
         BuildStartPanel();
 
         // منو باید روی همه‌چیز (از جمله نوارهای وضعیت که موقع اجرا روی Canvas ساخته می‌شن) باشه
         panel.transform.SetAsLastSibling();
+    }
+
+    // منو رو از Prefabِ Resources/Prefabs/MainMenu می‌سازه (چیدمان/تصاویر تو خودِ Prefab تعریف شدن و
+    // تو ادیتور قابلِ ویرایشن). فقط رفتارِ دکمه‌ها و متنِ ریال رو با کد وصل می‌کنیم.
+    // اگه Prefab پیدا نشد false برمی‌گردونه تا BuildUI به روشِ کدیِ قبلی برگرده.
+    bool BuildFromPrefab()
+    {
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/MainMenu");
+        if (prefab == null) return false;
+
+        panel = Instantiate(prefab, targetCanvas.transform);
+        panel.name = "MainMenuPanel";
+
+        // RectTransformِ ریشه رو تمام‌صفحه می‌کنیم (محضِ اطمینان که دقیق پرِ صفحه بشه)
+        RectTransform rt = panel.GetComponent<RectTransform>();
+        if (rt != null)
+        {
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+        }
+
+        // وصل‌کردنِ کلیکِ دکمه‌ها (چون onClick تو Prefab به متد وصل نمی‌شه، اینجا با کد وصلش می‌کنیم)
+        WirePrefabButton("StartButton", StartGame);
+        WirePrefabButton("SettingsButton", OpenSettings);
+        WirePrefabButton("ExitButton", QuitGame);
+
+        // عددِ موجودیِ ریال رو ست می‌کنیم
+        Transform num = FindDeep(panel.transform, "RialNumber");
+        if (num != null)
+        {
+            var t = num.GetComponent<RTLTextMeshPro>();
+            if (t != null) t.text = RialSystem.TotalPersian();
+        }
+
+        return true;
+    }
+
+    // یه دکمه‌ی داخلِ Prefab رو پیدا می‌کنه و کلیکش رو به متدِ داده‌شده وصل می‌کنه
+    void WirePrefabButton(string childName, UnityEngine.Events.UnityAction action)
+    {
+        Transform child = FindDeep(panel.transform, childName);
+        if (child == null) return;
+        Button btn = child.GetComponent<Button>();
+        if (btn == null) return;
+        btn.onClick.RemoveAllListeners();
+        btn.onClick.AddListener(action);
+    }
+
+    // جست‌وجوی بازگشتیِ یه فرزند با اسمِ مشخص (تو هر عمقی)
+    static Transform FindDeep(Transform parent, string name)
+    {
+        if (parent.name == name) return parent;
+        foreach (Transform c in parent)
+        {
+            Transform r = FindDeep(c, name);
+            if (r != null) return r;
+        }
+        return null;
     }
 
     // باکسِ ریال بالا-چپِ منو: تصویرِ RialBox (سکه + کادر) و عددِ موجودی داخلِ کادرش.
