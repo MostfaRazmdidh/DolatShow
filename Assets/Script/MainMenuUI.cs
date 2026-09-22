@@ -74,7 +74,7 @@ public class MainMenuUI : MonoBehaviour
         if (boxSpr == null) return;
 
         Vector2 canvasSize = ((RectTransform)targetCanvas.transform).rect.size;
-        float h = 0.065f; // کوچیک، تا جا برای چیزهای بعدی بمونه
+        float h = 0.095f; // بزرگ‌تر شد (قبلاً ۰.۰۶۵ بود، خیلی کوچیک به‌نظر می‌اومد)
         float aspect = boxSpr.rect.width / boxSpr.rect.height;
         float w = (h * canvasSize.y * aspect) / canvasSize.x;
         float left = 0.02f, top = 0.985f;
@@ -84,7 +84,7 @@ public class MainMenuUI : MonoBehaviour
 
         // عددِ موجودی — داخلِ کادرِ سمتِ راستِ تصویر (سکه سمتِ چپه)
         RTLTextMeshPro num = RuntimeUIHelper.CreateRTLText(boxGO.transform, "RialAmount",
-            new Vector2(0.44f, 0.18f), new Vector2(0.95f, 0.82f), 30, persianFont);
+            new Vector2(0.44f, 0.18f), new Vector2(0.95f, 0.82f), 40, persianFont);
         num.text = RialSystem.TotalPersian();
         num.color = new Color(0.98f, 0.88f, 0.55f); // کرمِ طلایی
         num.fontStyle = FontStyles.Bold;
