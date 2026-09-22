@@ -302,7 +302,7 @@ public class MainMenuUI : MonoBehaviour
         overlay.transition = Selectable.Transition.None;
         overlay.onClick.AddListener(HideAboutPanel);
 
-        Sprite img = Resources.Load<Sprite>("UI/AboutUs");
+        Sprite img = Resources.Load<Sprite>("UI/About Us");
         if (img != null)
         {
             GameObject go = RuntimeUIHelper.CreateImage(aboutPanel.transform, "AboutImage",
@@ -314,7 +314,7 @@ public class MainMenuUI : MonoBehaviour
             // اگه عکس هنوز اضافه نشده باشه، یه متنِ ساده به‌جاش (تا صفحه خالی نباشه)
             RTLTextMeshPro t = RuntimeUIHelper.CreateRTLText(aboutPanel.transform, "AboutText",
                 new Vector2(0.1f, 0.4f), new Vector2(0.9f, 0.6f), 34, persianFont);
-            t.text = "درباره‌ی ما\n(عکس رو تو Resources/UI/AboutUs بذار)";
+            t.text = "درباره‌ی ما\n(عکس رو تو Resources/UI/About Us بذار)";
             t.color = new Color(0.96f, 0.9f, 0.78f);
             t.raycastTarget = false;
         }
