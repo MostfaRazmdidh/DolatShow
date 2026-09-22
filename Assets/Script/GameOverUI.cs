@@ -57,6 +57,7 @@ public class GameOverUI : MonoBehaviour
         ShowScore();
         panel.transform.SetAsLastSibling(); // روی نوارهای وضعیت
         panel.SetActive(true);
+        RuntimeUIHelper.PlayFadeIn(this, panel); // باز شدنِ نرم
     }
 
     void HandleGameWon()
@@ -67,6 +68,7 @@ public class GameOverUI : MonoBehaviour
         ShowScore();
         panel.transform.SetAsLastSibling();
         panel.SetActive(true);
+        RuntimeUIHelper.PlayFadeIn(this, panel); // باز شدنِ نرم
     }
 
     // ریالِ به‌دست‌آمده از این دور (به‌جای امتیاز) — به موجودی اضافه می‌شه
