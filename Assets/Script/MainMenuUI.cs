@@ -53,6 +53,15 @@ public class MainMenuUI : MonoBehaviour
     void Start()
     {
         BuildUI();
+
+        // اگه بازیکن تازه ماهِ فروردین رو تموم کرده باشه، خانم رستمی تو منوی اصلی تبریک می‌گه
+        // و اسمِ کاربری رو می‌پرسه (پرچمش تو CardSwipe.EndStoryMonth ست می‌شه).
+        if (PlayerPrefs.GetInt("DolatShow_PendingResult", 0) == 1)
+        {
+            PlayerPrefs.SetInt("DolatShow_PendingResult", 0);
+            PlayerPrefs.Save();
+            ResultGreetingUI.Show(targetCanvas, persianFont, null);
+        }
     }
 
     void BuildUI()
