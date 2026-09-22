@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using RTLTMPro;
+using System.Collections;
 using System.Collections.Generic;
 
 // منوی اصلی بازی رو موقع اجرا با کد می‌سازه (مثل GameOverUI، چون امکان ساختنش تو Editor نبود).
@@ -40,6 +41,12 @@ public class MainMenuUI : MonoBehaviour
     private GameObject startPanel;
     private GameObject continueButtonGO;
 
+    // منوی کشویی سمتِ راست (فروشگاه/درباره/بستن) که با دکمه‌ی همبرگری باز/بسته می‌شه
+    private RectTransform slidePanelRT;
+    private CanvasGroup slideGroup;
+    private bool slideOpen;
+    private Coroutine slideCo;
+
     void Start()
     {
         BuildUI();
@@ -67,6 +74,9 @@ public class MainMenuUI : MonoBehaviour
 
         // پنلِ انتخابِ شروع/ادامه رو (یه‌بار) بساز و مخفی نگه‌دار (فعلاً همچنان با کد)
         BuildStartPanel();
+
+        // منوی کشویی سمتِ راست (روبه‌روی باکسِ ریال) — با انیمیشن باز/بسته می‌شه
+        BuildSlideMenu();
 
         // منو باید روی همه‌چیز (از جمله نوارهای وضعیت که موقع اجرا روی Canvas ساخته می‌شن) باشه
         panel.transform.SetAsLastSibling();
@@ -161,6 +171,118 @@ public class MainMenuUI : MonoBehaviour
         num.fontStyle = FontStyles.Bold;
         num.alignment = TextAlignmentOptions.Center;
         num.raycastTarget = false;
+    }
+
+    // منوی کشویی سمتِ راست: دکمه‌ی همبرگری (⋮) همیشه دیده می‌شه؛ با زدنش ستونِ
+    // «فروشگاه / درباره‌ی ما / بستن» با انیمیشن باز/بسته می‌شه. تصاویر از اسپرایت‌شیتِ
+    // Resources/UI/SlideMenu لود می‌شن (برش‌های نام‌دار: Store, About Us, Hamburger-style, Cross).
+    void BuildSlideMenu()
+    {
+        Sprite[] sheet = Resources.LoadAll<Sprite>("UI/SlideMenu");
+        if (sheet == null || sheet.Length == 0) return;
+        Sprite ham = FindSprite(sheet, "Hamburger-style");
+        Sprite store = FindSprite(sheet, "Store");
+        Sprite about = FindSprite(sheet, "About Us");
+        Sprite cross = FindSprite(sheet, "Cross");
+
+        // دکمه‌ی همبرگری (باز/بست‌کن) — بالا-راست، روبه‌روی باکسِ ریال
+        if (ham != null)
+            RuntimeUIHelper.CreateImageButton(panel.transform, "SlideToggle",
+                new Vector2(0.80f, 0.895f), new Vector2(0.96f, 0.985f), ham, ToggleSlideMenu);
+
+        // پنلِ کشویی (زیرِ دکمه‌ی همبرگری) — شاملِ سه دکمه‌ی ستونی
+        GameObject sp = new GameObject("SlidePanel", typeof(RectTransform));
+        sp.transform.SetParent(panel.transform, false);
+        slidePanelRT = sp.GetComponent<RectTransform>();
+        slidePanelRT.anchorMin = new Vector2(0.80f, 0.585f);
+        slidePanelRT.anchorMax = new Vector2(0.96f, 0.88f);
+        slidePanelRT.offsetMin = slidePanelRT.offsetMax = Vector2.zero;
+        slidePanelRT.pivot = new Vector2(0.5f, 1f); // از بالا (از زیرِ دکمه) باز می‌شه
+
+        slideGroup = sp.AddComponent<CanvasGroup>();
+
+        // سه دکمه‌ی ستونی (بالا→پایین): فروشگاه، درباره‌ی ما، بستن
+        if (store != null)
+            RuntimeUIHelper.CreateImageButton(sp.transform, "StoreButton",
+                new Vector2(0f, 0.68f), new Vector2(1f, 1f), store, OpenStore);
+        if (about != null)
+            RuntimeUIHelper.CreateImageButton(sp.transform, "AboutButton",
+                new Vector2(0f, 0.34f), new Vector2(1f, 0.66f), about, OpenAbout);
+        if (cross != null)
+            RuntimeUIHelper.CreateImageButton(sp.transform, "CloseSlideButton",
+                new Vector2(0f, 0f), new Vector2(1f, 0.32f), cross, CloseSlideMenu);
+
+        // حالتِ اولیه: بسته (نامرئی و غیرقابلِ کلیک)
+        slideOpen = false;
+        slidePanelRT.localScale = new Vector3(1f, 0f, 1f);
+        slideGroup.alpha = 0f;
+        slideGroup.blocksRaycasts = false;
+        slideGroup.interactable = false;
+    }
+
+    static Sprite FindSprite(Sprite[] arr, string n)
+    {
+        foreach (var s in arr) if (s != null && s.name == n) return s;
+        return null;
+    }
+
+    void ToggleSlideMenu()
+    {
+        slideOpen = !slideOpen;
+        if (slideCo != null) StopCoroutine(slideCo);
+        slideCo = StartCoroutine(AnimateSlide(slideOpen));
+    }
+
+    void CloseSlideMenu()
+    {
+        if (!slideOpen) return;
+        slideOpen = false;
+        if (slideCo != null) StopCoroutine(slideCo);
+        slideCo = StartCoroutine(AnimateSlide(false));
+    }
+
+    // انیمیشنِ باز/بسته‌شدنِ ستون (unroll از بالا + محوشدن)
+    IEnumerator AnimateSlide(bool opening)
+    {
+        if (slidePanelRT == null || slideGroup == null) yield break;
+        const float dur = 0.28f;
+        float t = 0f;
+        float start = slidePanelRT.localScale.y;
+        float end = opening ? 1f : 0f;
+        if (opening) { slideGroup.blocksRaycasts = true; slideGroup.interactable = true; }
+        while (t < dur)
+        {
+            t += Time.unscaledDeltaTime;
+            float p = Mathf.Clamp01(t / dur);
+            float eased = opening ? (1f - (1f - p) * (1f - p)) : (p * p); // باز: ease-out، بست: ease-in
+            ApplySlideState(Mathf.Lerp(start, end, eased));
+            yield return null;
+        }
+        ApplySlideState(end);
+        if (!opening) { slideGroup.blocksRaycasts = false; slideGroup.interactable = false; }
+        slideCo = null;
+    }
+
+    void ApplySlideState(float v)
+    {
+        if (slidePanelRT != null)
+        {
+            Vector3 s = slidePanelRT.localScale;
+            s.y = v;
+            slidePanelRT.localScale = s;
+        }
+        if (slideGroup != null) slideGroup.alpha = v;
+    }
+
+    // دکمه‌های منوی کشویی — فعلاً placeholder (مثلِ «تنظیمات»)؛ بعداً صفحه/محتواشون ساخته می‌شه
+    void OpenStore()
+    {
+        Debug.Log("فروشگاه — به‌زودی");
+    }
+
+    void OpenAbout()
+    {
+        Debug.Log("درباره‌ی ما — به‌زودی");
     }
 
     // پنلِ «شروع بازی جدید / ادامه بازی قبلی» رو با کد می‌سازه (تصاویرش از Resources/UI لود می‌شن،
