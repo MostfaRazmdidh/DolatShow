@@ -86,7 +86,14 @@ public class YearDisplayUI : MonoBehaviour
             yearText = yt.GetComponent<RTLTextMeshPro>();
             if (yearText != null && persianFont != null) yearText.font = persianFont;
         }
-        return yearText != null;
+        // اگه متن پیدا نشد، نمونه‌ی ساخته‌شده رو پاک می‌کنیم تا باکسِ یتیم رو صفحه نمونه (و کد نسخه‌ی خودش رو بسازه)
+        if (yearText == null)
+        {
+            if (boxGO != null) Destroy(boxGO);
+            boxGO = null;
+            return false;
+        }
+        return true;
     }
 
     void ShowBox()
