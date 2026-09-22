@@ -203,7 +203,15 @@ public class TutorialUI : MonoBehaviour
             b.onClick.RemoveAllListeners(); b.onClick.AddListener(Finish);
         }
 
-        return dialogText != null;
+        // اگه متنِ دیالوگ پیدا نشد، نمونه‌ی ساخته‌شده رو پاک می‌کنیم تا پنلِ «یتیم» رو صفحه نمونه
+        // (وگرنه نسخه‌ی کدیِ آموزش هم ساخته می‌شه و دو پنل روی هم می‌افتن → گیرکردنِ صفحه)
+        if (dialogText == null)
+        {
+            if (panel != null) Destroy(panel);
+            panel = null;
+            return false;
+        }
+        return true;
     }
 
     static Transform FindDeep(Transform parent, string name)
@@ -245,6 +253,15 @@ public class TutorialUI : MonoBehaviour
         onComplete = null; // جلوگیری از دوباره صدا خوردن (رد کردن + پایان هم‌زمان)
         if (audioSrc != null) audioSrc.Stop();
         if (panel != null) Destroy(panel);
+        // تورِ ایمنیِ نهایی: هر پنلِ آموزشیِ باقی‌مونده رو هم پاک کن (تا هیچ‌وقت روی صفحه گیر نکنه)
+        if (canvas != null)
+        {
+            for (int i = canvas.transform.childCount - 1; i >= 0; i--)
+            {
+                Transform c = canvas.transform.GetChild(i);
+                if (c != null && c.name == "TutorialPanel") Destroy(c.gameObject);
+            }
+        }
         Destroy(gameObject);
         cb?.Invoke();
     }
