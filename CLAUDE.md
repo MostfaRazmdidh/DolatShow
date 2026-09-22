@@ -190,6 +190,14 @@
   - `CreateImage` — یه Image ساده از یه Sprite (پس‌زمینه، لوگو، آیکون) — `stretch:true` یعنی دقیقاً پر کن (پس‌زمینه‌ها)، `false` یعنی نسبت تصویر حفظ بشه (لوگو/آیکون)
   - `CreateImageButton` — دکمه‌ای که خودِ عکسش برچسب/متن داره (مثل دکمه‌های آماده‌ی «شروع بازی»/«بازگشت»)
 
+### سیستمِ Prefab برای صفحه‌های UI (تازه — مهم)
+توسعه‌دهنده خواست صفحه‌های چیدمانی به‌جای ساختِ کامل با کد، به **Prefabِ قابلِ ویرایش تو ادیتور** تبدیل بشن (تا با موس تنظیمشون کنه، بدونِ منتظرِ کد موندن). الگوی هیبریدی که پیاده شد:
+- Prefabها تو `Assets/Resources/Prefabs/` هستن: **`MainMenu`، `StartPanel`، `DateBox`، `GameOverPanel`، `TutorialPanel`**. (نوارهای شاخص `StatBarUI` و کارنامه `MonthReportUI` عمداً تو کد موندن چون داینامیک/انیمیشن‌محورن.)
+- هر اسکریپتِ UI اول با `Resources.Load<GameObject>("Prefabs/...")` امتحان می‌کنه؛ اگه Prefab بود `Instantiate` می‌کنه و فقط **رفتار** (فونتِ فارسی، متنِ داینامیک، کلیکِ دکمه‌ها، صدا) رو با کد وصل می‌کنه. اگه Prefab نبود، به **روشِ کدیِ قبلی برمی‌گرده** (متد `BuildFromPrefab()`/`BuildStartPanelFromPrefab()` که `false` می‌ده) — پس هیچ صفحه‌ای خراب نمی‌شه.
+- کلیکِ دکمه‌ها تو Prefab به متد وصل نمی‌شه؛ کد بعد از Instantiate با اسمِ فرزند پیداشون می‌کنه (`FindDeep`) و `onClick` رو اضافه می‌کنه. **تورِ ایمنی:** اگه کامپوننتِ `Button` از Prefab لود نشه، کد با `AddComponent<Button>` می‌سازتش.
+- **شناسه‌های ثابتِ لازم برای ساختِ دستیِ Prefab** (از صحنه‌ی همین پروژه استخراج شدن): `Image` guid `fe87c0e1cc204ed48ad3b37840f39efc`؛ `Button` guid `4e29b1a8efbd4b44bb3f3716e73f07ff`؛ `RTLTextMeshPro` guid `f4688fdb7df04437aeb418b961361dc5`؛ فونتِ فارسی NotoNaskhArabic guid `1348f526aa2f6d847a6c02795af47876` با material fileID `-393344135853397389`. (⚠️ فونتِ `8f586378...` در واقع LiberationSansِ انگلیسیه — رقمِ فارسی نداره؛ استفاده نشه.)
+- ژنراتورِ کمکیِ Prefab (برای صفحه‌های پرمتن) تو scratchpad ساخته شد؛ اگه Prefabِ جدید خواستی، همون الگو رو دنبال کن. **ویرایشِ ظاهر:** دابل‌کلیک رو Prefab تو Project → تنظیم با موس → Ctrl+S.
+
 ### YearDisplayUI.cs — نمایش سال و ماه فعلی (توی باکس پایینِ صفحه)
 - رو `GameManager` نصب شده. یه باکس (تصویر `History.png` → فیلد `boxSprite`) پایین-وسطِ صفحه می‌سازه و متنِ «سال اول — فروردین» رو وسطش نشون می‌ده (قبلاً متنِ ساده بالای صفحه بود که رو نوارها می‌افتاد).
 - فیلدهای قابل‌تنظیم: `bottomMargin` (فاصله از پایین)، `boxSize`، `fontSize`، `textColor`، `persianFont`، `targetCanvas`.
