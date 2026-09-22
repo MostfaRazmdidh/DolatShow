@@ -36,27 +36,31 @@ public class YearDisplayUI : MonoBehaviour
 
     void Start()
     {
-        // باکس، پایین-وسطِ صفحه
-        GameObject box = new GameObject("DateBox", typeof(RectTransform));
-        boxGO = box;
-        box.transform.SetParent(targetCanvas.transform, false);
-        RectTransform boxRT = box.GetComponent<RectTransform>();
-        boxRT.anchorMin = boxRT.anchorMax = new Vector2(0.5f, 0f); // پایین-وسط
-        boxRT.pivot = new Vector2(0.5f, 0f);
-        boxRT.anchoredPosition = new Vector2(0f, bottomMargin);
-        boxRT.sizeDelta = boxSize;
-
-        if (boxSprite != null)
+        // اول از Prefab (قابلِ ویرایش تو ادیتور) امتحان می‌کنیم؛ اگه نبود به روشِ کدیِ قبلی برمی‌گردیم
+        if (!BuildFromPrefab())
         {
-            Image img = box.AddComponent<Image>();
-            img.sprite = boxSprite;
-            img.preserveAspect = true;
-        }
+            // باکس، پایین-وسطِ صفحه
+            GameObject box = new GameObject("DateBox", typeof(RectTransform));
+            boxGO = box;
+            box.transform.SetParent(targetCanvas.transform, false);
+            RectTransform boxRT = box.GetComponent<RectTransform>();
+            boxRT.anchorMin = boxRT.anchorMax = new Vector2(0.5f, 0f); // پایین-وسط
+            boxRT.pivot = new Vector2(0.5f, 0f);
+            boxRT.anchoredPosition = new Vector2(0f, bottomMargin);
+            boxRT.sizeDelta = boxSize;
 
-        // متن، وسطِ باکس
-        yearText = RuntimeUIHelper.CreateRTLText(box.transform, "YearText", Vector2.zero, Vector2.one, fontSize, persianFont);
-        yearText.color = textColor;
-        yearText.fontStyle = FontStyles.Bold;
+            if (boxSprite != null)
+            {
+                Image img = box.AddComponent<Image>();
+                img.sprite = boxSprite;
+                img.preserveAspect = true;
+            }
+
+            // متن، وسطِ باکس
+            yearText = RuntimeUIHelper.CreateRTLText(box.transform, "YearText", Vector2.zero, Vector2.one, fontSize, persianFont);
+            yearText.color = textColor;
+            yearText.fontStyle = FontStyles.Bold;
+        }
 
         UpdateDisplay(GameStats.Instance.CurrentMonth);
         GameStats.Instance.OnMonthChanged += UpdateDisplay;
@@ -64,6 +68,25 @@ public class YearDisplayUI : MonoBehaviour
         // باکسِ تاریخ فقط تو گیم‌پلی دیده بشه، نه تو منوی اصلی → تا شروعِ بازی مخفیش کن
         boxGO.SetActive(false);
         CardSwipe.GameStarted += ShowBox;
+    }
+
+    // باکسِ تاریخ رو از Resources/Prefabs/DateBox می‌سازه (چیدمان تو خودِ Prefab).
+    // فقط فونت و متن رو با کد ست می‌کنیم. اگه Prefab نبود false برمی‌گردونه.
+    bool BuildFromPrefab()
+    {
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/DateBox");
+        if (prefab == null) return false;
+
+        boxGO = Instantiate(prefab, targetCanvas.transform);
+        boxGO.name = "DateBox";
+
+        Transform yt = boxGO.transform.Find("YearText");
+        if (yt != null)
+        {
+            yearText = yt.GetComponent<RTLTextMeshPro>();
+            if (yearText != null && persianFont != null) yearText.font = persianFont;
+        }
+        return yearText != null;
     }
 
     void ShowBox()
