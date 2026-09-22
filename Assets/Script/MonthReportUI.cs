@@ -236,6 +236,7 @@ public class MonthReportUI : MonoBehaviour
 
         panel.transform.SetAsLastSibling();
         panel.SetActive(true);
+        RuntimeUIHelper.PlayFadeIn(this, panel); // باز شدنِ نرم
 
         // شروعِ انیمیشنِ شمارش (عددها از صفر تا مقدارِ واقعی بالا می‌رن + صدای تیک)
         if (countCo != null) StopCoroutine(countCo);
