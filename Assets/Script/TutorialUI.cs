@@ -189,14 +189,18 @@ public class TutorialUI : MonoBehaviour
 
         // ضربه روی پس‌زمینه → صفحه‌ی بعد
         Button advance = panel.GetComponent<Button>();
-        if (advance != null) { advance.onClick.RemoveAllListeners(); advance.onClick.AddListener(Next); }
+        if (advance == null) advance = panel.AddComponent<Button>();
+        advance.transition = Selectable.Transition.None;
+        advance.onClick.RemoveAllListeners();
+        advance.onClick.AddListener(Next);
 
         // دکمه‌ی «رد کردن» → پایان
         Transform skip = FindDeep(panel.transform, "SkipButton");
         if (skip != null)
         {
             Button b = skip.GetComponent<Button>();
-            if (b != null) { b.onClick.RemoveAllListeners(); b.onClick.AddListener(Finish); }
+            if (b == null) b = skip.gameObject.AddComponent<Button>();
+            b.onClick.RemoveAllListeners(); b.onClick.AddListener(Finish);
         }
 
         return dialogText != null;
