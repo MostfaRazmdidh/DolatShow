@@ -387,11 +387,23 @@ MonoBehaviour:
   slider: {fileID: 163289116}
   hintText: {fileID: 814085525}
   persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
-  nameFontSize: 50
-  nameColor: {r: 0.96, g: 0.9, b: 0.78, a: 1}
-  nameDropFromTop: 380
-  nameBoxSize: {x: 260, y: 80}
+  barHeight: 430
+  topMargin: 30
+  fillLeftFrac: 0.125
+  fillRightFrac: 0.85
+  fillBottomFrac: 0.03
+  fillTopFrac: 0.44
   fillColor: {r: 0.92, g: 0.71, b: 0.28, a: 1}
+  valueFontSize: 34
+  animDuration: 0.45
+  popScale: 0.12
+  dangerThreshold: 15
+  flashUpColor: {r: 0.35, g: 0.95, b: 0.45, a: 1}
+  flashDownColor: {r: 0.98, g: 0.4, b: 0.35, a: 1}
+  fillPadLeft: 10.77
+  fillPadRight: 7.18
+  fillPadTop: 0
+  fillPadBottom: 0
 --- !u!114 &163289116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -600,6 +612,10 @@ MonoBehaviour:
   startButtonSprite: {fileID: 2596368825315108945, guid: 3827320648d98d8419f39c6e8cd0eb48, type: 3}
   settingsButtonSprite: {fileID: 21300000, guid: 4b53e61016c443847b89ab9eb1afd012, type: 3}
   exitButtonSprite: {fileID: 21300000, guid: 9c8b8b95578683341ae8287eb70613b8, type: 3}
+  buttonWidthFraction: 0.44
+  startButtonCenter: {x: 0.5, y: 0.66}
+  settingsButtonCenter: {x: 0.5, y: 0.505}
+  exitButtonCenter: {x: 0.5, y: 0.355}
 --- !u!114 &352642747
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1470,6 +1486,12 @@ MonoBehaviour:
   returnSpeed: 10
   flyOffDistance: 15
   swipeRightMeansApprove: 1
+  approveColor: {r: 0.4, g: 0.85, b: 0.45, a: 1}
+  rejectColor: {r: 0.92, g: 0.38, b: 0.32, a: 1}
+  indicatorFontSize: 90
+  indicatorMargin: 40
+  indicatorYOffset: 150
+  indicatorBaseAlpha: 0.35
   autoConfigureCardText: 1
   cardTextColor: {r: 0.96, g: 0.9, b: 0.78, a: 1}
   textWidthFraction: 0.7
@@ -1484,9 +1506,15 @@ MonoBehaviour:
   - {fileID: 1095585442}
   - {fileID: 1077233621}
   hintThreshold: 0.3
+  hintHoldTime: 0.7
   approveClip: {fileID: 8300000, guid: 49f35959965f3f74cb47f7c376d9e46c, type: 3}
   rejectClip: {fileID: 8300000, guid: 60dd9b0240c4a1d4baa258efa8d0273b, type: 3}
   sfxVolume: 1
+  cardCenterY: -0.9
+  shakeMin: 0.04
+  shakeMax: 0.18
+  shakeGameOver: 0.32
+  shakeDuration: 0.22
 --- !u!61 &718640287
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2158,11 +2186,23 @@ MonoBehaviour:
   slider: {fileID: 1077233622}
   hintText: {fileID: 906075495}
   persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
-  nameFontSize: 50
-  nameColor: {r: 0.96, g: 0.9, b: 0.78, a: 1}
-  nameDropFromTop: 380
-  nameBoxSize: {x: 260, y: 80}
+  barHeight: 430
+  topMargin: 30
+  fillLeftFrac: 0.125
+  fillRightFrac: 0.85
+  fillBottomFrac: 0.03
+  fillTopFrac: 0.44
   fillColor: {r: 0.92, g: 0.71, b: 0.28, a: 1}
+  valueFontSize: 34
+  animDuration: 0.45
+  popScale: 0.12
+  dangerThreshold: 15
+  flashUpColor: {r: 0.35, g: 0.95, b: 0.45, a: 1}
+  flashDownColor: {r: 0.98, g: 0.4, b: 0.35, a: 1}
+  fillPadLeft: 10.77
+  fillPadRight: 7.18
+  fillPadTop: 0
+  fillPadBottom: 0
 --- !u!114 &1077233622
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2271,11 +2311,23 @@ MonoBehaviour:
   slider: {fileID: 1095585443}
   hintText: {fileID: 329463124}
   persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
-  nameFontSize: 50
-  nameColor: {r: 0.96, g: 0.9, b: 0.78, a: 1}
-  nameDropFromTop: 380
-  nameBoxSize: {x: 260, y: 80}
+  barHeight: 430
+  topMargin: 30
+  fillLeftFrac: 0.125
+  fillRightFrac: 0.85
+  fillBottomFrac: 0.03
+  fillTopFrac: 0.44
   fillColor: {r: 0.92, g: 0.71, b: 0.28, a: 1}
+  valueFontSize: 34
+  animDuration: 0.45
+  popScale: 0.12
+  dangerThreshold: 15
+  flashUpColor: {r: 0.35, g: 0.95, b: 0.45, a: 1}
+  flashDownColor: {r: 0.98, g: 0.4, b: 0.35, a: 1}
+  fillPadLeft: 10.77
+  fillPadRight: 7.18
+  fillPadTop: 0
+  fillPadBottom: 0
 --- !u!114 &1095585443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2720,11 +2772,23 @@ MonoBehaviour:
   slider: {fileID: 1732478015}
   hintText: {fileID: 352642747}
   persianFont: {fileID: 11400000, guid: 1348f526aa2f6d847a6c02795af47876, type: 2}
-  nameFontSize: 50
-  nameColor: {r: 0.96, g: 0.9, b: 0.78, a: 1}
-  nameDropFromTop: 380
-  nameBoxSize: {x: 260, y: 80}
+  barHeight: 430
+  topMargin: 30
+  fillLeftFrac: 0.125
+  fillRightFrac: 0.85
+  fillBottomFrac: 0.03
+  fillTopFrac: 0.44
   fillColor: {r: 0.92, g: 0.71, b: 0.28, a: 1}
+  valueFontSize: 34
+  animDuration: 0.45
+  popScale: 0.12
+  dangerThreshold: 15
+  flashUpColor: {r: 0.35, g: 0.95, b: 0.45, a: 1}
+  flashDownColor: {r: 0.98, g: 0.4, b: 0.35, a: 1}
+  fillPadLeft: 10.77
+  fillPadRight: 7.18
+  fillPadTop: 0
+  fillPadBottom: 0
 --- !u!114 &1732478015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3133,6 +3197,9 @@ MonoBehaviour:
   crisisWeight: 20
   chainWeight: 15
   specialWeight: 5
+  storyMode: 1
+  storyResourcesPath: Story/Farvardin
+  storyMonthNumber: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
