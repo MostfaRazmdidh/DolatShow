@@ -175,13 +175,7 @@ public class ResultGreetingUI : MonoBehaviour
             r.offsetMin = r.offsetMax = Vector2.zero;
         }
 
-        // بنرِ شناورِ جداگانه حذف شد؛ متن رو مستقیم تو اسلاتِ بالای خودِ باکس می‌ذاریم
-        RTLTextMeshPro title = RuntimeUIHelper.CreateRTLText(namePanel.transform, "Title",
-            new Vector2(0.22f, 0.6f), new Vector2(0.78f, 0.655f), 30, font);
-        title.text = "اسمت رو وارد کن";
-        title.color = new Color(0.98f, 0.86f, 0.55f);
-        title.fontStyle = FontStyles.Bold;
-        title.raycastTarget = false;
+        // (متنِ راهنما به‌صورتِ placeholder داخلِ خودِ کادرِ ورودی نوشته می‌شه — پایین)
 
         // فیلدِ ورودِ اسم
         BuildInputField(inputSpr, new Vector2(0.15f, 0.45f), new Vector2(0.85f, 0.55f));
@@ -200,7 +194,7 @@ public class ResultGreetingUI : MonoBehaviour
         }
     }
 
-    // ساختِ یه TMP_InputField ساده (با فونتِ فارسی). Persian کاملاً reshape نمی‌شه ولی متن ذخیره می‌شه.
+    // ساختِ TMP_InputField با متنِ RTLTextMeshPro تا فارسی درست بچسبه و راست‌به‌چپ نمایش داده بشه.
     void BuildInputField(Sprite bgSprite, Vector2 aMin, Vector2 aMax)
     {
         GameObject inGO = new GameObject("NameInput", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
@@ -218,27 +212,26 @@ public class ResultGreetingUI : MonoBehaviour
         area.transform.SetParent(inGO.transform, false);
         RectTransform art = (RectTransform)area.transform;
         art.anchorMin = Vector2.zero; art.anchorMax = Vector2.one;
-        art.offsetMin = new Vector2(20f, 8f); art.offsetMax = new Vector2(-20f, -8f);
+        art.offsetMin = new Vector2(24f, 8f); art.offsetMax = new Vector2(-24f, -8f);
 
-        // متنِ placeholder
+        // متنِ راهنما (placeholder) — با RTLTextMeshPro تا فارسی درست نمایش داده بشه
         GameObject phGO = new GameObject("Placeholder", typeof(RectTransform));
         phGO.transform.SetParent(area.transform, false);
-        TextMeshProUGUI ph = phGO.AddComponent<TextMeshProUGUI>();
+        RTLTextMeshPro ph = phGO.AddComponent<RTLTextMeshPro>();
         StretchFull((RectTransform)phGO.transform);
         if (font != null) ph.font = font;
-        ph.text = "اسم شما...";
-        ph.fontSize = 34; ph.color = new Color(0.7f, 0.65f, 0.5f, 0.7f);
+        ph.text = "اسمت رو وارد کن";
+        ph.fontSize = 34; ph.color = new Color(0.75f, 0.68f, 0.5f, 0.75f);
         ph.alignment = TextAlignmentOptions.MidlineRight;
 
-        // متنِ ورودی
+        // متنِ ورودی — با RTLTextMeshPro (خودش حروف رو می‌چسبونه و راست‌چین می‌کنه)
         GameObject txtGO = new GameObject("Text", typeof(RectTransform));
         txtGO.transform.SetParent(area.transform, false);
-        TextMeshProUGUI txt = txtGO.AddComponent<TextMeshProUGUI>();
+        RTLTextMeshPro txt = txtGO.AddComponent<RTLTextMeshPro>();
         StretchFull((RectTransform)txtGO.transform);
         if (font != null) txt.font = font;
         txt.fontSize = 34; txt.color = new Color(0.98f, 0.92f, 0.78f);
         txt.alignment = TextAlignmentOptions.MidlineRight;
-        txt.richText = false;
 
         nameInput.textViewport = art;
         nameInput.textComponent = txt;
