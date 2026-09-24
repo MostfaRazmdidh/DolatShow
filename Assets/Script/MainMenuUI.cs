@@ -80,8 +80,8 @@ public class MainMenuUI : MonoBehaviour
             AddMenuButton("SettingsButton", settingsButtonSprite, settingsButtonCenter, "تنظیمات", OpenSettings);
             AddMenuButton("ExitButton", exitButtonSprite, exitButtonCenter, "خروج", QuitGame);
 
-            // باکسِ ریال (بالا-چپ) — موجودیِ ریال رو نشون می‌ده.
-            BuildRialBox();
+            // باکسِ پروفایل (بالا-چپ) — اسمِ کاربر + موجودیِ ریال.
+            BuildProfileBox();
         }
 
         // پنلِ انتخابِ شروع/ادامه رو (یه‌بار) بساز و مخفی نگه‌دار (فعلاً همچنان با کد)
@@ -120,18 +120,10 @@ public class MainMenuUI : MonoBehaviour
         WirePrefabButton("SettingsButton", OpenSettings);
         WirePrefabButton("ExitButton", QuitGame);
 
-        // عددِ موجودیِ ریال رو ست می‌کنیم — و فونتِ فارسی رو با کد اعمال می‌کنیم
-        // (رفرنسِ فونت تو Prefab گاهی به فونتِ پیش‌فرضِ TMP برمی‌گرده که رقمِ فارسی نداره)
-        Transform num = FindDeep(panel.transform, "RialNumber");
-        if (num != null)
-        {
-            var t = num.GetComponent<RTLTextMeshPro>();
-            if (t != null)
-            {
-                if (persianFont != null) t.font = persianFont;
-                t.text = RialSystem.TotalPersian();
-            }
-        }
+        // باکسِ ریالِ قدیمیِ داخلِ Prefab رو حذف می‌کنیم و به‌جاش Profile Box می‌سازیم
+        Transform oldRial = FindDeep(panel.transform, "RialBox");
+        if (oldRial != null) Destroy(oldRial.gameObject);
+        BuildProfileBox();
 
         return true;
     }
@@ -160,29 +152,41 @@ public class MainMenuUI : MonoBehaviour
         return null;
     }
 
-    // باکسِ ریال بالا-چپِ منو: تصویرِ RialBox (سکه + کادر) و عددِ موجودی داخلِ کادرش.
-    void BuildRialBox()
+    // باکسِ پروفایل بالا-چپِ منو (جایگزینِ باکسِ ریال): دایره‌ی پروفایل (چپ، فعلاً خالی) +
+    // اسمِ کاربر تو بنرِ بالا + عددِ ریال روبه‌روی سکه تو بنرِ پایین. تصویر از Resources/UI/ProfileBox.
+    void BuildProfileBox()
     {
-        Sprite boxSpr = Resources.Load<Sprite>("UI/RialBox");
+        Sprite boxSpr = Resources.Load<Sprite>("UI/ProfileBox");
         if (boxSpr == null) return;
 
         Vector2 canvasSize = ((RectTransform)targetCanvas.transform).rect.size;
-        float h = 0.095f; // بزرگ‌تر شد (قبلاً ۰.۰۶۵ بود، خیلی کوچیک به‌نظر می‌اومد)
+        float h = 0.12f; // ارتفاعِ باکس (کسری از صفحه)
         float aspect = boxSpr.rect.width / boxSpr.rect.height;
-        float w = (h * canvasSize.y * aspect) / canvasSize.x;
+        float w = (h * canvasSize.y * aspect) / canvasSize.x; // عرض دقیقاً هم‌نسبتِ تصویر تا کِش/لِتربکس نشه
         float left = 0.02f, top = 0.985f;
 
-        GameObject boxGO = RuntimeUIHelper.CreateImage(panel.transform, "RialBox",
+        GameObject boxGO = RuntimeUIHelper.CreateImage(panel.transform, "ProfileBox",
             new Vector2(left, top - h), new Vector2(left + w, top), boxSpr);
+        boxGO.GetComponent<Image>().raycastTarget = false;
 
-        // عددِ موجودی — داخلِ کادرِ سمتِ راستِ تصویر (سکه سمتِ چپه)
-        RTLTextMeshPro num = RuntimeUIHelper.CreateRTLText(boxGO.transform, "RialAmount",
-            new Vector2(0.44f, 0.18f), new Vector2(0.95f, 0.82f), 40, persianFont);
-        num.text = RialSystem.TotalPersian();
-        num.color = new Color(0.98f, 0.88f, 0.55f); // کرمِ طلایی
-        num.fontStyle = FontStyles.Bold;
-        num.alignment = TextAlignmentOptions.Center;
-        num.raycastTarget = false;
+        // اسمِ کاربر — تو بنرِ بالای سمتِ راست (کسرها نسبت به خودِ تصویرِ باکس)
+        string playerName = PlayerPrefs.GetString(ResultGreetingUI.PlayerNameKey, "");
+        RTLTextMeshPro nameT = RuntimeUIHelper.CreateRTLText(boxGO.transform, "ProfileName",
+            new Vector2(0.37f, 0.52f), new Vector2(0.96f, 0.92f), 34, persianFont);
+        nameT.text = string.IsNullOrEmpty(playerName) ? "رئیس‌جمهور" : playerName;
+        nameT.color = new Color(0.98f, 0.90f, 0.62f);
+        nameT.fontStyle = FontStyles.Bold;
+        nameT.alignment = TextAlignmentOptions.Center;
+        nameT.raycastTarget = false;
+
+        // عددِ ریال — تو بنرِ پایین، روبه‌روی سکه (سکه سمتِ چپِ بنرِ پایینه، عدد سمتِ راستش)
+        RTLTextMeshPro rialT = RuntimeUIHelper.CreateRTLText(boxGO.transform, "RialAmount",
+            new Vector2(0.5f, 0.06f), new Vector2(0.95f, 0.46f), 34, persianFont);
+        rialT.text = RialSystem.TotalPersian();
+        rialT.color = new Color(0.98f, 0.88f, 0.55f);
+        rialT.fontStyle = FontStyles.Bold;
+        rialT.alignment = TextAlignmentOptions.Center;
+        rialT.raycastTarget = false;
     }
 
     // منوی کشویی سمتِ راست: دکمه‌ی همبرگری (⋮) همیشه دیده می‌شه؛ با زدنش ستونِ
