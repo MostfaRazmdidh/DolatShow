@@ -21,6 +21,7 @@ public class ResultGreetingUI : MonoBehaviour
     private bool nameShown;
     private GameObject dialogBoxGO;  // باکسِ دیالوگ (مرحله‌ی اول) — موقعِ پرسیدنِ اسم مخفی می‌شه
     private GameObject nameLabelGO;  // اسمِ «خانم رستمی» بالای باکس
+    private GameObject advisorGO;    // کاراکترِ مشاور — موقعِ پرسیدنِ اسم مخفی می‌شه
 
     public const string PlayerNameKey = "DolatShow_PlayerName";
 
@@ -70,6 +71,7 @@ public class ResultGreetingUI : MonoBehaviour
             GameObject a = RuntimeUIHelper.CreateImage(panel.transform, "Advisor",
                 new Vector2(0f, 0f), new Vector2(wFrac, hFrac), advisor);
             a.GetComponent<Image>().raycastTarget = false;
+            advisorGO = a;
         }
 
         // باکسِ دیالوگ — بالای صفحه
@@ -137,10 +139,12 @@ public class ResultGreetingUI : MonoBehaviour
         if (nameShown) return; // فقط یه‌بار
         nameShown = true;
 
-        // مرحله‌ی اول (دیالوگ) رو مخفی کن تا نوبتی نمایش داده بشه — فقط باکسِ اسم بمونه
+        // مرحله‌ی اول (دیالوگ + مشاور) رو کامل مخفی کن تا نوبتی نمایش داده بشه — فقط باکسِ اسم بمونه
         if (dialogBoxGO != null) dialogBoxGO.SetActive(false);
         if (nameLabelGO != null) nameLabelGO.SetActive(false);
-        if (voiceSrc != null) voiceSrc.Stop(); // صدای مشاور تموم شه
+        if (advisorGO != null) advisorGO.SetActive(false);   // کاراکتر هم بره
+        if (voiceSrc != null) voiceSrc.Stop();               // صدای مشاور قطع
+        if (sfxSrc != null) sfxSrc.Stop();                   // صدای تشویق هم قطع
 
         namePanel = new GameObject("NamePanel", typeof(RectTransform), typeof(Image));
         namePanel.transform.SetParent(panel.transform, false);
@@ -152,7 +156,6 @@ public class ResultGreetingUI : MonoBehaviour
 
         Sprite[] sheet = Resources.LoadAll<Sprite>("UI/NameBox");
         Sprite boxSpr = FindSprite(sheet, "Box");
-        Sprite titleSpr = FindSprite(sheet, "Title");
         Sprite inputSpr = FindSprite(sheet, "Input");
         Sprite tikSpr = FindSprite(sheet, "Tik");
 
@@ -172,16 +175,10 @@ public class ResultGreetingUI : MonoBehaviour
             r.offsetMin = r.offsetMax = Vector2.zero;
         }
 
-        // بنرِ عنوان + متنِ «نام کاربری خود را وارد کنید»
-        if (titleSpr != null)
-        {
-            GameObject tb = RuntimeUIHelper.CreateImage(namePanel.transform, "TitleBanner",
-                new Vector2(0.2f, 0.61f), new Vector2(0.8f, 0.69f), titleSpr);
-            tb.GetComponent<Image>().raycastTarget = false;
-        }
+        // بنرِ شناورِ جداگانه حذف شد؛ متن رو مستقیم تو اسلاتِ بالای خودِ باکس می‌ذاریم
         RTLTextMeshPro title = RuntimeUIHelper.CreateRTLText(namePanel.transform, "Title",
-            new Vector2(0.2f, 0.61f), new Vector2(0.8f, 0.69f), 30, font);
-        title.text = "نام کاربری خود را وارد کنید";
+            new Vector2(0.22f, 0.6f), new Vector2(0.78f, 0.655f), 30, font);
+        title.text = "اسمت رو وارد کن";
         title.color = new Color(0.98f, 0.86f, 0.55f);
         title.fontStyle = FontStyles.Bold;
         title.raycastTarget = false;
