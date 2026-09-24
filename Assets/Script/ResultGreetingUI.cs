@@ -19,6 +19,8 @@ public class ResultGreetingUI : MonoBehaviour
     private GameObject namePanel;
     private TMP_InputField nameInput;
     private bool nameShown;
+    private GameObject dialogBoxGO;  // باکسِ دیالوگ (مرحله‌ی اول) — موقعِ پرسیدنِ اسم مخفی می‌شه
+    private GameObject nameLabelGO;  // اسمِ «خانم رستمی» بالای باکس
 
     public const string PlayerNameKey = "DolatShow_PlayerName";
 
@@ -97,6 +99,8 @@ public class ResultGreetingUI : MonoBehaviour
             boxRT = r;
         }
 
+        dialogBoxGO = boxRT.gameObject; // برای مخفی‌کردن موقعِ پرسیدنِ اسم
+
         RTLTextMeshPro line = RuntimeUIHelper.CreateRTLText(boxRT, "Line",
             new Vector2(0.07f, 0.14f), new Vector2(0.93f, 0.90f), 34, font);
         line.color = new Color(0.96f, 0.90f, 0.78f);
@@ -111,6 +115,7 @@ public class ResultGreetingUI : MonoBehaviour
         nameText.fontStyle = FontStyles.Bold;
         nameText.alignment = TextAlignmentOptions.Right;
         nameText.raycastTarget = false;
+        nameLabelGO = nameText.gameObject;
 
         RTLTextMeshPro hint = RuntimeUIHelper.CreateRTLText(boxRT, "Hint",
             new Vector2(0.08f, 0.04f), new Vector2(0.6f, 0.22f), 22, font);
@@ -131,6 +136,11 @@ public class ResultGreetingUI : MonoBehaviour
     {
         if (nameShown) return; // فقط یه‌بار
         nameShown = true;
+
+        // مرحله‌ی اول (دیالوگ) رو مخفی کن تا نوبتی نمایش داده بشه — فقط باکسِ اسم بمونه
+        if (dialogBoxGO != null) dialogBoxGO.SetActive(false);
+        if (nameLabelGO != null) nameLabelGO.SetActive(false);
+        if (voiceSrc != null) voiceSrc.Stop(); // صدای مشاور تموم شه
 
         namePanel = new GameObject("NamePanel", typeof(RectTransform), typeof(Image));
         namePanel.transform.SetParent(panel.transform, false);
