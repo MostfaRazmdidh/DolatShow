@@ -10,4 +10,8 @@ public class SaveData
     public int diplomacy;
     public int currentMonth;
     public List<string> activeFlags;
+
+    // جای فعلیِ بازیکن داخلِ کارت‌های ماهِ داستانی (کدوم کارت از ۱۲ کارت) — تا «ادامه بازی»
+    // از همون کارت ادامه بده، نه از اولِ ماه.
+    public int storyIndex;
 }

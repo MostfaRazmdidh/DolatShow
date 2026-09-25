@@ -1,0 +1,676 @@
+fileFormatVersion: 2
+guid: 745abe44d2df2bc44803d045a2b2b622
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -9198027788737070072
+    second: Rial Box_0
+  - first:
+      213: -3285517947269406983
+    second: Rial Box_1
+  - first:
+      213: 4422476720170894588
+    second: Rial Box_2
+  - first:
+      213: 1273068335402436339
+    second: Rial Box_3
+  - first:
+      213: -5994666074916569506
+    second: Rial Box_4
+  - first:
+      213: 1209063672272698112
+    second: Rial Box_5
+  - first:
+      213: 1472120347472519966
+    second: Rial Box_6
+  - first:
+      213: 1675227538536779964
+    second: Rial Box_7
+  - first:
+      213: 6821296049002249126
+    second: Rial Box_8
+  - first:
+      213: 5757765376113884258
+    second: Rial Box_9
+  - first:
+      213: 7708482042867202397
+    second: Rial Box_10
+  - first:
+      213: -6507042194355489078
+    second: Rial Box_11
+  - first:
+      213: 7484584096767564150
+    second: Rial Box_12
+  - first:
+      213: 5666315369853650969
+    second: Rial Box_13
+  - first:
+      213: -4635732058989251764
+    second: Rial Box_14
+  - first:
+      213: -5521563157657857101
+    second: Rial Box_15
+  - first:
+      213: 6890524923379141755
+    second: Rial Box_16
+  - first:
+      213: 5781234403515822071
+    second: Rial Box_17
+  - first:
+      213: 2712517077624828685
+    second: Rial Box_18
+  - first:
+      213: -1412058472105261431
+    second: Rial Box_19
+  - first:
+      213: -267791189608615281
+    second: Rial Box_20
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Rial Box_0
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 0
+        width: 1695
+        height: 863
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80cb72a957a0a5080800000000000000
+      internalID: -9198027788737070072
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_1
+      rect:
+        serializedVersion: 2
+        x: 841
+        y: 845
+        width: 70
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9fe16d995de7762d0800000000000000
+      internalID: -3285517947269406983
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_2
+      rect:
+        serializedVersion: 2
+        x: 919
+        y: 846
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf4883d452bcf5d30800000000000000
+      internalID: 4422476720170894588
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_3
+      rect:
+        serializedVersion: 2
+        x: 1218
+        y: 821
+        width: 160
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f6c572f7e8daa110800000000000000
+      internalID: 1273068335402436339
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_4
+      rect:
+        serializedVersion: 2
+        x: 1508
+        y: 836
+        width: 71
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5e338947faaecca0800000000000000
+      internalID: -5994666074916569506
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_5
+      rect:
+        serializedVersion: 2
+        x: 1580
+        y: 838
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00bb4a8010577c010800000000000000
+      internalID: 1209063672272698112
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_6
+      rect:
+        serializedVersion: 2
+        x: 718
+        y: 824
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e1369b908a50e6410800000000000000
+      internalID: 1472120347472519966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_7
+      rect:
+        serializedVersion: 2
+        x: 1322
+        y: 757
+        width: 22
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb0df60129a9f3710800000000000000
+      internalID: 1675227538536779964
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_8
+      rect:
+        serializedVersion: 2
+        x: 1427
+        y: 759
+        width: 9
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6abfd84ad9c1aae50800000000000000
+      internalID: 6821296049002249126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_9
+      rect:
+        serializedVersion: 2
+        x: 1482
+        y: 741
+        width: 17
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 26cbf478a11b7ef40800000000000000
+      internalID: 5757765376113884258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 128
+        width: 66
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d59b392a3970afa60800000000000000
+      internalID: 7708482042867202397
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_11
+      rect:
+        serializedVersion: 2
+        x: 990
+        y: 120
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac676fa999752b5a0800000000000000
+      internalID: -6507042194355489078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_12
+      rect:
+        serializedVersion: 2
+        x: 1288
+        y: 130
+        width: 15
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6795e5bb4959ed760800000000000000
+      internalID: 7484584096767564150
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_13
+      rect:
+        serializedVersion: 2
+        x: 822
+        y: 106
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9188675becbc2ae40800000000000000
+      internalID: 5666315369853650969
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_14
+      rect:
+        serializedVersion: 2
+        x: 1709
+        y: 112
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c433e06e0429aafb0800000000000000
+      internalID: -4635732058989251764
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_15
+      rect:
+        serializedVersion: 2
+        x: 820
+        y: 88
+        width: 16
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3b35be600977f53b0800000000000000
+      internalID: -5521563157657857101
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_16
+      rect:
+        serializedVersion: 2
+        x: 671
+        y: 61
+        width: 24
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7c4df509ef00af50800000000000000
+      internalID: 6890524923379141755
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_17
+      rect:
+        serializedVersion: 2
+        x: 756
+        y: 69
+        width: 13
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ffe3d84f021b3050800000000000000
+      internalID: 5781234403515822071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_18
+      rect:
+        serializedVersion: 2
+        x: 1328
+        y: 67
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d03320b19ebc4a520800000000000000
+      internalID: 2712517077624828685
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_19
+      rect:
+        serializedVersion: 2
+        x: 1451
+        y: 55
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 986c5101d4c576ce0800000000000000
+      internalID: -1412058472105261431
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rial Box_20
+      rect:
+        serializedVersion: 2
+        x: 1457
+        y: 53
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f823665f45d984cf0800000000000000
+      internalID: -267791189608615281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Rial Box_0: -9198027788737070072
+      Rial Box_1: -3285517947269406983
+      Rial Box_10: 7708482042867202397
+      Rial Box_11: -6507042194355489078
+      Rial Box_12: 7484584096767564150
+      Rial Box_13: 5666315369853650969
+      Rial Box_14: -4635732058989251764
+      Rial Box_15: -5521563157657857101
+      Rial Box_16: 6890524923379141755
+      Rial Box_17: 5781234403515822071
+      Rial Box_18: 2712517077624828685
+      Rial Box_19: -1412058472105261431
+      Rial Box_2: 4422476720170894588
+      Rial Box_20: -267791189608615281
+      Rial Box_3: 1273068335402436339
+      Rial Box_4: -5994666074916569506
+      Rial Box_5: 1209063672272698112
+      Rial Box_6: 1472120347472519966
+      Rial Box_7: 1675227538536779964
+      Rial Box_8: 6821296049002249126
+      Rial Box_9: 5757765376113884258
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

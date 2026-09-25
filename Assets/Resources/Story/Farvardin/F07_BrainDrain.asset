@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0885a2500c18ea546ad854f4a80bd1ef, type: 3}
+  m_Name: F07_BrainDrain
+  m_EditorClassIdentifier: Assembly-CSharp::CardData
+  cardId: F07_BrainDrain
+  advisorName: "معاونِ فرهنگی"
+  cardText: "هر روز پزشک‌ها و مهندس‌ها دارن می‌رن. برنامه‌ای برای موندنشون بدیم که هزینه داره ولی تو مناظره کسی براش کف نمی‌زنه؟"
+  category: 2
+  approveEffects:
+  - type: 0
+    amount: -6
+  - type: 3
+    amount: 6
+  - type: 2
+    amount: 3
+  - type: 1
+    amount: -2
+  rejectEffects:
+  - type: 1
+    amount: 3
+  - type: 3
+    amount: -8
+  - type: 0
+    amount: 2
+  requiredFlag: 
+  setFlagOnApprove: 
+  setFlagOnReject: 
+  orderInMonth: 7
+  illustration: {fileID: 0}
+  approveSfx: {fileID: 0}
+  rejectSfx: {fileID: 0}

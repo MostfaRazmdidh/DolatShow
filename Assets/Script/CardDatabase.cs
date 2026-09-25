@@ -15,9 +15,26 @@ public class CardDatabase : MonoBehaviour
     public int chainWeight = 15;
     public int specialWeight = 5;
 
+    [Header("حالت داستانی (کمپین فروردین)")]
+    [Tooltip("روشن: کارت‌های داستانیِ ماه به‌ترتیب از پوشه‌ی Resources لود و پشت‌سرِهم پخش می‌شن (نه تصادفی)")]
+    public bool storyMode = true;
+    [Tooltip("مسیرِ کارت‌های داستانی داخلِ Assets/Resources — بدونِ پسوند")]
+    public string storyResourcesPath = "Story/Farvardin";
+    [Tooltip("شماره‌ی ماهِ این فصلِ داستانی (فروردین=۱) — برای نمایشِ درستِ تاریخ")]
+    public int storyMonthNumber = 1;
+
     private HashSet<string> activeFlags = new HashSet<string>();
     private Queue<string> recentCardIds = new Queue<string>();
     private const int recentHistorySize = 5;
+
+    // وضعیتِ ماهِ داستانی
+    private List<CardData> storyCards;
+    private int storyIndex;
+    // اگه ≥۰ باشه، StartStoryMonth به‌جای شروع از کارتِ اول، از این کارت ادامه می‌ده (برای «ادامه بازی»)
+    private int resumeStoryIndex = -1;
+
+    // وقتی همه‌ی کارت‌های ماهِ داستانی تموم شدن true می‌شه (CardSwipe ازش برای نمایشِ کارنامه استفاده می‌کنه)
+    public bool StoryMonthComplete => storyMode && storyCards != null && storyIndex >= storyCards.Count;
 
     void Awake()
     {
@@ -46,10 +63,46 @@ public class CardDatabase : MonoBehaviour
     {
         activeFlags.Clear();
         recentCardIds.Clear();
+        storyCards = null;
+        storyIndex = 0;
+        resumeStoryIndex = -1;
+    }
+
+    // جای فعلیِ بازیکن داخلِ کارت‌های ماهِ داستانی (برای ذخیره‌سازی)
+    public int GetStoryIndex() => storyIndex;
+
+    // برای «ادامه بازی» — می‌گه StartStoryMonth از این کارت ادامه بده (نه از اول). یه‌بار مصرفه.
+    public void SetResumeStoryIndex(int index) => resumeStoryIndex = index;
+
+    // شروعِ (یا ادامه‌ی) ماهِ داستانی — کارت‌ها رو از پوشه‌ی Resources به‌ترتیب لود می‌کنه.
+    // اگه resumeStoryIndex ست شده باشه (ادامه بازی)، از همون کارت شروع می‌کنه، وگرنه از اول.
+    public void StartStoryMonth()
+    {
+        storyCards = Resources.LoadAll<CardData>(storyResourcesPath)
+            .OrderBy(c => c.orderInMonth)
+            .ToList();
+        storyIndex = (resumeStoryIndex >= 0) ? Mathf.Clamp(resumeStoryIndex, 0, storyCards.Count) : 0;
+        resumeStoryIndex = -1; // مصرف شد
+        if (storyCards.Count == 0)
+            Debug.LogWarning($"هیچ کارتِ داستانی‌ای تو مسیرِ Resources/{storyResourcesPath} پیدا نشد.");
     }
 
     // متد اصلی — یه کارت مناسب برای نمایش بعدی برمی‌گردونه، یا null اگه چیزی نمونده
+    // (تو حالتِ داستانی، کارتِ بعدیِ ماه رو به‌ترتیب می‌ده؛ وقتی تموم شد null برمی‌گردونه)
     public CardData GetNextCard()
+    {
+        if (storyMode)
+        {
+            if (storyCards == null) StartStoryMonth();
+            if (storyIndex < storyCards.Count) return storyCards[storyIndex++];
+            return null; // ماهِ داستانی تموم شد → StoryMonthComplete = true
+        }
+
+        return GetNextRandomCard();
+    }
+
+    // انتخابِ تصادفیِ وزن‌دار (حالتِ غیرداستانی/ماه‌های آینده)
+    CardData GetNextRandomCard()
     {
         List<CardData> eligible = allCards.Where(c =>
             (string.IsNullOrEmpty(c.requiredFlag) || HasFlag(c.requiredFlag)) &&

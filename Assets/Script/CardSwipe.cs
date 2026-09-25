@@ -15,27 +15,352 @@ public class CardSwipe : MonoBehaviour
     [SerializeField] private float returnSpeed = 10f;
     [SerializeField] private float flyOffDistance = 15f;
 
-    [Header("پیش‌نمایش اثر تصمیم (اختیاری)")]
+    [Header("جهت تصمیم (بله / خیر)")]
+    [Tooltip("روشن: سوایپ راست = تایید (بله)، چپ = رد (خیر). خاموش: برعکس.")]
+    [SerializeField] private bool swipeRightMeansApprove = true;
+
+    [Header("نشانگرِ بله/خیر موقع کشیدنِ کارت (برای کاربر مشخص می‌کنه هر سمت یعنی چی)")]
+    [Tooltip("رنگِ سمتِ تایید (بله)")]
+    [SerializeField] private Color approveColor = new Color(0.40f, 0.85f, 0.45f, 1f); // سبز
+    [Tooltip("رنگِ سمتِ رد (خیر)")]
+    [SerializeField] private Color rejectColor = new Color(0.92f, 0.38f, 0.32f, 1f);  // قرمز
+    [Tooltip("اندازه‌ی فونتِ نشانگر")]
+    [SerializeField] private float indicatorFontSize = 90f;
+    [Tooltip("فاصله‌ی نشانگر از لبه‌ی چپ/راستِ صفحه (پیکسل)")]
+    [SerializeField] private float indicatorMargin = 40f;
+    [Tooltip("جابه‌جاییِ عمودیِ نشانگر نسبت به وسطِ صفحه (مثبت = بالاتر)")]
+    [SerializeField] private float indicatorYOffset = 150f;
+    [Tooltip("شفافیتِ پیش‌فرضِ نشانگر وقتی کارت وسطه (۰ تا ۱)")]
+    [SerializeField, Range(0f, 1f)] private float indicatorBaseAlpha = 0.35f;
+
+    [Header("چیدمان متن کارت")]
+    [Tooltip("روشن: کد موقع Start چیدمان متن رو از روی مقادیر پایین اعمال می‌کنه. اگه می‌خوای خودت دستی " +
+        "متن رو تو صحنه تنظیم کنی، این رو خاموش کن تا Play دیگه روش ننویسه (اول یه‌بار از راست‌کلیکِ " +
+        "کامپوننت «اعمال چیدمان متن کارت» رو بزن تا مقدار اولیه‌ی درست رو بگیری).")]
+    [SerializeField] private bool autoConfigureCardText = true;
+    [SerializeField] private Color cardTextColor = new Color(0.96f, 0.90f, 0.78f); // کرمِ روشن
+    [Tooltip("پهنای ناحیه‌ی متن نسبت به کارت — کمترش کنی، متن از لبه‌ها بیشتر فاصله می‌گیره")]
+    [SerializeField, Range(0.3f, 1f)] private float textWidthFraction = 0.7f;
+    [Tooltip("موقعیت عمودی اسم مشاور (کسری از ارتفاع کارت؛ مثبت = بالاتر)")]
+    [SerializeField] private float advisorYFraction = 0.28f;
+    [Tooltip("اندازه‌ی فونت اسم مشاور (کسری از ارتفاع کارت)")]
+    [SerializeField] private float advisorFontFraction = 0.05f;
+    [Tooltip("موقعیت عمودی متن تصمیم")]
+    [SerializeField] private float bodyYFraction = -0.02f;
+    [Tooltip("اندازه‌ی فونت متن تصمیم")]
+    [SerializeField] private float bodyFontFraction = 0.04f;
+    [Tooltip("ارتفاع ناحیه‌ی متن تصمیم (کسری از ارتفاع کارت)")]
+    [SerializeField] private float bodyHeightFraction = 0.45f;
+
+    [Header("نمایشِ اثرِ تصمیم روی نوارها (بعد از انتخاب)")]
     [SerializeField] private StatBarUI[] statBars; // هر ۴ نوار وضعیت رو اینجا بریز
-    [SerializeField] private float hintThreshold = 0.3f; // از این فاصله به بعد پیش‌نمایش ظاهر می‌شه
+    [SerializeField] private float hintThreshold = 0.3f; // (دیگه برای پیش‌نمایش استفاده نمی‌شه؛ نگه داشته شد برای سازگاری)
+    [Tooltip("چند ثانیه بعد از انتخاب، اثرِ +/- روی نوارها بمونه تا بازیکن ببینتش")]
+    [SerializeField] private float hintHoldTime = 0.7f;
+
+    [Header("افکت صوتیِ تصمیم (پوشه‌ی Assets/Sound)")]
+    [Tooltip("صدای «بله» — وقتی کارت به سمتِ تایید کشیده و رها می‌شه (yesEffect)")]
+    [SerializeField] private AudioClip approveClip;
+    [Tooltip("صدای «خیر» — وقتی کارت به سمتِ رد کشیده و رها می‌شه (noEffect)")]
+    [SerializeField] private AudioClip rejectClip;
+    [SerializeField, Range(0f, 1f)] private float sfxVolume = 1f;
+    private AudioSource audioSource;
+
+    [Header("جای کارت (ارتفاعِ عمودی — منفی = پایین‌تر)")]
+    [Tooltip("موقعیتِ عمودیِ کارت تو دنیا. با کد مجبور می‌شه، پس هرچی اینجا بذاری همون می‌شه (مستقلِ از صحنه).")]
+    [SerializeField] private float cardCenterY = -0.9f;
+
+    [Header("لرزشِ صفحه (Juice) موقعِ تصمیم")]
+    [Tooltip("لرزشِ کمینه برای تصمیم‌های کم‌اثر")]
+    [SerializeField] private float shakeMin = 0.04f;
+    [Tooltip("لرزشِ بیشینه برای تصمیم‌های پراثر")]
+    [SerializeField] private float shakeMax = 0.18f;
+    [Tooltip("لرزشِ باخت (وقتی شاخصی به ۰/۱۰۰ می‌رسه)")]
+    [SerializeField] private float shakeGameOver = 0.32f;
+    [Tooltip("مدتِ لرزش (ثانیه)")]
+    [SerializeField] private float shakeDuration = 0.22f;
 
     private Vector3 startPosition;
+    private Vector3 startScale;
     private Vector3 dragOffset;
     private bool isDragging = false;
     private bool decided = false;
     private Camera mainCamera;
     private CardData currentCard;
+    private MonthReportUI monthReport; // کارنامه‌ی پایانِ ماهِ داستانی — موقع اجرا ساخته می‌شه
+
+    // وقتی بازی واقعاً شروع می‌شه صدا زده می‌شه (بعد از منو/آموزش). UIهایی مثل باکسِ تاریخ
+    // بهش گوش می‌دن تا فقط تو گیم‌پلی دیده بشن، نه تو منوی اصلی.
+    public static event System.Action GameStarted;
+
+    // نشانگرِ بله/خیر به سبکِ Reigns — موقعِ کشیدن، کلِ کارت یه ته‌رنگِ سبز/قرمز می‌گیره (`cardTintImg`)
+    // و کلمه‌ی «بله» (راست) / «خیر» (چپ) روی کارت ظاهر می‌شه. چون فرزندِ Canvasِ کارتن، با کارت می‌چرخن.
+    private RTLTextMeshPro cardChoiceLabel;
+    private UnityEngine.UI.Image cardTintImg;  // ته‌رنگِ رنگیِ کلِ کارت (پشتِ متن، رو خودِ کارت)
+    private Vector2 cardLocalSize;             // اندازه‌ی محلیِ کارت (برای جای‌گذاری روی Canvasِ کارت)
 
     void Start()
     {
+        // موقعیتِ کارت رو با کد پایین می‌آریم (مستقلِ از مقدارِ صحنه، تا حتماً اثر کنه)
+        transform.position = new Vector3(transform.position.x, cardCenterY, transform.position.z);
         startPosition = transform.position;
+        startScale = transform.localScale;
         mainCamera = Camera.main;
+
+        // یه AudioSource برای پخشِ افکت‌های صوتی — اگه رو کارت نبود، با کد اضافه می‌شه (نیازی به وایرینگ نیست)
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+
+        FitColliderToCard();
+        if (autoConfigureCardText) ConfigureCardText();
+        EnsureTextRendersAboveCard();
+    }
+
+    // دکمه‌ی راست‌کلیک روی کامپوننت (تو حالت Edit) — چیدمان متن رو یه‌بار روی صحنه اعمال می‌کنه
+    // تا بعدش بتونی autoConfigureCardText رو خاموش کنی و خودت دستی تنظیمش کنی بدون اینکه Play بازنویسیش کنه.
+    [UnityEngine.ContextMenu("اعمال چیدمان متن کارت روی صحنه")]
+    void ApplyCardTextLayoutInEditor()
+    {
+        ConfigureCardText();
+    }
+
+    // متن‌های کارت (اسم مشاور + متن تصمیم) رنگ مشکی و اندازه‌ی میکروسکوپی داشتن (fontSize ۰.۳-۰.۵
+    // روی یه Canvasِ ۳۰۰×۴۰۰ که با اسکیل‌های تودرتو کوچیک شده بود) — عملاً نامرئی. اینجا Canvasِ متن و
+    // خودِ متن‌ها رو بر اساس اندازه‌ی واقعیِ اسپرایت کارت از نو و تمیز می‌چینیم و رنگ رو روشن می‌کنیم.
+    void ConfigureCardText()
+    {
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr == null || sr.sprite == null || advisorText == null || bodyText == null) return;
+
+        Vector2 cardSize = sr.sprite.bounds.size; // واحدهای محلیِ کارت، مثلاً 10.86 × 14.48
+
+        // Canvasِ متن رو دقیقاً هم‌اندازه‌ی صفحه‌ی کارت کن (نسبت ۱:۱ با فضای محلیِ کارت)
+        Canvas textCanvas = advisorText.GetComponentInParent<Canvas>();
+        if (textCanvas != null)
+        {
+            RectTransform canvasRT = textCanvas.GetComponent<RectTransform>();
+            canvasRT.localScale = Vector3.one;
+            canvasRT.sizeDelta = cardSize;
+            canvasRT.anchoredPosition = Vector2.zero;
+        }
+
+        // اسم مشاور — بالای کارت
+        StyleCardText(advisorText, new Vector2(0f, cardSize.y * advisorYFraction),
+            new Vector2(cardSize.x * textWidthFraction, cardSize.y * 0.14f), cardSize.y * advisorFontFraction, cardTextColor);
+
+        // متن تصمیم — وسط کارت، بزرگ‌تر و چندخطی
+        StyleCardText(bodyText, new Vector2(0f, cardSize.y * bodyYFraction),
+            new Vector2(cardSize.x * textWidthFraction, cardSize.y * bodyHeightFraction), cardSize.y * bodyFontFraction, cardTextColor);
+    }
+
+    void StyleCardText(RTLTextMeshPro t, Vector2 pos, Vector2 size, float maxFontSize, Color color)
+    {
+        RectTransform rt = t.rectTransform;
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = pos;
+        rt.sizeDelta = size;
+
+        t.alignment = TMPro.TextAlignmentOptions.Center;
+        t.enableAutoSizing = true;
+        t.fontSizeMin = 0.05f;
+        t.fontSizeMax = maxFontSize;
+        t.color = color;
+    }
+
+    // Collider کارت تو صحنه فقط ۱×۱ واحد بود، ولی خودِ کارت خیلی بزرگ‌تره — برای همین بیشترِ
+    // سطح کارت کلیک/سوایپ نمی‌گرفت. اینجا Collider رو دقیقاً هم‌اندازه‌ی اسپرایت کارت می‌کنیم.
+    void FitColliderToCard()
+    {
+        var sr = GetComponent<SpriteRenderer>();
+        var box = GetComponent<BoxCollider2D>();
+        if (sr != null && sr.sprite != null && box != null)
+        {
+            box.size = sr.sprite.bounds.size;   // اندازه‌ی محلیِ اسپرایت (قبل از اسکیلِ ترنسفورم)
+            box.offset = sr.sprite.bounds.center;
+        }
+    }
+
+    // کارت (Card cover) یه SpriteRenderer ماته با sortingOrder=۰. Canvasِ متنِ کارت (World Space)
+    // هم پیش‌فرض sortingOrder=۰ داره، برای همین کارت روی متن می‌افته و متن دیده نمی‌شه.
+    // اینجا Canvasِ متن رو مجبور می‌کنیم با sortingOrder بالاتر رندر بشه تا روی کارت بیاد.
+    void EnsureTextRendersAboveCard()
+    {
+        int cardOrder = 0;
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr != null) cardOrder = sr.sortingOrder;
+
+        if (advisorText != null)
+        {
+            Canvas textCanvas = advisorText.GetComponentInParent<Canvas>();
+            if (textCanvas != null)
+            {
+                textCanvas.overrideSorting = true;
+                textCanvas.sortingLayerID = sr != null ? sr.sortingLayerID : 0;
+                textCanvas.sortingOrder = cardOrder + 5;
+            }
+        }
     }
 
     // با «بازی جدید» یا «ادامه‌ی بازی» از منوی اصلی صدا زده می‌شه
     public void BeginGame()
     {
+        gameObject.SetActive(true); // اگه بعد از پایانِ ماهِ قبلی غیرفعال شده بود، دوباره فعالش کن
+        GameStarted?.Invoke(); // به UIهای گیم‌پلی (مثلِ باکسِ تاریخ) خبر بده که بازی شروع شد
+
+        if (cardChoiceLabel == null) CreateSwipeIndicators();
+        ShowSwipeIndicators(true);
+        ResetSwipeIndicators();
+
+        // نوارهای وضعیت تا اینجا مخفی بودن (تو منو دیده نشن)؛ حالا با شروعِ بازی نشونشون بده
+        if (statBars != null)
+            foreach (var bar in statBars) if (bar != null) bar.SetVisible(true);
+
+        // کارنامه‌ی پایانِ ماه رو (یه‌بار) بساز و مخفی نگه‌دار
+        if (monthReport == null)
+        {
+            TMPro.TMP_FontAsset font = advisorText != null ? advisorText.font : null;
+            monthReport = MonthReportUI.Create(GetUICanvas(), font, this);
+        }
+        if (monthReport != null) monthReport.Hide();
+
+        // شروعِ ماهِ داستانی (کمپین فروردین) — کارت‌ها به‌ترتیب از Resources لود می‌شن،
+        // و ماه رو روی شماره‌ی همین فصل (فروردین=۱) می‌ذاریم تا تاریخ درست نشون داده بشه
+        if (CardDatabase.Instance.storyMode)
+        {
+            CardDatabase.Instance.StartStoryMonth();
+            GameStats.Instance.SetMonth(CardDatabase.Instance.storyMonthNumber);
+        }
+
         LoadNextCard();
+    }
+
+    // شروعِ فوریِ یه بازیِ کاملاً جدید (برای دکمه‌ی «دوباره» تو کارنامه/صفحه‌ی باخت) —
+    // بدونِ برگشت به منو، تا حلقه‌ی «یه بار دیگه» سریع باشه.
+    public void RestartNewGame()
+    {
+        SaveSystem.DeleteSave();
+        GameStats.Instance.ResetState();
+        CardDatabase.Instance.ClearFlags();
+        BeginGame();
+    }
+
+    // به سبکِ Reigns: یه نوارِ رنگی + برچسبِ «بله/خیر» روی خودِ کارت می‌سازیم که موقعِ کشیدن ظاهر می‌شه.
+    // چون فرزندِ Canvasِ خودِ کارته، همراهِ کارت می‌چرخه و جابه‌جا می‌شه.
+    void CreateSwipeIndicators()
+    {
+        if (advisorText == null) return;
+        Canvas cardCanvas = advisorText.GetComponentInParent<Canvas>();
+        if (cardCanvas == null) return;
+
+        cardLocalSize = GetCardSize();
+
+        // ته‌رنگِ کلِ کارت — یه Image که ناحیه‌ی داخلیِ کارت رو می‌پوشونه؛ موقعِ کشیدن سبز/قرمز می‌شه.
+        // به‌عنوانِ اولین فرزندِ Canvas گذاشته می‌شه تا پشتِ متنِ کارت (اسم/متن) بمونه، نه روش.
+        GameObject tintGO = new GameObject("CardTint", typeof(RectTransform));
+        tintGO.transform.SetParent(cardCanvas.transform, false);
+        RectTransform tintRT = tintGO.GetComponent<RectTransform>();
+        tintRT.anchorMin = new Vector2(0.06f, 0.06f); // کمی داخل‌تر از لبه‌ی کارت (رو کادرِ تزئینی نیفته)
+        tintRT.anchorMax = new Vector2(0.94f, 0.94f);
+        tintRT.offsetMin = tintRT.offsetMax = Vector2.zero;
+        cardTintImg = tintGO.AddComponent<UnityEngine.UI.Image>();
+        cardTintImg.raycastTarget = false;
+        cardTintImg.color = new Color(0f, 0f, 0f, 0f);
+        tintRT.SetAsFirstSibling(); // پشتِ متنِ کارت
+
+        // کلمه‌ی بله/خیر — روی کارت (بالاترین فرزند تا روی همه‌چیز باشه)، سفیدِ درشت با دورخطِ تیره
+        GameObject go = new GameObject("CardChoiceLabel", typeof(RectTransform));
+        go.transform.SetParent(cardCanvas.transform, false);
+        RectTransform rt = go.GetComponent<RectTransform>();
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.sizeDelta = new Vector2(cardLocalSize.x * 0.5f, cardLocalSize.y * 0.18f);
+
+        cardChoiceLabel = go.AddComponent<RTLTextMeshPro>();
+        cardChoiceLabel.font = advisorText.font;
+        cardChoiceLabel.alignment = TMPro.TextAlignmentOptions.Center;
+        cardChoiceLabel.fontStyle = TMPro.FontStyles.Bold;
+        cardChoiceLabel.enableAutoSizing = true;
+        cardChoiceLabel.fontSizeMin = 0.05f;
+        cardChoiceLabel.fontSizeMax = cardLocalSize.y * 0.14f;
+        cardChoiceLabel.color = new Color(1f, 1f, 1f, 0f);
+        cardChoiceLabel.outlineWidth = 0.25f;
+        cardChoiceLabel.outlineColor = new Color(0f, 0f, 0f, 1f);
+        cardChoiceLabel.raycastTarget = false;
+        rt.SetAsLastSibling(); // روی همه‌چیز
+
+        SetChoiceAlpha(0f);
+    }
+
+    // اندازه‌ی محلیِ کارت (برای جای‌گذاریِ برچسب روی Canvasِ کارت که هم‌اندازه‌ی کارته)
+    Vector2 GetCardSize()
+    {
+        var sr = GetComponent<SpriteRenderer>();
+        if (sr != null && sr.sprite != null) return sr.sprite.bounds.size;
+        return new Vector2(10f, 14f);
+    }
+
+    // Canvasِ اصلیِ صحنه رو از روی یکی از نوارهای وضعیت پیدا می‌کنه (برای کارنامه‌ی ماه)
+    Canvas GetUICanvas()
+    {
+        if (statBars != null)
+        {
+            foreach (var bar in statBars)
+            {
+                if (bar == null) continue;
+                Canvas c = bar.GetComponentInParent<Canvas>();
+                if (c != null) return c.rootCanvas;
+            }
+        }
+        return null;
+    }
+
+    void ShowSwipeIndicators(bool show)
+    {
+        if (cardChoiceLabel != null) cardChoiceLabel.gameObject.SetActive(show);
+        if (cardTintImg != null) cardTintImg.gameObject.SetActive(show);
+    }
+
+    // موقعِ کشیدنِ کارت: کلِ کارت ته‌رنگِ سبز(بله)/قرمز(خیر) می‌گیره و کلمه سمتِ راست(بله)/چپ(خیر) ظاهر می‌شه
+    void UpdateSwipeIndicators(float xOffset)
+    {
+        if (cardChoiceLabel == null || cardTintImg == null) return;
+
+        float t = Mathf.Clamp01(Mathf.Abs(xOffset) / swipeThreshold);
+        if (t < 0.02f) { SetChoiceAlpha(0f); return; }
+
+        bool approved = IsApprove(xOffset);
+        Color col = approved ? approveColor : rejectColor;
+
+        // ته‌رنگِ کلِ کارت
+        Color wash = col; wash.a = 0.4f * t;
+        cardTintImg.color = wash;
+
+        // کلمه: «بله» سمتِ راستِ کارت، «خیر» سمتِ چپِ کارت
+        float side = approved ? 1f : -1f;
+        cardChoiceLabel.rectTransform.anchoredPosition = new Vector2(side * cardLocalSize.x * 0.18f, cardLocalSize.y * 0.36f);
+        cardChoiceLabel.rectTransform.localScale = Vector3.one * (0.9f + 0.25f * t);
+        cardChoiceLabel.text = approved ? "بله" : "خیر";
+        cardChoiceLabel.color = new Color(1f, 1f, 1f, Mathf.Clamp01(t * 1.5f));
+    }
+
+    void ResetSwipeIndicators()
+    {
+        SetChoiceAlpha(0f);
+        if (cardChoiceLabel != null) cardChoiceLabel.rectTransform.localScale = Vector3.one;
+    }
+
+    void SetChoiceAlpha(float a)
+    {
+        if (cardTintImg != null)
+        {
+            Color c = cardTintImg.color; c.a = 0.4f * a; cardTintImg.color = c;
+        }
+        if (cardChoiceLabel != null)
+        {
+            Color c = cardChoiceLabel.color; c.a = a; cardChoiceLabel.color = c;
+        }
     }
 
     // کارت بعدی رو از دیتابیس می‌گیره و متنش رو نمایش می‌ده
@@ -52,10 +377,18 @@ public class CardSwipe : MonoBehaviour
 
         if (currentCard == null)
         {
+            // اگه ماهِ داستانی تموم شده، به‌جای خاموش‌شدنِ ساده، کارنامه‌ی ماه رو نشون بده
+            if (CardDatabase.Instance.StoryMonthComplete)
+            {
+                EndStoryMonth();
+                return;
+            }
             Debug.Log("کارتی برای نمایش نمونده!");
             gameObject.SetActive(false);
             return;
         }
+
+        HideAllHints(); // اثرهای کارتِ قبلی رو پاک کن
 
         advisorText.text = currentCard.advisorName;
         bodyText.text = currentCard.cardText;
@@ -63,6 +396,39 @@ public class CardSwipe : MonoBehaviour
         decided = false;
         transform.position = startPosition;
         transform.rotation = Quaternion.identity;
+
+        // یه انیمیشنِ ریزِ «ظاهرشدن» برای جونِ بیشترِ گیم‌پلی
+        if (isActiveAndEnabled) StartCoroutine(AppearAnimation());
+    }
+
+    // وقتی ۱۲ کارتِ ماهِ داستانی تموم شد: نشانگرها و کارت رو مخفی کن و کارنامه‌ی ماه رو نشون بده
+    void EndStoryMonth()
+    {
+        // ماهِ داستانی کامل شد → سیو دیگه معنی نداره (چیزی برای ادامه نمونده)، پاکش کن
+        SaveSystem.DeleteSave();
+        // پرچم: دفعه‌ی بعد که به منوی اصلی برگشت، خانم رستمی تبریک بگه و اسمش رو بپرسه
+        PlayerPrefs.SetInt("DolatShow_PendingResult", 1);
+        PlayerPrefs.Save();
+        ShowSwipeIndicators(false);
+        if (monthReport != null)
+            monthReport.Show(GameStats.Instance.Budget, GameStats.Instance.Popularity,
+                             GameStats.Instance.Security, GameStats.Instance.Diplomacy);
+        gameObject.SetActive(false);
+    }
+
+    // ظاهرشدنِ کارت با یه پرشِ کوچیکِ اندازه (از ۸۵٪ به ۱۰۰٪)
+    IEnumerator AppearAnimation()
+    {
+        float dur = 0.18f, t = 0f;
+        Vector3 from = startScale * 0.85f;
+        transform.localScale = from;
+        while (t < dur)
+        {
+            t += Time.deltaTime;
+            transform.localScale = Vector3.Lerp(from, startScale, t / dur);
+            yield return null;
+        }
+        transform.localScale = startScale;
     }
 
     void OnMouseDown()
@@ -81,21 +447,17 @@ public class CardSwipe : MonoBehaviour
         float xOffset = transform.position.x - startPosition.x;
         transform.rotation = Quaternion.Euler(0, 0, -xOffset * rotationFactor);
 
-        UpdateHints(xOffset);
+        // دیگه پیش‌نمایشِ اثرها موقعِ کشیدن نشون داده نمی‌شه — طبق خواسته‌ی توسعه‌دهنده اثرها
+        // فقط «بعد از انتخاب» نشون داده می‌شن (تو ShowAppliedHints). فقط جهتِ بله/خیر رو نشون می‌دیم.
+        UpdateSwipeIndicators(xOffset);
     }
 
-    // بر اساس جهت و فاصله‌ی کشیدن، نشون می‌ده اگه همین الان رها کنی چه اثری رخ می‌ده
-    void UpdateHints(float xOffset)
+    // بعد از اینکه تصمیم گرفته شد، اثرِ واقعیِ اون تصمیم رو روی هر نوار نشون می‌ده (+ یا -)
+    void ShowAppliedHints(bool approved)
     {
         if (statBars == null || currentCard == null) return;
 
-        if (Mathf.Abs(xOffset) < hintThreshold)
-        {
-            HideAllHints();
-            return;
-        }
-
-        var effects = xOffset > 0 ? currentCard.approveEffects : currentCard.rejectEffects;
+        var effects = approved ? currentCard.approveEffects : currentCard.rejectEffects;
 
         foreach (var bar in statBars)
         {
@@ -117,21 +479,77 @@ public class CardSwipe : MonoBehaviour
     {
         if (!isDragging) return;
         isDragging = false;
-        HideAllHints();
+        ResetSwipeIndicators();
 
         float xOffset = transform.position.x - startPosition.x;
 
         if (Mathf.Abs(xOffset) > swipeThreshold)
         {
-            bool approved = xOffset > 0;
+            bool draggedRight = xOffset > 0;      // کارت به کدوم سمت کشیده شد
+            bool approved = IsApprove(xOffset);   // اون سمت یعنی تایید یا رد
             decided = true;
+            int maxEff = MaxAbsEffect(approved);  // بزرگ‌ترین اثرِ این تصمیم (برای شدتِ لرزش)
+            PlayDecisionSound(approved);          // صدای بله/خیر
             ApplyCardEffects(approved);
-            StartCoroutine(FlyOffScreen(approved));
+            ShowAppliedHints(approved);           // اثرها «بعد از انتخاب» نشون داده می‌شن
+            TriggerShake(maxEff);                 // لرزشِ صفحه — هرچی اثر بزرگ‌تر، لرزشِ بیشتر
+            StartCoroutine(FlyOffScreen(draggedRight)); // کارت به سمتی که کشیده شد پرت می‌شه
         }
         else
         {
             StartCoroutine(ReturnToCenter());
         }
+    }
+
+    // بزرگ‌ترین قدرِمطلقِ اثرِ این تصمیم رو برمی‌گردونه (برای تعیینِ شدتِ لرزش)
+    int MaxAbsEffect(bool approved)
+    {
+        if (currentCard == null) return 0;
+        var effects = approved ? currentCard.approveEffects : currentCard.rejectEffects;
+        int m = 0;
+        foreach (var e in effects) m = Mathf.Max(m, Mathf.Abs(e.amount));
+        return m;
+    }
+
+    // لرزشِ صفحه رو با شدتِ مناسب شروع می‌کنه (باخت = لرزشِ قوی‌تر)
+    void TriggerShake(int maxEffect)
+    {
+        float mag = Mathf.Lerp(shakeMin, shakeMax, Mathf.Clamp01(maxEffect / 20f));
+        if (GameStats.Instance.IsGameOver) mag = shakeGameOver;
+        if (mainCamera != null && isActiveAndEnabled) StartCoroutine(ShakeCamera(mag));
+    }
+
+    // دوربین رو کوتاه با میراییِ نمایی می‌لرزونه، بعد به جای اصلیش برمی‌گردونه
+    IEnumerator ShakeCamera(float magnitude)
+    {
+        Vector3 origin = mainCamera.transform.position;
+        float t = 0f;
+        while (t < shakeDuration)
+        {
+            t += Time.deltaTime;
+            float damp = 1f - (t / shakeDuration);      // میرایی خطی
+            float ox = (Random.value * 2f - 1f) * magnitude * damp;
+            float oy = (Random.value * 2f - 1f) * magnitude * damp;
+            mainCamera.transform.position = origin + new Vector3(ox, oy, 0f);
+            yield return null;
+        }
+        mainCamera.transform.position = origin;
+    }
+
+    // صدای مناسبِ تصمیم رو پخش می‌کنه: اگه کارت صدای مخصوصِ خودش رو داشت اون، وگرنه صدای پیش‌فرضِ بله/خیر
+    void PlayDecisionSound(bool approved)
+    {
+        AudioClip clip = approved
+            ? (currentCard != null && currentCard.approveSfx != null ? currentCard.approveSfx : approveClip)
+            : (currentCard != null && currentCard.rejectSfx != null ? currentCard.rejectSfx : rejectClip);
+        if (clip != null && audioSource != null) audioSource.PlayOneShot(clip, sfxVolume);
+    }
+
+    // بر اساس گزینه‌ی swipeRightMeansApprove مشخص می‌کنه سوایپ به این جهت یعنی تایید یا رد
+    bool IsApprove(float xOffset)
+    {
+        bool draggedRight = xOffset > 0;
+        return swipeRightMeansApprove ? draggedRight : !draggedRight;
     }
 
     // اثرات تصمیم رو روی شاخص‌ها اعمال می‌کنه و پرچم مربوطه رو (اگه بود) ست می‌کنه
@@ -146,9 +564,13 @@ public class CardSwipe : MonoBehaviour
         string flag = approved ? currentCard.setFlagOnApprove : currentCard.setFlagOnReject;
         CardDatabase.Instance.SetFlag(flag);
 
-        GameStats.Instance.AdvanceMonth();
+        // تو حالتِ داستانی، هر ۱۲ کارت داخلِ همون یه ماه (فروردین) هستن؛ پس ماه رو جلو نمی‌بریم.
+        // (تو ماه‌های تصادفیِ آینده، هر تصمیم یه ماه رو جلو می‌بره — مثل قبل.)
+        if (!CardDatabase.Instance.storyMode)
+            GameStats.Instance.AdvanceMonth();
 
-        // بعد از هر تصمیم، وضعیت رو خودکار ذخیره می‌کنیم تا «ادامه‌ی بازی» درست کار کنه
+        // سیوِ خودکار بعد از هر تصمیم: اگه بازی باخته → سیو پاک می‌شه، وگرنه وضعیتِ فعلی
+        // (شاخص‌ها + پرچم‌ها + جای فعلیِ کارتِ داستانی) ذخیره می‌شه تا بشه بعداً «ادامه» داد.
         if (GameStats.Instance.IsGameOver)
             SaveSystem.DeleteSave();
         else
@@ -174,9 +596,10 @@ public class CardSwipe : MonoBehaviour
         transform.rotation = Quaternion.identity;
     }
 
-    IEnumerator FlyOffScreen(bool approved)
+    // toRight = کارت به کدوم سمت (فیزیکی) پرت بشه — همون سمتی که کاربر کشیدش
+    IEnumerator FlyOffScreen(bool toRight)
     {
-        Vector3 direction = approved ? Vector3.right : Vector3.left;
+        Vector3 direction = toRight ? Vector3.right : Vector3.left;
         Vector3 fromPos = transform.position;
         Vector3 toPos = fromPos + direction * flyOffDistance;
 
@@ -190,7 +613,9 @@ public class CardSwipe : MonoBehaviour
             yield return null;
         }
 
-        Debug.Log(approved ? "APPROVED (تایید شد)" : "REJECTED (رد شد)");
+        // یه مکثِ کوتاه تا بازیکن اثرِ تصمیمش (+/-) رو روی نوارها ببینه، بعد کارتِ بعدی
+        yield return new WaitForSeconds(hintHoldTime);
+
         LoadNextCard(); // کارت بعدی رو بیار
     }
 }
