@@ -57,6 +57,10 @@ public class MainMenuUI : MonoBehaviour
 
     void Start()
     {
+        // تنظیماتِ صدا/موسیقی از همون ابتدا اعمال می‌شن (بلندیِ صدا، روشن/خاموشِ موسیقی)
+        MusicManager.EnsureExists();
+        SettingsSystem.Apply();
+
         BuildUI();
 
         // اگه بازیکن تازه ماهِ فروردین رو تموم کرده باشه، خانم رستمی تو منوی اصلی تبریک می‌گه
@@ -606,10 +610,10 @@ public class MainMenuUI : MonoBehaviour
         cardSwipe.BeginGame();
     }
 
-    // فعلاً صفحه‌ی تنظیمات ساخته نشده — این دکمه جای خالیشه. وقتی محتوای تنظیمات (صدا و...) مشخص شد پر می‌شه.
+    // صفحه‌ی تنظیمات رو باز می‌کنه (صدا، موسیقی، لرزش، پاک‌کردنِ اطلاعات، نسخه).
     void OpenSettings()
     {
-        Debug.Log("تنظیمات هنوز ساخته نشده — بعداً اضافه می‌شه.");
+        SettingsUI.Open(targetCanvas, persianFont);
     }
 
     void QuitGame()

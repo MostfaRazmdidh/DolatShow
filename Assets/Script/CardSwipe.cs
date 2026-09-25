@@ -547,6 +547,7 @@ public class CardSwipe : MonoBehaviour
             ? (currentCard != null && currentCard.approveSfx != null ? currentCard.approveSfx : approveClip)
             : (currentCard != null && currentCard.rejectSfx != null ? currentCard.rejectSfx : rejectClip);
         if (clip != null && audioSource != null) audioSource.PlayOneShot(clip, sfxVolume);
+        SettingsSystem.Vibrate(); // لرزشِ کوتاه موقعِ تصمیم (اگه تو تنظیمات روشن باشه)
     }
 
     // بر اساس گزینه‌ی swipeRightMeansApprove مشخص می‌کنه سوایپ به این جهت یعنی تایید یا رد
