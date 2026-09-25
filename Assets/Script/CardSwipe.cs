@@ -409,6 +409,10 @@ public class CardSwipe : MonoBehaviour
         // پرچم: دفعه‌ی بعد که به منوی اصلی برگشت، خانم رستمی تبریک بگه و اسمش رو بپرسه
         PlayerPrefs.SetInt("DolatShow_PendingResult", 1);
         PlayerPrefs.Save();
+        // بازیکن ماهِ فروردین رو کامل کرد → پروفایل باز بشه + XP بر اساسِ عملکرد
+        ProfileSystem.MarkFarvardinDone();
+        LevelSystem.RewardRun(GameStats.Instance.Budget, GameStats.Instance.Popularity,
+                              GameStats.Instance.Security, GameStats.Instance.Diplomacy);
         ShowSwipeIndicators(false);
         if (monthReport != null)
             monthReport.Show(GameStats.Instance.Budget, GameStats.Instance.Popularity,

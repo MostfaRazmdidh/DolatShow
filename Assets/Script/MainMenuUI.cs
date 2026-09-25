@@ -50,6 +50,9 @@ public class MainMenuUI : MonoBehaviour
     // صفحه‌ی «درباره‌ی ما» (یه‌بار ساخته و بعد نشون/مخفی می‌شه)
     private GameObject aboutPanel;
 
+    // متنِ اسمِ روی باکسِ پروفایل (تا بعد از واردکردنِ اسم رفرش بشه)
+    private RTLTextMeshPro profileNameText;
+
     void Start()
     {
         BuildUI();
@@ -60,7 +63,7 @@ public class MainMenuUI : MonoBehaviour
         {
             PlayerPrefs.SetInt("DolatShow_PendingResult", 0);
             PlayerPrefs.Save();
-            ResultGreetingUI.Show(targetCanvas, persianFont, null);
+            ResultGreetingUI.Show(targetCanvas, persianFont, RefreshProfileName);
         }
     }
 
@@ -156,6 +159,9 @@ public class MainMenuUI : MonoBehaviour
     // اسمِ کاربر تو بنرِ بالا + عددِ ریال روبه‌روی سکه تو بنرِ پایین. تصویر از Resources/UI/ProfileBox.
     void BuildProfileBox()
     {
+        // پروفایل فقط بعد از تموم‌شدنِ ماهِ فروردین نشون داده می‌شه (قبلش اصلاً ساخته نمی‌شه)
+        if (!ProfileSystem.FarvardinDone) return;
+
         Sprite boxSpr = Resources.Load<Sprite>("UI/ProfileBox");
         if (boxSpr == null) return;
 
@@ -169,8 +175,17 @@ public class MainMenuUI : MonoBehaviour
             new Vector2(left, top - h), new Vector2(left + w, top), boxSpr);
         boxGO.GetComponent<Image>().raycastTarget = false;
 
+        // آواتارِ پروفایل — داخلِ دایره‌ی سمتِ چپِ باکس (کسرها نسبت به خودِ باکس؛ قابلِ تنظیم)
+        Sprite avatar = ProfileSystem.GetAvatarSprite();
+        if (avatar != null)
+        {
+            GameObject av = RuntimeUIHelper.CreateImage(boxGO.transform, "Avatar",
+                new Vector2(0.0f, 0.02f), new Vector2(0.40f, 0.98f), avatar); // preserveAspect: مربع/گرد وسطِ دایره
+            av.GetComponent<Image>().raycastTarget = false;
+        }
+
         // اسمِ کاربر — تو بنرِ بالای سمتِ راست (کسرها نسبت به خودِ تصویرِ باکس)
-        string playerName = PlayerPrefs.GetString(ResultGreetingUI.PlayerNameKey, "");
+        string playerName = ProfileSystem.PlayerName;
         RTLTextMeshPro nameT = RuntimeUIHelper.CreateRTLText(boxGO.transform, "ProfileName",
             new Vector2(0.37f, 0.53f), new Vector2(0.96f, 0.79f), 34, persianFont);
         nameT.text = string.IsNullOrEmpty(playerName) ? "رئیس‌جمهور" : playerName;
@@ -178,6 +193,7 @@ public class MainMenuUI : MonoBehaviour
         nameT.fontStyle = FontStyles.Bold;
         nameT.alignment = TextAlignmentOptions.Center;
         nameT.raycastTarget = false;
+        profileNameText = nameT;
 
         // عددِ ریال — تو بنرِ پایین، روبه‌روی سکه (سکه سمتِ چپِ بنرِ پایینه، عدد سمتِ راستش)
         RTLTextMeshPro rialT = RuntimeUIHelper.CreateRTLText(boxGO.transform, "RialAmount",
@@ -187,6 +203,23 @@ public class MainMenuUI : MonoBehaviour
         rialT.fontStyle = FontStyles.Bold;
         rialT.alignment = TextAlignmentOptions.Center;
         rialT.raycastTarget = false;
+
+        // سطحِ بازیکن (مثلاً «سطح یک») — زیرِ آواتار (فعلاً؛ جاش بعداً قابلِ تنظیمه)
+        RTLTextMeshPro lvlT = RuntimeUIHelper.CreateRTLText(boxGO.transform, "LevelText",
+            new Vector2(0.0f, -0.36f), new Vector2(0.42f, -0.04f), 26, persianFont);
+        lvlT.text = LevelSystem.LevelPersian();
+        lvlT.color = new Color(0.98f, 0.88f, 0.55f);
+        lvlT.fontStyle = FontStyles.Bold;
+        lvlT.alignment = TextAlignmentOptions.Center;
+        lvlT.raycastTarget = false;
+    }
+
+    // بعد از واردکردنِ اسم (صحنه‌ی تبریک)، اسمِ روی پروفایل رو تازه می‌کنه
+    void RefreshProfileName()
+    {
+        if (profileNameText == null) return;
+        string pn = ProfileSystem.PlayerName;
+        profileNameText.text = string.IsNullOrEmpty(pn) ? "رئیس‌جمهور" : pn;
     }
 
     // منوی کشویی سمتِ راست: دکمه‌ی همبرگری (⋮) همیشه دیده می‌شه؛ با زدنش ستونِ
