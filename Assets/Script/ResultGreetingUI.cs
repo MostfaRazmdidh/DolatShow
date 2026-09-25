@@ -32,6 +32,7 @@ public class ResultGreetingUI : MonoBehaviour
     public static ResultGreetingUI Show(Canvas canvas, TMP_FontAsset font, Action onComplete)
     {
         if (canvas == null) { onComplete?.Invoke(); return null; }
+        MusicManager.SetMenu(false); // خانم مشاور داره تبریک می‌گه → آهنگِ منو قطع شه
         GameObject go = new GameObject("ResultGreetingUI", typeof(RectTransform));
         go.transform.SetParent(canvas.transform, false);
         ResultGreetingUI ui = go.AddComponent<ResultGreetingUI>();
@@ -275,6 +276,7 @@ public class ResultGreetingUI : MonoBehaviour
         if (sfxSrc != null) sfxSrc.Stop();
         if (panel != null) Destroy(panel);
         Destroy(gameObject);
+        MusicManager.SetMenu(true); // تبریک تموم شد و برگشتیم به منو → آهنگ دوباره پخش شه
         cb?.Invoke();
     }
 }

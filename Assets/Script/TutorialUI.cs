@@ -46,6 +46,7 @@ public class TutorialUI : MonoBehaviour
     public static TutorialUI Show(Canvas canvas, TMP_FontAsset font, Action onComplete)
     {
         if (canvas == null) { onComplete?.Invoke(); return null; }
+        MusicManager.SetMenu(false); // خانم مشاور داره حرف می‌زنه → آهنگِ منو قطع شه
         GameObject go = new GameObject("TutorialUI", typeof(RectTransform));
         go.transform.SetParent(canvas.transform, false);
         TutorialUI ui = go.AddComponent<TutorialUI>();
