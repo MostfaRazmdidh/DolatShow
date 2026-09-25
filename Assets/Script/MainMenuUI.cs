@@ -59,6 +59,7 @@ public class MainMenuUI : MonoBehaviour
     {
         // تنظیماتِ صدا/موسیقی از همون ابتدا اعمال می‌شن (بلندیِ صدا، روشن/خاموشِ موسیقی)
         MusicManager.EnsureExists();
+        MusicManager.SetMenu(true);  // تو منوییم → آهنگِ اصلی پخش شه (بعد از برگشت از بازی هم دوباره روشن می‌شه)
         UISound.EnsureExists();   // صدای کلیکِ سراسریِ دکمه‌ها
         SettingsSystem.Apply();
 
