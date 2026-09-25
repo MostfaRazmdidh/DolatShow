@@ -59,9 +59,13 @@ public class MainMenuUI : MonoBehaviour
     {
         // تنظیماتِ صدا/موسیقی از همون ابتدا اعمال می‌شن (بلندیِ صدا، روشن/خاموشِ موسیقی)
         MusicManager.EnsureExists();
+        UISound.EnsureExists();   // صدای کلیکِ سراسریِ دکمه‌ها
         SettingsSystem.Apply();
 
         BuildUI();
+
+        // دکمه‌های منو تازه ساخته شدن — همین الان صدای کلیک بهشون وصل شه (بی‌تأخیر)
+        UISound.HookAll();
 
         // اگه بازیکن تازه ماهِ فروردین رو تموم کرده باشه، خانم رستمی تو منوی اصلی تبریک می‌گه
         // و اسمِ کاربری رو می‌پرسه (پرچمش تو CardSwipe.EndStoryMonth ست می‌شه).

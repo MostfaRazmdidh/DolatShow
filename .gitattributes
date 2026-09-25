@@ -175,3 +175,6 @@ Assets/Resources/Bars/*.png -filter -diff -merge -text
 Assets/Resources/UI/*.png -filter -diff -merge -text
 Assets/Resources/Characters/*.png -filter -diff -merge -text
 Assets/Resources/Voice/Dialogue/*.wav -filter -diff -merge -text
+Assets/Resources/Sound/*.wav -filter -diff -merge -text
+Assets/Resources/Sound/*.mp3 -filter -diff -merge -text
+Assets/Resources/Sound/*.ogg -filter -diff -merge -text
