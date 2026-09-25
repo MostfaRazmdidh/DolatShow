@@ -172,7 +172,7 @@ public class MainMenuUI : MonoBehaviour
         // اسمِ کاربر — تو بنرِ بالای سمتِ راست (کسرها نسبت به خودِ تصویرِ باکس)
         string playerName = PlayerPrefs.GetString(ResultGreetingUI.PlayerNameKey, "");
         RTLTextMeshPro nameT = RuntimeUIHelper.CreateRTLText(boxGO.transform, "ProfileName",
-            new Vector2(0.37f, 0.52f), new Vector2(0.96f, 0.92f), 34, persianFont);
+            new Vector2(0.37f, 0.53f), new Vector2(0.96f, 0.79f), 34, persianFont);
         nameT.text = string.IsNullOrEmpty(playerName) ? "رئیس‌جمهور" : playerName;
         nameT.color = new Color(0.98f, 0.90f, 0.62f);
         nameT.fontStyle = FontStyles.Bold;
@@ -181,7 +181,7 @@ public class MainMenuUI : MonoBehaviour
 
         // عددِ ریال — تو بنرِ پایین، روبه‌روی سکه (سکه سمتِ چپِ بنرِ پایینه، عدد سمتِ راستش)
         RTLTextMeshPro rialT = RuntimeUIHelper.CreateRTLText(boxGO.transform, "RialAmount",
-            new Vector2(0.5f, 0.06f), new Vector2(0.95f, 0.46f), 34, persianFont);
+            new Vector2(0.5f, 0.0f), new Vector2(0.95f, 0.32f), 34, persianFont);
         rialT.text = RialSystem.TotalPersian();
         rialT.color = new Color(0.98f, 0.88f, 0.55f);
         rialT.fontStyle = FontStyles.Bold;
