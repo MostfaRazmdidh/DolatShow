@@ -173,7 +173,7 @@ public class MainMenuUI : MonoBehaviour
         // پروفایل فقط بعد از تموم‌شدنِ ماهِ فروردین نشون داده می‌شه (قبلش اصلاً ساخته نمی‌شه)
         if (!ProfileSystem.FarvardinDone) return;
 
-        Sprite boxSpr = Resources.Load<Sprite>("UI/ProfileBox");
+        Sprite boxSpr = Resources.Load<Sprite>("UI/Profile Box");
         if (boxSpr == null) return;
 
         Vector2 canvasSize = ((RectTransform)targetCanvas.transform).rect.size;
@@ -196,14 +196,14 @@ public class MainMenuUI : MonoBehaviour
         if (avatar != null)
         {
             GameObject av = RuntimeUIHelper.CreateImage(boxGO.transform, "Avatar",
-                new Vector2(0.0f, 0.02f), new Vector2(0.40f, 0.98f), avatar); // preserveAspect: مربع/گرد وسطِ دایره
+                new Vector2(0.03f, 0.15f), new Vector2(0.30f, 0.86f), avatar); // preserveAspect: گرد وسطِ دایره
             av.GetComponent<Image>().raycastTarget = false;
         }
 
-        // اسمِ کاربر — تو بنرِ بالای سمتِ راست (کسرها نسبت به خودِ تصویرِ باکس)
+        // اسمِ کاربر — وسطِ بنرِ بالا (کسرها نسبت به خودِ تصویرِ باکس)
         string playerName = ProfileSystem.PlayerName;
         RTLTextMeshPro nameT = RuntimeUIHelper.CreateRTLText(boxGO.transform, "ProfileName",
-            new Vector2(0.37f, 0.53f), new Vector2(0.96f, 0.79f), 34, persianFont);
+            new Vector2(0.40f, 0.42f), new Vector2(0.92f, 0.72f), 32, persianFont);
         nameT.text = string.IsNullOrEmpty(playerName) ? "رئیس‌جمهور" : playerName;
         nameT.color = new Color(0.98f, 0.90f, 0.62f);
         nameT.fontStyle = FontStyles.Bold;
@@ -211,20 +211,20 @@ public class MainMenuUI : MonoBehaviour
         nameT.raycastTarget = false;
         profileNameText = nameT;
 
-        // عددِ ریال — تو بنرِ پایین، روبه‌روی سکه (سکه سمتِ چپِ بنرِ پایینه، عدد سمتِ راستش)
+        // عددِ ریال — تو بنرِ پایین، روبه‌روی نشانِ «ریال» (نشان سمتِ چپه، عدد سمتِ راست/وسطش)
         RTLTextMeshPro rialT = RuntimeUIHelper.CreateRTLText(boxGO.transform, "RialAmount",
-            new Vector2(0.5f, 0.0f), new Vector2(0.95f, 0.32f), 34, persianFont);
+            new Vector2(0.60f, 0.12f), new Vector2(0.85f, 0.30f), 30, persianFont);
         rialT.text = RialSystem.TotalPersian();
         rialT.color = new Color(0.98f, 0.88f, 0.55f);
         rialT.fontStyle = FontStyles.Bold;
         rialT.alignment = TextAlignmentOptions.Center;
         rialT.raycastTarget = false;
 
-        // سطحِ بازیکن (مثلاً «سطح یک») — زیرِ آواتار (فعلاً؛ جاش بعداً قابلِ تنظیمه)
+        // عددِ سطح — داخلِ نشانِ «سطح» (بالا-چپ)، فقط رقم (چون کلمه‌ی «سطح» رو خودِ نشان داره)
         RTLTextMeshPro lvlT = RuntimeUIHelper.CreateRTLText(boxGO.transform, "LevelText",
-            new Vector2(0.0f, -0.36f), new Vector2(0.42f, -0.04f), 26, persianFont);
-        lvlT.text = LevelSystem.LevelPersian();
-        lvlT.color = new Color(0.98f, 0.88f, 0.55f);
+            new Vector2(0.31f, 0.79f), new Vector2(0.47f, 0.92f), 24, persianFont);
+        lvlT.text = ProfileSystem.ToPersianDigits(LevelSystem.Level.ToString());
+        lvlT.color = new Color(0.98f, 0.90f, 0.62f);
         lvlT.fontStyle = FontStyles.Bold;
         lvlT.alignment = TextAlignmentOptions.Center;
         lvlT.raycastTarget = false;
