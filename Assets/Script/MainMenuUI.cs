@@ -52,6 +52,8 @@ public class MainMenuUI : MonoBehaviour
 
     // متنِ اسمِ روی باکسِ پروفایل (تا بعد از واردکردنِ اسم رفرش بشه)
     private RTLTextMeshPro profileNameText;
+    private GameObject profileBoxGO;      // خودِ باکسِ پروفایل (برای چشمک/کلیک)
+    private Coroutine profileBlinkCo;     // انیمیشنِ چشمک
 
     void Start()
     {
@@ -173,7 +175,12 @@ public class MainMenuUI : MonoBehaviour
 
         GameObject boxGO = RuntimeUIHelper.CreateImage(panel.transform, "ProfileBox",
             new Vector2(left, top - h), new Vector2(left + w, top), boxSpr);
-        boxGO.GetComponent<Image>().raycastTarget = false;
+        profileBoxGO = boxGO;
+        // باکس کلیک‌پذیره → پنلِ پروفایل باز می‌شه
+        boxGO.GetComponent<Image>().raycastTarget = true;
+        Button pbtn = boxGO.AddComponent<Button>();
+        pbtn.transition = Selectable.Transition.None;
+        pbtn.onClick.AddListener(OpenProfilePanel);
 
         // آواتارِ پروفایل — داخلِ دایره‌ی سمتِ چپِ باکس (کسرها نسبت به خودِ باکس؛ قابلِ تنظیم)
         Sprite avatar = ProfileSystem.GetAvatarSprite();
@@ -212,6 +219,41 @@ public class MainMenuUI : MonoBehaviour
         lvlT.fontStyle = FontStyles.Bold;
         lvlT.alignment = TextAlignmentOptions.Center;
         lvlT.raycastTarget = false;
+
+        // اگه تازه اسمش رو وارد کرده، باکس چشمک بزنه تا بفهمه روش کلیک کنه
+        if (ProfileSystem.ProfileHintPending)
+            profileBlinkCo = StartCoroutine(BlinkProfile());
+    }
+
+    // باز کردنِ پنلِ پروفایل + قطعِ چشمک
+    void OpenProfilePanel()
+    {
+        ProfileSystem.SetProfileHint(false);
+        if (profileBlinkCo != null) { StopCoroutine(profileBlinkCo); profileBlinkCo = null; }
+        if (profileBoxGO != null) profileBoxGO.transform.localScale = Vector3.one;
+        ProfilePanelUI.Open(targetCanvas, persianFont, RefreshProfileBox);
+    }
+
+    // چشمکِ ملایمِ باکسِ پروفایل (پرش/کوچیک‌شدنِ نرمِ اندازه) تا اولین کلیک
+    IEnumerator BlinkProfile()
+    {
+        float t = 0f;
+        while (profileBoxGO != null)
+        {
+            t += Time.unscaledDeltaTime * 3f;
+            float s = 1f + Mathf.Sin(t) * 0.05f; // ۰.۹۵ تا ۱.۰۵
+            profileBoxGO.transform.localScale = new Vector3(s, s, 1f);
+            yield return null;
+        }
+    }
+
+    // بعد از تغییرِ نام/آواتار تو پنل، باکسِ پروفایلِ منو رو تازه می‌کنه (ساده: دوباره می‌سازیم)
+    void RefreshProfileBox()
+    {
+        if (profileBoxGO != null) Destroy(profileBoxGO);
+        if (profileBlinkCo != null) { StopCoroutine(profileBlinkCo); profileBlinkCo = null; }
+        profileBoxGO = null; profileNameText = null;
+        BuildProfileBox();
     }
 
     // بعد از واردکردنِ اسم (صحنه‌ی تبریک)، اسمِ روی پروفایل رو تازه می‌کنه

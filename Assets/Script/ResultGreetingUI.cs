@@ -253,10 +253,10 @@ public class ResultGreetingUI : MonoBehaviour
     {
         string entered = nameInput != null ? nameInput.text.Trim() : "";
         if (!string.IsNullOrEmpty(entered))
-        {
-            PlayerPrefs.SetString(PlayerNameKey, entered);
-            PlayerPrefs.Save();
-        }
+            ProfileSystem.SetName(entered);
+        // شناسه‌ی یکتا رو بساز (اگه نباشه) و پرچمِ چشمکِ پروفایل رو روشن کن
+        var _ = ProfileSystem.UserId;
+        ProfileSystem.SetProfileHint(true);
         Finish();
     }
 

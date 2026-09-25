@@ -18,6 +18,16 @@ public static class RialSystem
         PlayerPrefs.Save();
     }
 
+    // خرج‌کردنِ ریال — اگه موجودی کافی باشه کم می‌کنه و true می‌ده، وگرنه false
+    public static bool Spend(int amount)
+    {
+        if (amount <= 0) return true;
+        if (Total < amount) return false;
+        PlayerPrefs.SetInt(Key, Total - amount);
+        PlayerPrefs.Save();
+        return true;
+    }
+
     // محاسبه‌ی ریالِ به‌دست‌آمده از یه دور بازی (کم و سخت):
     // فقط بابتِ «بالاتر از میانگین نگه‌داشتنِ کشور» ریال می‌دیم. یه دورِ خیلی خوب ~۶ ریال،
     // دورِ متوسط ۱-۲ ریال، دورِ بد ۰. (ضریب‌ها قابلِ تنظیمن.)
