@@ -38,8 +38,8 @@ public class SettingsUI : MonoBehaviour
         overlay.transition = Selectable.Transition.None;
         overlay.onClick.AddListener(Close);
 
-        // باکسِ وسط (از StartBox؛ اگه نبود رنگِ ساده)
-        Sprite boxSpr = Resources.Load<Sprite>("UI/StartBox");
+        // باکسِ وسط (از Box؛ اگه نبود رنگِ ساده)
+        Sprite boxSpr = Resources.Load<Sprite>("UI/Box");
         GameObject box;
         if (boxSpr != null)
             box = RuntimeUIHelper.CreateImage(panel.transform, "Box", new Vector2(0.07f, 0.12f), new Vector2(0.93f, 0.88f), boxSpr, stretch: true);

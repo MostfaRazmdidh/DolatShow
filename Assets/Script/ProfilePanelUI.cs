@@ -40,14 +40,14 @@ public class ProfilePanelUI : MonoBehaviour
         overlay.transition = Selectable.Transition.None;
         overlay.onClick.AddListener(Close);
 
-        // باکسِ وسط (از StartBox استفاده می‌کنیم؛ اگه نبود رنگِ ساده)
-        Sprite boxSpr = Resources.Load<Sprite>("UI/StartBox");
+        // باکسِ وسط (از Box؛ عمودیه پس رِکتِ عمودی تا کِش نیاد. اگه نبود رنگِ ساده)
+        Sprite boxSpr = Resources.Load<Sprite>("UI/Box");
         GameObject box;
         if (boxSpr != null)
-            box = RuntimeUIHelper.CreateImage(panel.transform, "Box", new Vector2(0.08f, 0.26f), new Vector2(0.92f, 0.74f), boxSpr, stretch: true);
+            box = RuntimeUIHelper.CreateImage(panel.transform, "Box", new Vector2(0.1f, 0.12f), new Vector2(0.9f, 0.88f), boxSpr, stretch: true);
         else
         {
-            box = RuntimeUIHelper.CreateImage(panel.transform, "Box", new Vector2(0.08f, 0.26f), new Vector2(0.92f, 0.74f), null);
+            box = RuntimeUIHelper.CreateImage(panel.transform, "Box", new Vector2(0.1f, 0.12f), new Vector2(0.9f, 0.88f), null);
             box.GetComponent<Image>().color = new Color(0.16f, 0.10f, 0.05f, 0.98f);
         }
         // کلیک روی خودِ باکس نباید ببنده
