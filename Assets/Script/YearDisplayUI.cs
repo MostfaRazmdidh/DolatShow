@@ -62,6 +62,16 @@ public class YearDisplayUI : MonoBehaviour
             yearText.fontStyle = FontStyles.Bold;
         }
 
+        // موقعیتِ نهاییِ باکسِ تاریخ رو مستقیم اینجا قفل می‌کنیم تا حتماً اعمال شه (بدونِ اتکا به Prefab/Instantiate).
+        // مختصاتِ دقیقی که توسعه‌دهنده خواست: کنارِ چپش دکمه‌ی توقفه.
+        RectTransform brt = boxGO != null ? boxGO.GetComponent<RectTransform>() : null;
+        if (brt != null)
+        {
+            brt.anchorMin = brt.anchorMax = new Vector2(0.5f, 0f);
+            brt.pivot = new Vector2(0.5f, 0f);
+            brt.anchoredPosition = new Vector2(112f, 45f);
+        }
+
         UpdateDisplay(GameStats.Instance.CurrentMonth);
         GameStats.Instance.OnMonthChanged += UpdateDisplay;
 
