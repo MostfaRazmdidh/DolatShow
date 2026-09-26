@@ -59,32 +59,33 @@ public class ProfilePanelUI : MonoBehaviour
         RTLTextMeshPro title = RuntimeUIHelper.CreateRTLText(brt, "Title", new Vector2(0.1f, 0.86f), new Vector2(0.9f, 0.98f), 40, font);
         title.text = "پروفایل"; title.color = new Color(0.98f, 0.88f, 0.55f); title.fontStyle = FontStyles.Bold; title.raycastTarget = false;
 
-        // آواتار (بالا-وسط)
-        GameObject av = RuntimeUIHelper.CreateImage(brt, "Avatar", new Vector2(0.36f, 0.58f), new Vector2(0.64f, 0.86f), ProfileSystem.GetAvatarSprite());
+        // آواتار (بالا-وسط) — با دو فلشِ چپ/راست بینِ آواتارها جابه‌جا می‌شه
+        GameObject av = RuntimeUIHelper.CreateImage(brt, "Avatar", new Vector2(0.37f, 0.62f), new Vector2(0.63f, 0.84f), ProfileSystem.GetAvatarSprite());
         avatarImg = av.GetComponent<Image>(); avatarImg.raycastTarget = false;
 
-        // دکمه‌ی تعویضِ آواتار (رایگان، چرخشی)
-        RuntimeUIHelper.CreateButton(brt, "AvatarButton", new Vector2(0.3f, 0.5f), new Vector2(0.7f, 0.57f), "تغییر آواتار", font, new Color(0.2f, 0.4f, 0.5f, 1f), CycleAvatar);
+        // فلشِ قبلی (چپ) و بعدی (راست) برای عوض‌کردنِ آواتار
+        AddArrowButton(brt, "PrevAvatar", new Vector2(0.13f, 0.66f), new Vector2(0.27f, 0.80f), "<", PrevAvatar);
+        AddArrowButton(brt, "NextAvatar", new Vector2(0.73f, 0.66f), new Vector2(0.87f, 0.80f), ">", NextAvatar);
 
         // شناسه
-        RTLTextMeshPro idText = RuntimeUIHelper.CreateRTLText(brt, "IdText", new Vector2(0.08f, 0.4f), new Vector2(0.92f, 0.48f), 28, font);
+        RTLTextMeshPro idText = RuntimeUIHelper.CreateRTLText(brt, "IdText", new Vector2(0.08f, 0.50f), new Vector2(0.92f, 0.57f), 28, font);
         idText.text = "شناسه: " + ProfileSystem.ToPersianDigits(ProfileSystem.UserId);
         idText.color = new Color(0.85f, 0.82f, 0.7f); idText.raycastTarget = false;
 
         // اسمِ فعلی
-        nameText = RuntimeUIHelper.CreateRTLText(brt, "NameText", new Vector2(0.08f, 0.32f), new Vector2(0.92f, 0.4f), 32, font);
+        nameText = RuntimeUIHelper.CreateRTLText(brt, "NameText", new Vector2(0.08f, 0.42f), new Vector2(0.92f, 0.49f), 32, font);
         nameText.color = new Color(0.98f, 0.9f, 0.62f); nameText.fontStyle = FontStyles.Bold; nameText.raycastTarget = false;
 
         // دکمه‌ی تعویضِ نام (با هزینه)
-        GameObject cn = RuntimeUIHelper.CreateButton(brt, "ChangeNameButton", new Vector2(0.2f, 0.2f), new Vector2(0.8f, 0.28f), "", font, new Color(0.3f, 0.45f, 0.2f, 1f), ShowNameInput);
+        GameObject cn = RuntimeUIHelper.CreateButton(brt, "ChangeNameButton", new Vector2(0.18f, 0.30f), new Vector2(0.82f, 0.40f), "", font, new Color(0.3f, 0.45f, 0.2f, 1f), ShowNameInput);
         changeNameLabel = cn.GetComponentInChildren<RTLTextMeshPro>();
 
         // پیامِ کوچیک (خطا/موفقیت)
-        msgText = RuntimeUIHelper.CreateRTLText(brt, "Msg", new Vector2(0.08f, 0.12f), new Vector2(0.92f, 0.19f), 24, font);
+        msgText = RuntimeUIHelper.CreateRTLText(brt, "Msg", new Vector2(0.08f, 0.22f), new Vector2(0.92f, 0.29f), 24, font);
         msgText.color = new Color(0.95f, 0.6f, 0.5f); msgText.raycastTarget = false; msgText.text = "";
 
-        // دکمه‌ی بستن
-        RuntimeUIHelper.CreateButton(brt, "CloseButton", new Vector2(0.35f, 0.03f), new Vector2(0.65f, 0.11f), "بستن", font, new Color(0.4f, 0.25f, 0.2f, 1f), Close);
+        // دکمه‌ی بستن (داخلِ کادر، بالای لبه‌ی پایین)
+        RuntimeUIHelper.CreateButton(brt, "CloseButton", new Vector2(0.30f, 0.11f), new Vector2(0.70f, 0.20f), "بستن", font, new Color(0.4f, 0.25f, 0.2f, 1f), Close);
 
         RefreshTexts();
         panel.transform.SetAsLastSibling();
@@ -99,11 +100,39 @@ public class ProfilePanelUI : MonoBehaviour
         if (avatarImg != null) avatarImg.sprite = ProfileSystem.GetAvatarSprite();
     }
 
-    void CycleAvatar()
+    void PrevAvatar()
+    {
+        ProfileSystem.SelectedAvatar = (ProfileSystem.SelectedAvatar - 1 + ProfileSystem.AvatarCount) % ProfileSystem.AvatarCount;
+        RefreshTexts();
+        onChanged?.Invoke();
+    }
+
+    void NextAvatar()
     {
         ProfileSystem.SelectedAvatar = (ProfileSystem.SelectedAvatar + 1) % ProfileSystem.AvatarCount;
         RefreshTexts();
         onChanged?.Invoke();
+    }
+
+    // فلشِ ساده (بدونِ قابِ دکمه) با گلیفِ متنیِ ASCII (< یا >) — از TextMeshProUGUIِ معمولی
+    // (نه RTL) تا گلیف برعکس/بازچینش نشه.
+    void AddArrowButton(RectTransform parent, string name, Vector2 aMin, Vector2 aMax, string glyph, UnityEngine.Events.UnityAction onClick)
+    {
+        GameObject go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
+        go.transform.SetParent(parent, false);
+        RectTransform rt = (RectTransform)go.transform;
+        rt.anchorMin = aMin; rt.anchorMax = aMax; rt.offsetMin = rt.offsetMax = Vector2.zero;
+        go.GetComponent<Image>().color = new Color(0.28f, 0.19f, 0.10f, 0.92f);
+        go.GetComponent<Button>().onClick.AddListener(onClick);
+
+        GameObject tGO = new GameObject("T", typeof(RectTransform));
+        tGO.transform.SetParent(rt, false);
+        RectTransform trt = (RectTransform)tGO.transform;
+        trt.anchorMin = Vector2.zero; trt.anchorMax = Vector2.one; trt.offsetMin = trt.offsetMax = Vector2.zero;
+        TextMeshProUGUI t = tGO.AddComponent<TextMeshProUGUI>();
+        if (font != null) t.font = font;
+        t.text = glyph; t.fontSize = 44; t.color = new Color(0.98f, 0.88f, 0.55f);
+        t.alignment = TextAlignmentOptions.Center; t.fontStyle = FontStyles.Bold; t.raycastTarget = false;
     }
 
     // --- تعویضِ نام ---
