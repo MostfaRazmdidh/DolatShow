@@ -56,6 +56,8 @@ public class PauseUI : MonoBehaviour
         // تضمینِ اینکه دکمه‌ی توقف همیشه روی همه‌چیز (نوارها/کارت) رندر شه
         Canvas cv = pauseButton.AddComponent<Canvas>();
         cv.overrideSorting = true; cv.sortingOrder = 500;
+        // چون یه Canvasِ تودرتو اضافه کردیم، باید GraphicRaycasterِ خودش رو هم بده وگرنه کلیک ثبت نمی‌شه
+        pauseButton.AddComponent<GraphicRaycaster>();
 
         pauseButton.SetActive(false); // تا شروعِ بازی مخفی
 
