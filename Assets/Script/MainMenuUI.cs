@@ -62,6 +62,7 @@ public class MainMenuUI : MonoBehaviour
         MusicManager.SetMenu(true);  // تو منوییم → آهنگِ اصلی پخش شه (بعد از برگشت از بازی هم دوباره روشن می‌شه)
         UISound.EnsureExists();   // صدای کلیکِ سراسریِ دکمه‌ها
         PauseUI.Create(targetCanvas, persianFont, cardSwipe);  // دکمه‌ی توقف (موقعِ گیم‌پلی نشون داده می‌شه)
+        AdManager.Initialize();   // آماده‌سازیِ تبلیغِ ادیوری (اگه SDK نصب و ADIVERY_ADS روشن باشه)
         SettingsSystem.Apply();
 
         BuildUI();

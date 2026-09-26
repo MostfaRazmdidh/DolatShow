@@ -127,9 +127,13 @@ public class GameOverUI : MonoBehaviour
     {
         if (!wasLoss) return;
 
-        GameStats.Instance.RecoverStatViaAd(lastLossType, lastLossHitMax);
-        panel.SetActive(false);
-        cardSwipe.BeginGame();
+        // تبلیغِ جایزه‌دار رو نشون بده؛ بعد از دیدنِ کامل (یا شبیه‌سازی وقتی SDK نصب نیست)، کشور نجات پیدا می‌کنه
+        AdManager.ShowRewarded(() =>
+        {
+            GameStats.Instance.RecoverStatViaAd(lastLossType, lastLossHitMax);
+            panel.SetActive(false);
+            cardSwipe.BeginGame();
+        });
     }
 
     // دکمه‌ی «وتوی ریاست‌جمهوری» — اگه بازیکن این آیتم رو از فروشگاه خریده باشه، موقعِ باخت

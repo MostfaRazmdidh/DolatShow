@@ -173,6 +173,13 @@
 - `MainMenuUI.Start` با `PauseUI.Create(canvas, font, cardSwipe)` می‌سازتش.
 - **تصویرها:** از اطلسِ برش‌خورده‌ی دکمه‌های توقف تو `Resources/UI` با `Resources.LoadAll<Sprite>` لود می‌شن و با کلیدواژه‌ی نامِ برش پیدا می‌شن (`continu/resume`→ادامه، `home`→خانه، `replay`→دوباره، `step/stop/pause`→دکمه‌ی توقف). اسمِ فایلِ اطلس از چند کاندیدا امتحان می‌شه (`Step`, `Steppe`, `Stop`, `Pause`, ...). **این اطلس باید spriteMode=Multiple بمونه** (برخلافِ بقیه‌ی عکس‌ها) چون چند اسپرایتِ نام‌دار داخلشه. اگه اطلس پیدا نشد، دکمه‌های متنیِ موقت ساخته می‌شن.
 
+### AdManager.cs — تبلیغِ ادیوری (تازه، پشتِ سوییچِ کامپایل)
+- **`AdManager`** (static): اتصال به شبکه‌ی تبلیغِ **ادیوری** برای تبلیغِ **جایزه‌دار** (دکمه‌ی «دیدن تبلیغ و ادامه» موقعِ باخت).
+- **مهم:** همه‌ی کدِ ادیوری پشتِ `#if ADIVERY_ADS` هست تا **بدونِ نصبِ SDK هم پروژه کامپایل بشه**. تا وقتی سوییچ خاموشه، `ShowRewarded(onReward)` مثلِ قبل شبیه‌سازی می‌کنه (مستقیم جایزه می‌ده). 
+- **فعال‌سازی بعد از نصبِ SDK:** Unity → Project Settings → Player → Other Settings → Scripting Define Symbols → اضافه‌کردنِ `ADIVERY_ADS`.
+- **App Key** تو کد هست (`29eb0ccc-...`)؛ **`RewardedZone` هنوز placeholderه** (`PUT_REWARDED_ZONE_ID_HERE`) — باید Zone IDِ جایگاهِ جایزه‌دار جاش گذاشته شه.
+- `AdManager.Initialize()` تو `MainMenuUI.Start` صدا زده می‌شه؛ `GameOverUI.WatchAdAndContinue` به‌جای اعمالِ مستقیم، `AdManager.ShowRewarded(...)` رو صدا می‌زنه و تو callbackِ جایزه کشور رو نجات می‌ده. اگه امضای متدهای `AdListener` با نسخه‌ی SDK فرق داشت، تو همون بلاکِ `#if` اصلاح می‌شه.
+
 ### StoreSystem.cs / StoreUI.cs — فروشگاه (تازه)
 - **`StoreSystem`** (static، داده‌محور): کاتالوگِ آیتم‌ها (`Catalog`) + خرید با ریال (`Buy` → `RialSystem.Spend`) + مالکیت/تعداد تو `PlayerPrefs` (`DolatShow_Store_<id>`). برای آیتمِ جدید فقط یه سطر به `Catalog` اضافه کن. دو نوع: `Consumable` (شمارنده‌دار، `GetCount`/`Consume`) و `Permanent` (یه‌بار، `IsOwned`).
   - **آیتم‌های فعلی:** `headstart` (شروع +۱۰ همه شاخص‌ها، ۶ ریال)، `superstart` (+۲۰، ۱۲ ریال)، `veto` (نجاتِ بدونِ تبلیغ موقعِ باخت، ۱۰ ریال) — همه Consumable؛ و `frame_royal` (قابِ سلطنتی) + `theme_dark` (تمِ کارت) — Permanent (اثرِ بصری‌شون فعلاً پیاده نشده، جای آیکون/تم بعداً).
