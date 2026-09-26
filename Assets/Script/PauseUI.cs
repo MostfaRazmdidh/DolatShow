@@ -36,13 +36,18 @@ public class PauseUI : MonoBehaviour
     {
         LoadSprites();
 
-        // دکمه‌ی توقف — گوشه‌ی بالا-چپ. اولش مخفیه، با شروعِ بازی روشن می‌شه.
+        // دکمه‌ی توقف — گوشه‌ی بالا-چپ، کمی پایین‌ترِ نوارهای وضعیت تا روشون نیفته.
+        // اولش مخفیه، با شروعِ بازی روشن می‌شه.
         if (sprPause != null)
             pauseButton = RuntimeUIHelper.CreateImageButton(canvas.transform, "PauseButton",
-                new Vector2(0.02f, 0.88f), new Vector2(0.15f, 0.975f), sprPause, OpenPanel);
+                new Vector2(0.02f, 0.75f), new Vector2(0.14f, 0.85f), sprPause, OpenPanel);
         else
             pauseButton = RuntimeUIHelper.CreateButton(canvas.transform, "PauseButton",
-                new Vector2(0.02f, 0.88f), new Vector2(0.15f, 0.975f), "II", font, new Color(0.3f, 0.22f, 0.12f, 0.95f), OpenPanel);
+                new Vector2(0.02f, 0.75f), new Vector2(0.14f, 0.85f), "II", font, new Color(0.3f, 0.22f, 0.12f, 0.95f), OpenPanel);
+
+        // تضمینِ اینکه دکمه‌ی توقف همیشه روی همه‌چیز (نوارها/کارت) رندر شه
+        Canvas cv = pauseButton.AddComponent<Canvas>();
+        cv.overrideSorting = true; cv.sortingOrder = 500;
 
         pauseButton.SetActive(false); // تا شروعِ بازی مخفی
 
@@ -69,6 +74,7 @@ public class PauseUI : MonoBehaviour
         if (panel == null) BuildPanel();
         panel.transform.SetAsLastSibling();
         panel.SetActive(true);
+        if (pauseButton != null) pauseButton.SetActive(false); // موقعِ باز بودنِ پنل، خودِ دکمه‌ی توقف مخفی
         if (cardSwipe != null) cardSwipe.enabled = false; // ورودیِ سوایپِ کارت متوقف بشه
         RuntimeUIHelper.PlayFadeIn(this, panel);
     }
@@ -76,6 +82,7 @@ public class PauseUI : MonoBehaviour
     void Resume()
     {
         if (panel != null) panel.SetActive(false);
+        if (pauseButton != null) pauseButton.SetActive(true); // دکمه‌ی توقف دوباره پیدا شه
         if (cardSwipe != null) cardSwipe.enabled = true;
     }
 
