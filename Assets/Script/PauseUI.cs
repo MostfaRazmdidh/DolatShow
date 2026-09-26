@@ -36,14 +36,22 @@ public class PauseUI : MonoBehaviour
     {
         LoadSprites();
 
-        // دکمه‌ی توقف — گوشه‌ی بالا-چپ، کمی پایین‌ترِ نوارهای وضعیت تا روشون نیفته.
+        // دکمه‌ی توقف — پایینِ صفحه، دقیقاً سمتِ چپِ باکسِ تاریخ (طبقِ طرحِ توسعه‌دهنده).
         // اولش مخفیه، با شروعِ بازی روشن می‌شه.
         if (sprPause != null)
             pauseButton = RuntimeUIHelper.CreateImageButton(canvas.transform, "PauseButton",
-                new Vector2(0.02f, 0.75f), new Vector2(0.14f, 0.85f), sprPause, OpenPanel);
+                Vector2.zero, Vector2.one, sprPause, OpenPanel);
         else
             pauseButton = RuntimeUIHelper.CreateButton(canvas.transform, "PauseButton",
-                new Vector2(0.02f, 0.75f), new Vector2(0.14f, 0.85f), "II", font, new Color(0.3f, 0.22f, 0.12f, 0.95f), OpenPanel);
+                Vector2.zero, Vector2.one, "II", font, new Color(0.3f, 0.22f, 0.12f, 0.95f), OpenPanel);
+
+        // مختصاتِ پیکسلیِ هم‌سبک با باکسِ تاریخ (وسط-پایین) تا همیشه کنارِ باکس بمونه.
+        // باکسِ تاریخ: anchor (0.5,0)، size 760×200، y=120. لبه‌ی چپش x=-380؛ دکمه رو چپِ اون می‌ذاریم.
+        RectTransform rt = (RectTransform)pauseButton.transform;
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0f);
+        rt.pivot = new Vector2(0.5f, 0f);
+        rt.sizeDelta = new Vector2(190f, 190f);
+        rt.anchoredPosition = new Vector2(-490f, 125f);
 
         // تضمینِ اینکه دکمه‌ی توقف همیشه روی همه‌چیز (نوارها/کارت) رندر شه
         Canvas cv = pauseButton.AddComponent<Canvas>();
