@@ -32,11 +32,9 @@ public class SettingsUI : MonoBehaviour
 
     void Build()
     {
-        // پس‌زمینه‌ی تیره؛ کلیک روی فضای خالی → بستن
+        // پس‌زمینه‌ی تیره — جلوی کلیکِ چیزهای پشتش رو می‌گیره ولی خودش با کلیک بسته نمی‌شه
+        // (فقط دکمه‌ی «بستن» می‌بنده). Imageِ پنل raycastTarget داره پس کلیک‌ها رو می‌گیره.
         panel = RuntimeUIHelper.CreateFullScreenPanel(canvas.transform, "SettingsPanel", new Color(0f, 0f, 0f, 0.82f));
-        Button overlay = panel.AddComponent<Button>();
-        overlay.transition = Selectable.Transition.None;
-        overlay.onClick.AddListener(Close);
 
         // باکسِ وسط (از Box؛ اگه نبود رنگِ ساده)
         Sprite boxSpr = Resources.Load<Sprite>("UI/Box");

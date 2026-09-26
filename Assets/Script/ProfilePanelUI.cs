@@ -34,11 +34,9 @@ public class ProfilePanelUI : MonoBehaviour
 
     void Build()
     {
-        // پس‌زمینه‌ی تیره؛ کلیک روی فضای خالی → بستن
+        // پس‌زمینه‌ی تیره — جلوی کلیکِ چیزهای پشتش رو می‌گیره ولی خودش با کلیک بسته نمی‌شه
+        // (فقط دکمه‌ی «بستن» می‌بنده).
         panel = RuntimeUIHelper.CreateFullScreenPanel(canvas.transform, "ProfilePanel", new Color(0f, 0f, 0f, 0.8f));
-        Button overlay = panel.AddComponent<Button>();
-        overlay.transition = Selectable.Transition.None;
-        overlay.onClick.AddListener(Close);
 
         // باکسِ وسط (از Box؛ عمودیه پس رِکتِ عمودی تا کِش نیاد. اگه نبود رنگِ ساده)
         Sprite boxSpr = Resources.Load<Sprite>("UI/Box");
