@@ -23,6 +23,7 @@ public class GameOverUI : MonoBehaviour
 
     private GameObject panel;
     private GameObject adButton;
+    private GameObject vetoButton;   // دکمه‌ی «استفاده از وتو» (اگه آیتمِ وتو از فروشگاه داشته باشه)
     private RTLTextMeshPro messageText;
     private RTLTextMeshPro scoreText;
 
@@ -54,6 +55,7 @@ public class GameOverUI : MonoBehaviour
 
         messageText.text = GetLossMessage(type, hitMax);
         adButton.SetActive(!GameStats.Instance.AdUsedThisRun);
+        ShowVetoButton();
         ShowScore();
         panel.transform.SetAsLastSibling(); // روی نوارهای وضعیت
         panel.SetActive(true);
@@ -125,6 +127,32 @@ public class GameOverUI : MonoBehaviour
     {
         if (!wasLoss) return;
 
+        GameStats.Instance.RecoverStatViaAd(lastLossType, lastLossHitMax);
+        panel.SetActive(false);
+        cardSwipe.BeginGame();
+    }
+
+    // دکمه‌ی «وتوی ریاست‌جمهوری» — اگه بازیکن این آیتم رو از فروشگاه خریده باشه، موقعِ باخت
+    // می‌تونه بدونِ تبلیغ یک بار کشور رو نجات بده. یه‌بار ساخته و بعد فقط نشون/مخفی می‌شه.
+    void ShowVetoButton()
+    {
+        int count = StoreSystem.GetCount("veto");
+        if (count <= 0) { if (vetoButton != null) vetoButton.SetActive(false); return; }
+
+        if (vetoButton == null)
+            vetoButton = RuntimeUIHelper.CreateButton(panel.transform, "VetoButton",
+                new Vector2(0.28f, 0.44f), new Vector2(0.72f, 0.53f), "", persianFont,
+                new Color(0.45f, 0.2f, 0.45f, 1f), UseVeto);
+
+        vetoButton.GetComponentInChildren<RTLTextMeshPro>().text =
+            "استفاده از وتو (×" + ToPersian(count) + ")";
+        vetoButton.SetActive(true);
+    }
+
+    void UseVeto()
+    {
+        if (!wasLoss) return;
+        if (!StoreSystem.Consume("veto")) return;
         GameStats.Instance.RecoverStatViaAd(lastLossType, lastLossHitMax);
         panel.SetActive(false);
         cardSwipe.BeginGame();

@@ -377,7 +377,8 @@ public class MainMenuUI : MonoBehaviour
     // دکمه‌های منوی کشویی — فعلاً placeholder (مثلِ «تنظیمات»)؛ بعداً صفحه/محتواشون ساخته می‌شه
     void OpenStore()
     {
-        Debug.Log("فروشگاه — به‌زودی");
+        CloseSlideMenu();
+        StoreUI.Open(targetCanvas, persianFont);
     }
 
     // صفحه‌ی «درباره‌ی ما» — عکسِ Resources/UI/AboutUs رو تمام‌قد وسطِ صفحه نشون می‌ده،
@@ -591,6 +592,17 @@ public class MainMenuUI : MonoBehaviour
         StartCoroutine(FadeInPanel(startPanel)); // باز شدنِ نرم (محو + پرشِ ریز)
     }
 
+    // بونوسِ شروع از فروشگاه (اگه خریده باشه): +۱۰ یا +۲۰ روی هر چهار شاخص، یه‌بار مصرف می‌شه.
+    void ApplyStoreStartBonus()
+    {
+        int bonus = StoreSystem.ConsumeStartBonus();
+        if (bonus <= 0) return;
+        GameStats.Instance.ApplyEffect(GameStats.StatType.Budget, bonus);
+        GameStats.Instance.ApplyEffect(GameStats.StatType.Popularity, bonus);
+        GameStats.Instance.ApplyEffect(GameStats.StatType.Security, bonus);
+        GameStats.Instance.ApplyEffect(GameStats.StatType.Diplomacy, bonus);
+    }
+
     void StartNewGame()
     {
         SaveSystem.DeleteSave();
@@ -599,7 +611,12 @@ public class MainMenuUI : MonoBehaviour
         HideStartPanel();
         panel.SetActive(false);
         // اولِ بازیِ جدید، بخشِ آموزشی (دیالوگِ مشاور) نشون داده می‌شه؛ بعدش بازی شروع می‌شه.
-        TutorialUI.Show(targetCanvas, persianFont, () => cardSwipe.BeginGame());
+        // اگه آیتمِ «شروعِ قدرتمند/طلایی» از فروشگاه خریده باشه، همون‌جا مصرف و روی شاخص‌ها اعمال می‌شه.
+        TutorialUI.Show(targetCanvas, persianFont, () =>
+        {
+            ApplyStoreStartBonus();
+            cardSwipe.BeginGame();
+        });
     }
 
     void ContinueGame()
