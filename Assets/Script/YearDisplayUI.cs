@@ -77,7 +77,9 @@ public class YearDisplayUI : MonoBehaviour
         GameObject prefab = Resources.Load<GameObject>("Prefabs/DateBox");
         if (prefab == null) return false;
 
-        boxGO = Instantiate(prefab, targetCanvas.transform);
+        // مهم: worldPositionStays=false تا مختصاتِ RectTransformِ خودِ Prefab (anchoredPosition/size) عیناً حفظ شه.
+        // با نسخه‌ی دوآرگومانی (worldPositionStays=true) یونیتی موقعیت رو از نو حساب می‌کرد و تغییرِ Prefab بی‌اثر می‌شد.
+        boxGO = Instantiate(prefab, targetCanvas.transform, false);
         boxGO.name = "DateBox";
 
         Transform yt = boxGO.transform.Find("YearText");
