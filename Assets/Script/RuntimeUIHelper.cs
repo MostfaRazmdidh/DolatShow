@@ -67,6 +67,16 @@ public static class RuntimeUIHelper
         return text;
     }
 
+    // قابِ آماده‌ی دکمه (Resources/UI/Button) که یه‌بار لود و کش می‌شه. اگه بود، همه‌ی دکمه‌های
+    // متنی به‌جای رنگِ ساده این قابِ تزئینی رو می‌گیرن؛ اگه نبود به رنگِ ساده برمی‌گرده.
+    static Sprite _btnFrame;
+    static bool _btnFrameTried;
+    static Sprite ButtonFrame()
+    {
+        if (!_btnFrameTried) { _btnFrame = Resources.Load<Sprite>("UI/Button"); _btnFrameTried = true; }
+        return _btnFrame;
+    }
+
     public static GameObject CreateButton(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, string label, TMP_FontAsset font, Color backgroundColor, UnityEngine.Events.UnityAction onClick)
     {
         GameObject buttonGO = new GameObject(name, typeof(RectTransform));
@@ -77,10 +87,27 @@ public static class RuntimeUIHelper
         rect.offsetMin = Vector2.zero;
         rect.offsetMax = Vector2.zero;
 
-        buttonGO.AddComponent<Image>().color = backgroundColor;
+        Image img = buttonGO.AddComponent<Image>();
+        Sprite frame = ButtonFrame();
+        Color textColor = Color.white;
+        if (frame != null)
+        {
+            img.sprite = frame;         // قابِ طلاییِ آماده
+            img.type = Image.Type.Simple;
+            img.color = Color.white;     // رنگِ واقعیِ تصویر
+            textColor = new Color(0.98f, 0.9f, 0.62f); // متنِ کرمِ روشن روی قابِ تیره
+        }
+        else
+        {
+            img.color = backgroundColor; // حالتِ قدیمی: رنگِ ساده
+        }
         buttonGO.AddComponent<Button>().onClick.AddListener(onClick);
 
-        CreateRTLText(buttonGO.transform, "Text", Vector2.zero, Vector2.one, 28, font).text = label;
+        // متن یه‌کم از لبه‌های قاب فاصله بگیره تا رو تزئیناتِ گوشه نیفته
+        RTLTextMeshPro t = CreateRTLText(buttonGO.transform, "Text", new Vector2(0.1f, 0.15f), new Vector2(0.9f, 0.85f), 28, font);
+        t.text = label;
+        t.color = textColor;
+        t.enableAutoSizing = true; t.fontSizeMin = 14; t.fontSizeMax = 30;
 
         return buttonGO;
     }

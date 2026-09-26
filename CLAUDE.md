@@ -198,7 +198,7 @@
 
 ### RuntimeUIHelper.cs — کمکی مشترک
 - چون GameOverUI، MainMenuUI، YearDisplayUI، و BackgroundUI هر کدوم بخشی از UI‌شون رو با کد می‌سازن (نه از پیش تو صحنه)، این کلاس static متدهای مشترک رو بینشون به اشتراک می‌ذاره تا کد تکراری نباشه:
-  - `CreateFullScreenPanel` / `CreateButton` — نسخه‌ی رنگ ساده (حالت پیش‌فرض وقتی عکسی وصل نیست)
+  - `CreateFullScreenPanel` / `CreateButton` — `CreateButton` حالا خودکار از قابِ تزئینیِ `Resources/UI/Button.png` به‌عنوانِ پس‌زمینه‌ی همه‌ی دکمه‌های متنی استفاده می‌کنه (متن کرمِ روشن، autosize)؛ اگه اون تصویر نبود به رنگِ ساده برمی‌گرده. (سوییچ‌های تنظیمات جدان و این رو نمی‌گیرن.)
   - `CreateRTLText` — متن فارسی
   - `CreateImage` — یه Image ساده از یه Sprite (پس‌زمینه، لوگو، آیکون) — `stretch:true` یعنی دقیقاً پر کن (پس‌زمینه‌ها)، `false` یعنی نسبت تصویر حفظ بشه (لوگو/آیکون)
   - `CreateImageButton` — دکمه‌ای که خودِ عکسش برچسب/متن داره (مثل دکمه‌های آماده‌ی «شروع بازی»/«بازگشت»)
