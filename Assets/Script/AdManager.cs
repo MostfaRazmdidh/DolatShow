@@ -4,22 +4,28 @@ using UnityEngine;
 using AdiveryUnity;   // فقط وقتی SDKِ ادیوری نصب و سوییچِ ADIVERY_ADS روشن باشه
 #endif
 
-// مدیرِ تبلیغِ بازی (ادیوری). طراحی‌شده که **بدونِ نصبِ SDK هم پروژه کامپایل بشه**:
-// همه‌ی کدِ ادیوری پشتِ سوییچِ کامپایلِ ADIVERY_ADS هست.
+// مدیرِ تبلیغِ بازی (ادیوری) — بر اساسِ APIِ رسمیِ پلاگینِ یونیتیِ ادیوری:
+//   Adivery.Configure(appId) / Adivery.PrepareRewardedAd(zone) / Adivery.Show(zone) /
+//   AdiveryListener (event-محور) + Adivery.AddListener(listener)
 //
-// روشِ فعال‌سازی (بعد از نصبِ SDK ادیوری تو Unity):
-//   Edit → Project Settings → Player → Other Settings → Scripting Define Symbols
-//   → اضافه کن:  ADIVERY_ADS
-// تا وقتی این سوییچ خاموشه، ShowRewarded مثلِ قبل «شبیه‌سازی» می‌کنه (مستقیم جایزه می‌ده).
+// طراحی‌شده که **بدونِ نصبِ SDK هم پروژه کامپایل بشه**: همه‌ی کدِ ادیوری پشتِ سوییچِ ADIVERY_ADS هست.
+// روشِ فعال‌سازی (بعد از نصبِ Adivery.unitypackage):
+//   ۱) Player Settings → تیکِ «Custom Launcher Gradle Template»؛ بعد تو
+//      Assets/Plugins/Android/…gradle خطِ  implementation 'com.adivery:sdk:4.9.0'  رو اضافه کن.
+//   ۲) Player Settings → Other Settings → Scripting Define Symbols → اضافه کن:  ADIVERY_ADS
 public static class AdManager
 {
-    // از پنلِ ادیوری:
-    private const string AppKey = "29eb0ccc-c206-4e3a-89b7-57d47d4ab829";
+    private const string AppId = "29eb0ccc-c206-4e3a-89b7-57d47d4ab829";   // «کلید اپلیکیشن» از پنلِ ادیوری
     // ⚠️ بعد از ساختِ «جایگاهِ جایزه‌دار» تو ادیوری، Zone ID رو اینجا بذار:
     private const string RewardedZone = "PUT_REWARDED_ZONE_ID_HERE";
 
     private static bool initialized;
-    private static Action pendingReward;   // callbackِ جایزه که موقعِ بسته‌شدنِ تبلیغ صدا زده می‌شه
+    private static bool rewardedReady;      // با رویدادِ Loaded true می‌شه
+    private static Action pendingReward;     // callbackِ جایزه
+
+#if ADIVERY_ADS
+    private static AdiveryListener listener;
+#endif
 
     // موقعِ شروعِ بازی یه‌بار صدا زده می‌شه (تو MainMenuUI.Start).
     public static void Initialize()
@@ -27,9 +33,25 @@ public static class AdManager
         if (initialized) return;
         initialized = true;
 #if ADIVERY_ADS
-        Adivery.Configure(AppKey);
-        Adivery.addListener(new DolatAdListener());
-        Adivery.prepareRewardedAd(RewardedZone);   // برای اولین نمایش آماده کن
+        Adivery.Configure(AppId);
+
+        listener = new AdiveryListener();
+        // ⚠️ اگه امضای این رویدادها با AdiveryListener.cs نصب‌شده فرق داشت، همین‌جا اصلاحش کن.
+        listener.OnRewardedAdLoaded += (sender, placementId) => { rewardedReady = true; };
+        listener.OnRewardedAdClosed += (sender, isRewarded) =>
+        {
+            rewardedReady = false;
+            if (isRewarded) { Action cb = pendingReward; pendingReward = null; cb?.Invoke(); }
+            Adivery.PrepareRewardedAd(RewardedZone);   // برای دفعه‌ی بعد آماده کن
+        };
+        listener.OnError += (sender, placementId, reason) =>
+        {
+            rewardedReady = false;
+            Adivery.PrepareRewardedAd(RewardedZone);
+        };
+        Adivery.AddListener(listener);
+
+        Adivery.PrepareRewardedAd(RewardedZone);   // برای اولین نمایش آماده کن
 #endif
     }
 
@@ -39,27 +61,26 @@ public static class AdManager
         get
         {
 #if ADIVERY_ADS
-            return Adivery.isLoaded(RewardedZone);
+            return rewardedReady;
 #else
             return true;
 #endif
         }
     }
 
-    // نمایشِ تبلیغِ جایزه‌دار. اگه بازیکن جایزه رو گرفت (تبلیغ کامل دیده شد)، onReward صدا زده می‌شه.
+    // نمایشِ تبلیغِ جایزه‌دار. اگه بازیکن جایزه رو گرفت، onReward صدا زده می‌شه.
     public static void ShowRewarded(Action onReward)
     {
 #if ADIVERY_ADS
-        pendingReward = onReward;
-        if (Adivery.isLoaded(RewardedZone))
+        if (rewardedReady)
         {
-            Adivery.showAd(RewardedZone);
+            pendingReward = onReward;
+            Adivery.Show(RewardedZone);
         }
         else
         {
-            // اگه هنوز لود نشده، برای دفعه‌ی بعد آماده کن و فعلاً جایزه رو بده (تجربه‌ی بهتر برای بازیکن)
-            Adivery.prepareRewardedAd(RewardedZone);
-            pendingReward = null;
+            // هنوز لود نشده؛ برای دفعه‌ی بعد آماده کن و فعلاً جایزه رو بده (تجربه‌ی بهتر)
+            Adivery.PrepareRewardedAd(RewardedZone);
             onReward?.Invoke();
         }
 #else
@@ -67,26 +88,4 @@ public static class AdManager
         onReward?.Invoke();
 #endif
     }
-
-#if ADIVERY_ADS
-    // شنونده‌ی رویدادهای ادیوری. اگه امضای متدها با نسخه‌ی SDKِ تو فرق داشت، همین‌جا اصلاحش کن.
-    private class DolatAdListener : AdListener
-    {
-        public override void onRewardedAdClosed(string placementId, bool isRewarded)
-        {
-            if (isRewarded)
-            {
-                Action cb = pendingReward;
-                pendingReward = null;
-                cb?.Invoke();
-            }
-            Adivery.prepareRewardedAd(RewardedZone);   // برای دفعه‌ی بعد دوباره آماده کن
-        }
-
-        public override void onError(string placementId, string reason)
-        {
-            Adivery.prepareRewardedAd(RewardedZone);
-        }
-    }
-#endif
 }

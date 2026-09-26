@@ -178,7 +178,9 @@
 - **مهم:** همه‌ی کدِ ادیوری پشتِ `#if ADIVERY_ADS` هست تا **بدونِ نصبِ SDK هم پروژه کامپایل بشه**. تا وقتی سوییچ خاموشه، `ShowRewarded(onReward)` مثلِ قبل شبیه‌سازی می‌کنه (مستقیم جایزه می‌ده). 
 - **فعال‌سازی بعد از نصبِ SDK:** Unity → Project Settings → Player → Other Settings → Scripting Define Symbols → اضافه‌کردنِ `ADIVERY_ADS`.
 - **App Key** تو کد هست (`29eb0ccc-...`)؛ **`RewardedZone` هنوز placeholderه** (`PUT_REWARDED_ZONE_ID_HERE`) — باید Zone IDِ جایگاهِ جایزه‌دار جاش گذاشته شه.
-- `AdManager.Initialize()` تو `MainMenuUI.Start` صدا زده می‌شه؛ `GameOverUI.WatchAdAndContinue` به‌جای اعمالِ مستقیم، `AdManager.ShowRewarded(...)` رو صدا می‌زنه و تو callbackِ جایزه کشور رو نجات می‌ده. اگه امضای متدهای `AdListener` با نسخه‌ی SDK فرق داشت، تو همون بلاکِ `#if` اصلاح می‌شه.
+- `AdManager.Initialize()` تو `MainMenuUI.Start` صدا زده می‌شه؛ `GameOverUI.WatchAdAndContinue` به‌جای اعمالِ مستقیم، `AdManager.ShowRewarded(...)` رو صدا می‌زنه و تو callbackِ جایزه کشور رو نجات می‌ده.
+- **APIِ واقعیِ ادیوری (از داکِ رسمی):** `Adivery.Configure(appId)` / `Adivery.PrepareRewardedAd(zone)` / `Adivery.Show(zone)` / `new AdiveryListener()` با رویدادهای `OnRewardedAdLoaded`/`OnRewardedAdClosed`/`OnError` و `Adivery.AddListener(listener)`. namespace: `AdiveryUnity`. کد بر همین اساس نوشته شده؛ **امضای دقیقِ رویدادها موقعِ نصبِ SDK باید با `AdiveryListener.cs` چک/اصلاح شه** (به‌خصوص فلگِ جایزه تو `OnRewardedAdClosed`).
+- **نصبِ SDK (طبقِ داک):** فایلِ `Adivery.unitypackage` رو Import کن → Player Settings تیکِ **Custom Launcher Gradle Template** → تو `Assets/Plugins/Android/…gradle` خطِ `implementation 'com.adivery:sdk:4.9.0'` رو به `dependencies` اضافه کن → GAID رو هم طبقِ داک ست کن → بعد `ADIVERY_ADS` رو به Scripting Define Symbols اضافه کن.
 
 ### StoreSystem.cs / StoreUI.cs — فروشگاه (تازه)
 - **`StoreSystem`** (static، داده‌محور): کاتالوگِ آیتم‌ها (`Catalog`) + خرید با ریال (`Buy` → `RialSystem.Spend`) + مالکیت/تعداد تو `PlayerPrefs` (`DolatShow_Store_<id>`). برای آیتمِ جدید فقط یه سطر به `Catalog` اضافه کن. دو نوع: `Consumable` (شمارنده‌دار، `GetCount`/`Consume`) و `Permanent` (یه‌بار، `IsOwned`).
