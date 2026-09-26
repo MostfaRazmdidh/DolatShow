@@ -1,0 +1,990 @@
+fileFormatVersion: 2
+guid: 92ead87f5c1414341a657daab78ea1f8
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3600584066302820428
+    second: Name Change Box_0
+  - first:
+      213: 276595265406465372
+    second: Name Change Box_1
+  - first:
+      213: 4981803368479146334
+    second: Name Change Box_2
+  - first:
+      213: -3892442563338331848
+    second: Name Change Box_3
+  - first:
+      213: 2404449078554443507
+    second: Name Change Box_4
+  - first:
+      213: -8094803670751068207
+    second: Name Change Box_5
+  - first:
+      213: -812661943897312326
+    second: Name Change Box_6
+  - first:
+      213: -6683174565430437518
+    second: Name Change Box_7
+  - first:
+      213: -6213033633491555470
+    second: Name Change Box_8
+  - first:
+      213: -5382092745061879806
+    second: Name Change Box_9
+  - first:
+      213: 8410421140760964891
+    second: Name Change Box_10
+  - first:
+      213: -2486573326730489706
+    second: Name Change Box_11
+  - first:
+      213: 5786315923167937472
+    second: Name Change Box_12
+  - first:
+      213: 6777914226444938025
+    second: Name Change Box_13
+  - first:
+      213: 30529268890897098
+    second: Name Change Box_14
+  - first:
+      213: 4099133240761144582
+    second: Name Change Box_15
+  - first:
+      213: 351403023743326435
+    second: Name Change Box_16
+  - first:
+      213: 4869809228415133386
+    second: Name Change Box_17
+  - first:
+      213: 1605835697408174141
+    second: Name Change Box_18
+  - first:
+      213: -2592310639280555377
+    second: Name Change Box_19
+  - first:
+      213: -2097144287727438802
+    second: Name Change Box_20
+  - first:
+      213: 8615443650341475115
+    second: Name Change Box_21
+  - first:
+      213: 7566087912283259018
+    second: Name Change Box_22
+  - first:
+      213: 5337875688551811060
+    second: Name Change Box_23
+  - first:
+      213: 3002392207070773715
+    second: Name Change Box_24
+  - first:
+      213: 4855718205181834561
+    second: Name Change Box_25
+  - first:
+      213: -4076399076760172244
+    second: Name Change Box_26
+  - first:
+      213: -6012842142135976907
+    second: Name Change Box_27
+  - first:
+      213: 4689497165712197360
+    second: Name Change Box_28
+  - first:
+      213: 6637890682843666345
+    second: Name Change Box_29
+  - first:
+      213: 3168040084608924934
+    second: Name Change Box_30
+  - first:
+      213: -7263182185951878264
+    second: Name Change Box_31
+  - first:
+      213: 1748802786076168601
+    second: Name Change Box_32
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Main box
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 419
+        width: 841
+        height: 438
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c4049efa128d7f130800000000000000
+      internalID: 3600584066302820428
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Text
+      rect:
+        serializedVersion: 2
+        x: 897
+        y: 664
+        width: 849
+        height: 95
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c557b1dade9a6d300800000000000000
+      internalID: 276595265406465372
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_2
+      rect:
+        serializedVersion: 2
+        x: 1323
+        y: 826
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e514b07d4cbe22540800000000000000
+      internalID: 4981803368479146334
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_3
+      rect:
+        serializedVersion: 2
+        x: 1442
+        y: 812
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8399b979c144bf9c0800000000000000
+      internalID: -3892442563338331848
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_4
+      rect:
+        serializedVersion: 2
+        x: 1206
+        y: 818
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3feb0c792b15e5120800000000000000
+      internalID: 2404449078554443507
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_5
+      rect:
+        serializedVersion: 2
+        x: 1321
+        y: 800
+        width: 18
+        height: 23
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1dfba5613fa79af80800000000000000
+      internalID: -8094803670751068207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_6
+      rect:
+        serializedVersion: 2
+        x: 1430
+        y: 810
+        width: 11
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab3b5878448d8b4f0800000000000000
+      internalID: -812661943897312326
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_7
+      rect:
+        serializedVersion: 2
+        x: 1321
+        y: 780
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 279d79744289043a0800000000000000
+      internalID: -6683174565430437518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_8
+      rect:
+        serializedVersion: 2
+        x: 1446
+        y: 768
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 27b6e2214ded6c9a0800000000000000
+      internalID: -6213033633491555470
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_9
+      rect:
+        serializedVersion: 2
+        x: 1432
+        y: 627
+        width: 36
+        height: 21
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2003166f927fe45b0800000000000000
+      internalID: -5382092745061879806
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 837
+        height: 396
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1f2e7a9771d7b470800000000000000
+      internalID: 8410421140760964891
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_11
+      rect:
+        serializedVersion: 2
+        x: 876
+        y: 373
+        width: 868
+        height: 241
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6909448dbbaed7dd0800000000000000
+      internalID: -2486573326730489706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_12
+      rect:
+        serializedVersion: 2
+        x: 1119
+        y: 359
+        width: 8
+        height: 25
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c38c96ccaf1d4050800000000000000
+      internalID: 5786315923167937472
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_13
+      rect:
+        serializedVersion: 2
+        x: 1454
+        y: 377
+        width: 20
+        height: 25
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 92b2159f31dff0e50800000000000000
+      internalID: 6777914226444938025
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NO
+      rect:
+        serializedVersion: 2
+        x: 870
+        y: 161
+        width: 436
+        height: 164
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aca8e7355367c6000800000000000000
+      internalID: 30529268890897098
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_15
+      rect:
+        serializedVersion: 2
+        x: 928
+        y: 55
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 605509ed6fb03e830800000000000000
+      internalID: 4099133240761144582
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_16
+      rect:
+        serializedVersion: 2
+        x: 942
+        y: 48
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e81833303f60e400800000000000000
+      internalID: 351403023743326435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_17
+      rect:
+        serializedVersion: 2
+        x: 983
+        y: 24
+        width: 7
+        height: 5
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac66a9f11b9059340800000000000000
+      internalID: 4869809228415133386
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_18
+      rect:
+        serializedVersion: 2
+        x: 991
+        y: 24
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d38e7a70f03194610800000000000000
+      internalID: 1605835697408174141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_19
+      rect:
+        serializedVersion: 2
+        x: 1017
+        y: 42
+        width: 15
+        height: 30
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f8a773e4533460cd0800000000000000
+      internalID: -2592310639280555377
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: OK
+      rect:
+        serializedVersion: 2
+        x: 1315
+        y: 157
+        width: 441
+        height: 166
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e243447a16275e2e0800000000000000
+      internalID: -2097144287727438802
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_21
+      rect:
+        serializedVersion: 2
+        x: 1364
+        y: 42
+        width: 5
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b239ff87a54309770800000000000000
+      internalID: 8615443650341475115
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_22
+      rect:
+        serializedVersion: 2
+        x: 1428
+        y: 50
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a80450f8ed4200960800000000000000
+      internalID: 7566087912283259018
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_23
+      rect:
+        serializedVersion: 2
+        x: 1446
+        y: 20
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f7035f48a1f31a40800000000000000
+      internalID: 5337875688551811060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_24
+      rect:
+        serializedVersion: 2
+        x: 1499
+        y: 20
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d1cad21ec3aaa920800000000000000
+      internalID: 3002392207070773715
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_25
+      rect:
+        serializedVersion: 2
+        x: 1537
+        y: 64
+        width: 25
+        height: 26
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 145b24d1bf9f26340800000000000000
+      internalID: 4855718205181834561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_26
+      rect:
+        serializedVersion: 2
+        x: 1569
+        y: 18
+        width: 18
+        height: 22
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c29cafa23a8bd67c0800000000000000
+      internalID: -4076399076760172244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_27
+      rect:
+        serializedVersion: 2
+        x: 1581
+        y: 48
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 53c7c7bdde71e8ca0800000000000000
+      internalID: -6012842142135976907
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_28
+      rect:
+        serializedVersion: 2
+        x: 1588
+        y: 33
+        width: 5
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f60a7183d0741140800000000000000
+      internalID: 4689497165712197360
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_29
+      rect:
+        serializedVersion: 2
+        x: 1598
+        y: 63
+        width: 15
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a795c038668e1c50800000000000000
+      internalID: 6637890682843666345
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_30
+      rect:
+        serializedVersion: 2
+        x: 1614
+        y: 48
+        width: 7
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60d30550ca327fb20800000000000000
+      internalID: 3168040084608924934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_31
+      rect:
+        serializedVersion: 2
+        x: 1668
+        y: 46
+        width: 7
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 883a46ba84ef33b90800000000000000
+      internalID: -7263182185951878264
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Name Change Box_32
+      rect:
+        serializedVersion: 2
+        x: 1708
+        y: 48
+        width: 12
+        height: 10
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 991984e4edef44810800000000000000
+      internalID: 1748802786076168601
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 6facad2730470a54cadb9e30e1de8197
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
+    nameFileIdTable:
+      Main box: 3600584066302820428
+      NO: 30529268890897098
+      Name Change Box_10: 8410421140760964891
+      Name Change Box_11: -2486573326730489706
+      Name Change Box_12: 5786315923167937472
+      Name Change Box_13: 6777914226444938025
+      Name Change Box_15: 4099133240761144582
+      Name Change Box_16: 351403023743326435
+      Name Change Box_17: 4869809228415133386
+      Name Change Box_18: 1605835697408174141
+      Name Change Box_19: -2592310639280555377
+      Name Change Box_2: 4981803368479146334
+      Name Change Box_21: 8615443650341475115
+      Name Change Box_22: 7566087912283259018
+      Name Change Box_23: 5337875688551811060
+      Name Change Box_24: 3002392207070773715
+      Name Change Box_25: 4855718205181834561
+      Name Change Box_26: -4076399076760172244
+      Name Change Box_27: -6012842142135976907
+      Name Change Box_28: 4689497165712197360
+      Name Change Box_29: 6637890682843666345
+      Name Change Box_3: -3892442563338331848
+      Name Change Box_30: 3168040084608924934
+      Name Change Box_31: -7263182185951878264
+      Name Change Box_32: 1748802786076168601
+      Name Change Box_4: 2404449078554443507
+      Name Change Box_5: -8094803670751068207
+      Name Change Box_6: -812661943897312326
+      Name Change Box_7: -6683174565430437518
+      Name Change Box_8: -6213033633491555470
+      Name Change Box_9: -5382092745061879806
+      OK: -2097144287727438802
+      Text: 276595265406465372
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
