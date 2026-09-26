@@ -51,7 +51,7 @@ public class PauseUI : MonoBehaviour
         rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0f);
         rt.pivot = new Vector2(0.5f, 0f);
         rt.sizeDelta = new Vector2(190f, 190f);
-        rt.anchoredPosition = new Vector2(-490f, 125f);
+        rt.anchoredPosition = new Vector2(-381f, 45f); // مختصاتِ دقیقِ توسعه‌دهنده (کنارِ چپِ باکسِ تاریخ)
 
         // تضمینِ اینکه دکمه‌ی توقف همیشه روی همه‌چیز (نوارها/کارت) رندر شه
         Canvas cv = pauseButton.AddComponent<Canvas>();
