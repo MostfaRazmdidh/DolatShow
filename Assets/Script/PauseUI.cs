@@ -143,14 +143,12 @@ public class PauseUI : MonoBehaviour
         }
         if (atlas == null || atlas.Length == 0) return;
 
-        sprResume = Find(atlas, "continu", "resume", "play", "ادامه");
+        // نکته: اطلسِ Steppe برش‌های خالیِ اضافه (Steppe_2..18) هم داره که شاملِ «step»ان،
+        // پس برای دکمه‌ی توقف فقط «stop/pause» رو می‌گیریم (نه «step») تا برشِ خالی انتخاب نشه.
+        sprResume = Find(atlas, "continue", "continu", "resume", "play", "ادامه");
         sprHome   = Find(atlas, "home", "خانه");
         sprReplay = Find(atlas, "replay", "retry", "restart", "دوباره");
-        sprPause  = Find(atlas, "step", "stop", "pause");
-        // اگه دکمه‌ی توقف با کلیدواژه پیدا نشد، اسپرایتی که هیچ‌کدومِ سه‌تای دیگه نیست رو بردار
-        if (sprPause == null)
-            foreach (var sp in atlas)
-                if (sp != sprResume && sp != sprHome && sp != sprReplay) { sprPause = sp; break; }
+        sprPause  = Find(atlas, "stop", "pause");
     }
 
     static Sprite Find(Sprite[] atlas, params string[] keys)
