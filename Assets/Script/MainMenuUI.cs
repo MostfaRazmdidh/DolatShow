@@ -173,7 +173,7 @@ public class MainMenuUI : MonoBehaviour
         // پروفایل فقط بعد از تموم‌شدنِ ماهِ فروردین نشون داده می‌شه (قبلش اصلاً ساخته نمی‌شه)
         if (!ProfileSystem.FarvardinDone) return;
 
-        Sprite boxSpr = Resources.Load<Sprite>("UI/Profile Box");
+        Sprite boxSpr = Resources.Load<Sprite>("UI/ProfileBox");
         if (boxSpr == null) return;
 
         Vector2 canvasSize = ((RectTransform)targetCanvas.transform).rect.size;
