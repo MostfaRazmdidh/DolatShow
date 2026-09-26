@@ -20,6 +20,7 @@ public class ProfilePanelUI : MonoBehaviour
     private RTLTextMeshPro msgText;      // پیامِ «ریال کافی نیست» و...
     private GameObject inputOverlay;
     private TMP_InputField nameInput;
+    private RTLTextMeshPro inputMsg;   // پیامِ خطا داخلِ پنلِ تعویضِ نام (تا پشتِ overlay قایم نشه)
 
     public static ProfilePanelUI Open(Canvas canvas, TMP_FontAsset font, Action onChanged)
     {
@@ -133,27 +134,72 @@ public class ProfilePanelUI : MonoBehaviour
         t.alignment = TextAlignmentOptions.Center; t.fontStyle = FontStyles.Bold; t.raycastTarget = false;
     }
 
-    // --- تعویضِ نام ---
+    // --- تعویضِ نام (با گرافیکِ اطلسِ «Name Change Box»: Main box / Text / OK / NO) ---
     void ShowNameInput()
     {
         if (inputOverlay != null) return;
-        inputOverlay = RuntimeUIHelper.CreateFullScreenPanel(panel.transform, "NameInputOverlay", new Color(0f, 0f, 0f, 0.6f));
-        Button ob = inputOverlay.AddComponent<Button>();
-        ob.transition = Selectable.Transition.None;
-        ob.onClick.AddListener(CancelNameInput);
+        // پس‌زمینه‌ی تیره — با کلیک بسته نمی‌شه (فقط دکمه‌ی انصراف)
+        inputOverlay = RuntimeUIHelper.CreateFullScreenPanel(panel.transform, "NameInputOverlay", new Color(0f, 0f, 0f, 0.75f));
 
-        // یه باکسِ ساده برای ورودِ نام
-        GameObject b = RuntimeUIHelper.CreateImage(inputOverlay.transform, "Box", new Vector2(0.1f, 0.42f), new Vector2(0.9f, 0.58f), null);
-        b.GetComponent<Image>().color = new Color(0.14f, 0.09f, 0.04f, 0.99f);
+        // اطلسِ گرافیک‌ها (Multiple) — با نام برش‌ها پیدا می‌شن
+        Sprite[] atlas = Resources.LoadAll<Sprite>("UI/Name Change Box");
+        Sprite sMain = FindSprite(atlas, "main box");
+        Sprite sText = FindSprite(atlas, "text");
+        Sprite sOK = FindSprite(atlas, "ok");
+        Sprite sNO = FindSprite(atlas, "no");
 
+        // باکسِ پس‌زمینه (از Main box؛ اگه نبود رنگِ ساده)
+        GameObject b;
+        if (sMain != null)
+            b = RuntimeUIHelper.CreateImage(inputOverlay.transform, "Box", new Vector2(0.07f, 0.34f), new Vector2(0.93f, 0.66f), sMain, stretch: true);
+        else
+        {
+            b = RuntimeUIHelper.CreateImage(inputOverlay.transform, "Box", new Vector2(0.07f, 0.34f), new Vector2(0.93f, 0.66f), null);
+            b.GetComponent<Image>().color = new Color(0.14f, 0.09f, 0.04f, 0.99f);
+        }
+        b.GetComponent<Image>().raycastTarget = true;
         RectTransform brt = (RectTransform)b.transform;
-        RTLTextMeshPro t = RuntimeUIHelper.CreateRTLText(brt, "T", new Vector2(0.05f, 0.72f), new Vector2(0.95f, 0.98f), 26, font);
-        t.text = "نامِ جدید رو وارد کن"; t.color = new Color(0.98f, 0.86f, 0.55f); t.raycastTarget = false;
 
-        BuildInputField(brt, new Vector2(0.06f, 0.34f), new Vector2(0.94f, 0.68f));
+        // عنوان: «نام جدید رو وارد کن» — اگه تصویرش بود تصویری، وگرنه متن
+        if (sText != null)
+        {
+            GameObject tg = RuntimeUIHelper.CreateImage(brt, "Title", new Vector2(0.15f, 0.76f), new Vector2(0.85f, 0.94f), sText);
+            tg.GetComponent<Image>().raycastTarget = false;
+        }
+        else
+        {
+            RTLTextMeshPro t = RuntimeUIHelper.CreateRTLText(brt, "T", new Vector2(0.06f, 0.78f), new Vector2(0.94f, 0.95f), 26, font);
+            t.text = "نامِ جدید رو وارد کن"; t.color = new Color(0.98f, 0.86f, 0.55f); t.raycastTarget = false;
+        }
 
-        RuntimeUIHelper.CreateButton(brt, "OK", new Vector2(0.55f, 0.04f), new Vector2(0.94f, 0.3f), "تأیید", font, new Color(0.2f, 0.5f, 0.25f, 1f), ConfirmNameChange);
-        RuntimeUIHelper.CreateButton(brt, "Cancel", new Vector2(0.06f, 0.04f), new Vector2(0.45f, 0.3f), "انصراف", font, new Color(0.45f, 0.25f, 0.2f, 1f), CancelNameInput);
+        // فیلدِ ورودی
+        BuildInputField(brt, new Vector2(0.12f, 0.50f), new Vector2(0.88f, 0.72f));
+
+        // پیامِ خطا داخلِ همین پنل (تا پشتِ overlay قایم نشه)
+        inputMsg = RuntimeUIHelper.CreateRTLText(brt, "Msg", new Vector2(0.08f, 0.40f), new Vector2(0.92f, 0.48f), 22, font);
+        inputMsg.color = new Color(0.95f, 0.6f, 0.5f); inputMsg.raycastTarget = false; inputMsg.text = "";
+
+        // دکمه‌های تایید/انصراف (تصویری اگه بود، وگرنه متنی)
+        AddImgOrTextButton(brt, "OK", sOK, "تأیید", new Vector2(0.52f, 0.08f), new Vector2(0.9f, 0.32f), ConfirmNameChange);
+        AddImgOrTextButton(brt, "Cancel", sNO, "انصراف", new Vector2(0.1f, 0.08f), new Vector2(0.48f, 0.32f), CancelNameInput);
+    }
+
+    // دکمه: اگه اسپرایتش تو اطلس بود تصویری (متنِ روش رو خودِ عکس داره)، وگرنه دکمه‌ی متنی
+    void AddImgOrTextButton(RectTransform parent, string name, Sprite spr, string label, Vector2 aMin, Vector2 aMax, UnityEngine.Events.UnityAction onClick)
+    {
+        if (spr != null)
+            RuntimeUIHelper.CreateImageButton(parent, name, aMin, aMax, spr, onClick);
+        else
+            RuntimeUIHelper.CreateButton(parent, name, aMin, aMax, label, font, new Color(0.3f, 0.4f, 0.2f, 1f), onClick);
+    }
+
+    // پیدا کردنِ برشِ اطلس با نام (اول تطبیقِ دقیق، بعد شاملِ نام)
+    static Sprite FindSprite(Sprite[] atlas, string lowerName)
+    {
+        if (atlas == null) return null;
+        foreach (var s in atlas) if (s != null && s.name.ToLower() == lowerName) return s;
+        foreach (var s in atlas) if (s != null && s.name.ToLower().Contains(lowerName)) return s;
+        return null;
     }
 
     void CancelNameInput()
@@ -164,7 +210,7 @@ public class ProfilePanelUI : MonoBehaviour
     void ConfirmNameChange()
     {
         string entered = nameInput != null ? nameInput.text.Trim() : "";
-        if (string.IsNullOrEmpty(entered)) { SetMsg("اسم خالیه!"); return; }
+        if (string.IsNullOrEmpty(entered)) { SetInputMsg("اسم خالیه!"); return; }
         int cost = ProfileSystem.NextNameChangeCost;
         if (ProfileSystem.TryChangeName(entered))
         {
@@ -176,10 +222,12 @@ public class ProfilePanelUI : MonoBehaviour
         }
         else
         {
-            SetMsg("ریالِ کافی نداری! (لازم: " + RialSystem.ToPersian(cost) + ")");
-            msgText.color = new Color(0.95f, 0.6f, 0.5f);
+            // پنل باز می‌مونه؛ پیام رو روی خودِ پنل نشون بده (نه پشتش)
+            SetInputMsg("ریالِ کافی نداری! (لازم: " + RialSystem.ToPersian(cost) + " ریال)");
         }
     }
+
+    void SetInputMsg(string s) { if (inputMsg != null) inputMsg.text = s; }
 
     void SetMsg(string s) { if (msgText != null) msgText.text = s; }
 
